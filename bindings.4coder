@@ -285,10 +285,10 @@ keys_file = {
     { "move_down",              "Down" 	},
     { "move_left",              "Left" 	},
     { "move_right",             "Right" },
-	{ "move_up_to_blank_line",    			 "K", "Control" },
-    { "move_down_to_blank_line",  			 "J", "Control" },
-	{ "move_left_alpha_numeric_boundary",    "L", "Control" },
-    { "move_right_alpha_numeric_boundary",   "H", "Control" },
+	{ "move_up_to_blank_line",    			 "K", "Shift" },
+    { "move_down_to_blank_line",  			 "J", "Shift" },
+	{ "move_left_alpha_numeric_boundary",    "H", "Shift" },
+    { "move_right_alpha_numeric_boundary",   "L", "Shift" },
 	{ "page_up_half",           "K", "Control", "Shift" },
 	{ "page_down_half",         "J", "Control", "Shift" },
     { "seek_end_of_line",       "L", "Control", "Shift" },
@@ -303,34 +303,29 @@ keys_file = {
 	{ "cursor_mark_swap",       "Space", "Shift", "Control" },
 	{ "f4_backspace_alpha_numeric_or_camel_boundary",       "Backspace", "Control", "Shift"},	
 	{ "f4_delete_alpha_numeric_or_camel_boundary",       "Delete",  "Control", "Shift"},
-	{ "f4_backspace_token_boundary",       "Backspace", "Control"},	
-	{ "f4_delete_token_boundary",       "Delete", "Control"},
+	{ "f4_backspace_token_boundary",       "Backspace", "Shift"},	
+	{ "f4_delete_token_boundary",       "Delete", "Shift"},
 	
     { "save",        "S" },
     { "save_all_dirty_buffers",        "S", "Shift" },
   
-
-	
 	{ "copy",                   "C" },
 	{ "paste_and_indent",       "P"},
 	{ "cut",                    "X" },	
 	{ "redo",                   "R" },
     { "undo",                   "U" },
-    { "momo_cut_line",          "X", "Control", },
-	{ "search",                      "F", },
+    { "momo_cut_line",          "X", "Shift", },
+	{ "f4_search",                      "F", },
 	{ "replace_in_range",            "F", "Control" },
-	{ "replace_in_range",            "F", "Control", "Shift"  },
-    { "reverse_search",              "F", "Shift" },	
-    
-	  
+	{ "query_replace",            "F", "Control", "Shift"  },
+    { "f4_reverse_search",              "F", "Shift" },	
+
 	{ "momo_switch_to_insert_mode",	"I" },
 	{ "momo_append_line_and_enter_insert",  "A" },
 	    
-	{ "keyboard_macro_start_recording", "M" },
-    { "keyboard_macro_finish_recording", "M", "Control" },
-    { "keyboard_macro_replay",           "M", "Control", "Shift" },
-
-
+	{ "keyboard_macro_start_recording", "M", "Control"	},
+    { "keyboard_macro_finish_recording", "M", "Control", "Shift" },
+    { "keyboard_macro_replay",           "M", "Alt" },
     { "momo_write_todo",                 "T" },
     { "momo_write_note",                 "N" },
 
@@ -338,11 +333,13 @@ keys_file = {
 
 keys_file_1 = {
 	{ "momo_switch_to_edit_mode",	"Escape" 	},
+	{ "f4_leave_event_unhandled", "T" },
+	{ "f4_leave_event_unhandled", "N" },
 };
 
 
 keys_code = {
-    { "jump_to_definition_at_cursor", "D" },
+    { "f4_go_to_definition", "D" },
     { "comment_line_toggle",        "ForwardSlash" },
 	
     { "word_complete",              "Tab" },

@@ -12,24 +12,24 @@ mode = "4coder";
 bind_by_physical_key = false;
 
 // UI
-use_scroll_bars = false;
 use_file_bars = true;
+hide_file_bar_in_ui = true;
 use_error_highlight = true;
 use_jump_highlight = true;
 use_scope_highlight = true;
 use_paren_helper = true;
 use_comment_keywords = true;
-lister_whole_word_backspace_when_modified = false;
-show_line_number_margins = false;
+lister_whole_word_backspace_when_modified = true;
+show_line_number_margins = true;
 enable_output_wrapping = false;
 
-enable_undo_fade_out = false;
+enable_undo_fade_out = true;
 
 // cursor_roundess is a value [0,50] setting the radius of
 // the cursor and mark's roundness as a percentage of their width
 // (At 50 the left and right corners will be so round they form a semi-circle,
 //  hence 50 is the max)
-cursor_roundness = 10;
+cursor_roundness = 45;
 
 // mark_thickness is a pixel count value setting the
 // thickness of the mark wire box in original mode
@@ -40,9 +40,9 @@ mark_thickness = 2;
 lister_roundness = 20;
 
 // Code Wrapping
-treat_as_code = ".cpp.c.hpp.h.cc.cs.java.rs.glsl.m.mm.ds.md.4coder.jai.vert.frag";
+treat_as_code = ".cpp.c.hpp.h.cc.cs.java.rs.glsl.m.mm.go";
 enable_virtual_whitespace = true;
-virtual_whitespace_regular_indent = 1;
+virtual_whitespace_regular_indent = 4;
 enable_code_wrapping = true;
 
 // This only applies to code files in code-wrapping mode.
@@ -53,7 +53,7 @@ automatically_indent_text_on_save = true;
 automatically_save_changes_on_build = true;
 
 // Load project on startup
-automatically_load_project = true;
+automatically_load_project = false;
 
 // Indentation
 indent_with_tabs = false;
@@ -61,13 +61,12 @@ indent_width = 4;
 default_tab_width = 4;
 
 // Theme
-default_theme_name = "theme-fleury";
-highlight_line_at_cursor = true;
-
+//default_theme_name = "theme-fleury";
+default_theme_name = "theme-momo";
 // Font
 default_font_name = "liberation-mono.ttf";
-default_font_size = 14;
-default_font_hinting = true;
+default_font_size = 16;
+default_font_hinting = false;
 
 // aa modes:
 //  8bit - mono-chrome 0-255 opacity channel per pixel
@@ -75,7 +74,7 @@ default_font_hinting = true;
 default_font_aa_mode = "8bit";
 
 // User
-user_name = "rjf";
+user_name = "Momo";
 
 // Keyboard AltGr setting
 lalt_lctrl_is_altgr = false;
@@ -86,14 +85,3 @@ default_flags_bat = "-FC -GR- -EHa- -nologo -Zi";
 default_compiler_sh = "g++";
 default_flags_sh  = "-g";
 
-// NOTE(rjf): Fleury 4coder Disabling Options
-// f4_disable_brace_highlight = true;
-// f4_disable_close_brace_annotation = true;
-// f4_disable_brace_lines = true;
-// f4_disable_progress_bar = true;
-// f4_disable_divider_comments = true;
-// f4_disable_error_annotations = true;
-// f4_disable_calc_comments = true;
-// f4_poscontext_draw_at_bottom_of_buffer = true;
-// f4_disable_poscontext = true;
-// f4_disable_cursor_token_occurance = true;
