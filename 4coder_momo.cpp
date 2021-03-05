@@ -460,6 +460,9 @@ typedef int socklen_t;
 //~ NOTE(rjf): 4coder Stuff
 #include "generated/managed_id_metadata.cpp"
 
+//~ NOTE(Momo): Momo's stuff
+#include "4coder_momo_hooks.cpp"
+
 //~ NOTE(rjf): @f4_custom_layer_initialization
 
 void custom_layer_init(Application_Links *app)
@@ -473,7 +476,7 @@ void custom_layer_init(Application_Links *app)
         set_all_default_hooks(app);
         //t $          ($  , $                             , $                     );
         set_custom_hook(app, HookID_Tick,                    F4_Tick);
-        set_custom_hook(app, HookID_RenderCaller,            F4_Render);
+        set_custom_hook(app, HookID_RenderCaller,            Momo_Render);
         set_custom_hook(app, HookID_BeginBuffer,             F4_BeginBuffer);
         set_custom_hook(app, HookID_Layout,                  F4_Layout);
         set_custom_hook(app, HookID_WholeScreenRenderCaller, F4_WholeScreenRender);
