@@ -102,6 +102,12 @@ CUSTOM_DOC("Alias for opening files")
     interactive_open_or_new(app);
 }
 
+CUSTOM_COMMAND_SIG(q)
+CUSTOM_DOC("Alias for exiting")
+{
+    exit_4coder(app);
+}
+
 
 CUSTOM_COMMAND_SIG(momo_write_text_input)
 CUSTOM_DOC("Inserts whatever text was used to trigger this command.")
