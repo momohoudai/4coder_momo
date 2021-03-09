@@ -96,7 +96,7 @@ CUSTOM_DOC("Alias for saving all dirty buffers")
     save_all_dirty_buffers(app);
 }
 
-CUSTOM_COMMAND_SIG(e)
+CUSTOM_COMMAND_SIG(E)
 CUSTOM_DOC("Alias for opening files")
 {
     interactive_open_or_new(app);
