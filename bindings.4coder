@@ -27,6 +27,9 @@ keys_global = {
     { "project_fkey_command", "F14" },
     { "project_fkey_command", "F15" },
     { "project_fkey_command", "F16" },
+    
+	{ "momo_query_search",              "ForwardSlash", },
+    
 };
 
 keys_global_1 = {
@@ -313,10 +316,8 @@ keys_file = {
 	{ "redo",                   "R", "Control" },
     { "undo",                   "U" },
     { "momo_cut_line",          "D", "Shift", },
-	{ "f4_search",              "ForwardSlash", },
 	{ "replace_in_range",       "ForwardSlash", "Control" },
 	{ "query_replace",          "ForwardSlash", "Control", "Shift"  },
-    { "f4_reverse_search",      "ForwardSlash", "Shift" },	
 
 	{ "momo_switch_to_insert_mode",	"I" },
 	{ "momo_append_line_and_enter_insert",  "O" },
@@ -342,8 +343,6 @@ keys_code = {
     { "f4_go_to_definition", "Q" },
     { "comment_line_toggle",        "Semicolon" },
 	
-    { "word_complete",              "Tab" },
-    { "word_complete_drop_down",    "Tab", "Control" },
     { "list_all_locations_of_type_definition",               "D", "Alt" },
     { "list_all_locations_of_type_definition_of_identifier", "T", "Alt", "Shift" },
     { "select_surrounding_scope",   "LeftBracket", "Alt" },
@@ -356,4 +355,9 @@ keys_code = {
 
     { "open_file_in_quotes",        "1", "Alt" },
     { "open_matching_file_cpp",     "2", "Alt" },
+};
+
+keys_code_1 = {
+    { "word_complete",              "Tab" },
+    { "word_complete_drop_down",    "Tab", "Shift" },
 };
