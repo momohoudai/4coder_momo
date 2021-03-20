@@ -53,6 +53,44 @@ momo_boundary_word(Application_Links* app, Buffer_ID buffer, Side side, Scan_Dir
     return result;
 }
 
+function void
+momo_seek_string_forward(Application_Links* app, Buffer_ID buffer, i64 fallback_pos, i64 pos, i64 end, String_Const_u8 needle, i64* result) {
+    if (end == 0) {
+        end = (i32)buffer_get_size(app, buffer);
+    }
+    String_Match match = {};
+    match.range.first = pos;
+    for (;;) {
+        match = buffer_seek_string(app, buffer, needle, Scan_Forward, (i32)match.range.first);
+        if (HasFlag(match.flags, StringMatch_CaseSensitive) ||
+            match.buffer != buffer || match.range.first >= end) break;
+    }
+    if (match.range.first < end && match.buffer == buffer) {
+        *result = match.range.first;
+    }
+    else {
+        // Instead of returning end of buffer size, return pos
+        //*result = buffer_get_size(app, buffer);
+        *result = fallback_pos;
+    }
+}
+
+function void
+momo_seek_string_backward(Application_Links* app, Buffer_ID buffer, i64 fallback_pos, i64 pos, i64 min, String_Const_u8 needle, i64* result) {
+    String_Match match = {};
+    match.range.first = pos;
+    for (;;) {
+        match = buffer_seek_string(app, buffer, needle, Scan_Backward, (i32)match.range.first);
+        if (HasFlag(match.flags, StringMatch_CaseSensitive) ||
+            match.buffer != buffer || match.range.first < min) break;
+    }
+    if (match.range.first >= min && match.buffer == buffer) {
+        *result = match.range.first;
+    }
+    else {
+        *result = fallback_pos;
+    }
+}
 
 CUSTOM_COMMAND_SIG(page_up_half)
 CUSTOM_DOC("Page up halfway")
@@ -174,4 +212,56 @@ CUSTOM_DOC("Write note and enter insert mode")
     write_note(app);
     momo_switch_to_insert_mode(app);
 }
+
+CUSTOM_COMMAND_SIG(momo_query_search)
+CUSTOM_DOC("Queries the user a string, and can do reverse and forward search with 'n' and 'N'")
+{
+    View_ID view = get_active_view(app, Access_ReadVisible);
+    Buffer_ID buffer = view_get_buffer(app, view, Access_ReadVisible);
+    if (buffer != 0){
+        Query_Bar_Group group(app);
+        Query_Bar find = {};
+        u8 find_buffer[1024];
+        find.prompt = string_u8_litexpr("Search: ");
+        find.string = SCu8(find_buffer, (u64)0);
+        find.string_capacity = sizeof(find_buffer);
+        if (query_user_string(app, &find)){
+            if (find.string.size > 0){
+                i64 pos = view_get_cursor_pos(app, view);
+                //query_replace_parameter(app, find.string, pos, false);
+                i64 new_pos = 0;
+                seek_string_forward(app, buffer, pos - 1, 0, find.string, &new_pos);
+                User_Input in = {};
+                for (;;) {
+                    Range_i64 match = Ii64(new_pos, new_pos + find.string.size);
+                    isearch__update_highlight(app, view, match);
+
+                    in = get_next_input(app, EventProperty_AnyKey, EventProperty_MouseButton);
+                    if (in.abort || match_key_code(&in, KeyCode_Escape)){
+                        break;
+                    }
+
+                    
+                    if (match_key_code(&in, KeyCode_N)) {
+                        Input_Modifier_Set *mods = &in.event.key.modifiers;
+                        if (has_modifier(mods, KeyCode_Shift)){
+                            momo_seek_string_backward(app, buffer, match.start, match.start - 1, 0, find.string, &new_pos);
+                        } 
+                        else {
+                            momo_seek_string_forward(app, buffer, match.start, match.end, 0, find.string, &new_pos);
+                        }
+                    }
+
+                }
+
+                view_disable_highlight_range(app, view);
+                if (in.abort){
+                    return;
+                }
+                view_set_cursor_and_preferred_x(app, view, seek_pos(new_pos));
+            }
+        }
+    }
+}
+
 #endif
