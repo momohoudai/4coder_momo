@@ -225,8 +225,14 @@ CUSTOM_DOC("Queries the user a string, and can do reverse and forward search wit
         find.prompt = string_u8_litexpr("Search: ");
         find.string = SCu8(find_buffer, (u64)0);
         find.string_capacity = sizeof(find_buffer);
+
         if (query_user_string(app, &find)){
             if (find.string.size > 0){
+
+                Query_Bar bar = {};
+                bar.prompt = string_u8_litexpr("Navigate to: next(n), prev(N). Exit (Esc).\n");
+                start_query_bar(app, &bar, 1);
+
                 i64 pos = view_get_cursor_pos(app, view);
                 //query_replace_parameter(app, find.string, pos, false);
                 i64 new_pos = 0;
@@ -241,7 +247,6 @@ CUSTOM_DOC("Queries the user a string, and can do reverse and forward search wit
                         break;
                     }
 
-                    
                     if (match_key_code(&in, KeyCode_N)) {
                         Input_Modifier_Set *mods = &in.event.key.modifiers;
                         if (has_modifier(mods, KeyCode_Shift)){

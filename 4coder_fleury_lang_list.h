@@ -43,26 +43,6 @@ F4_RegisterLanguages(void)
                             F4_Jai_Highlight,
                             Lex_State_Jai);
     }
-    
-    // NOTE(rjf): Metadesk
-    {
-        String_Const_u8 extensions[] =
-        {
-            // TODO(rjf): Maybe find a config-driven way to specify these? "mc" was sort of
-            // introduced ad-hoc...
-            S8Lit("md"), S8Lit("mc"), S8Lit("metacode"), S8Lit("meta"), S8Lit("metadesk"),
-        };
-        for(int i = 0; i < ArrayCount(extensions); i += 1)
-        {
-            F4_RegisterLanguage(extensions[i],
-                                F4_MD_IndexFile,
-                                lex_full_input_cpp_init,
-                                lex_full_input_cpp_breaks,
-                                F4_MD_PosContext,
-                                F4_MD_Highlight,
-                                Lex_State_Cpp);
-        }
-    }
 }
 
 #endif //FCODER_FLEURY_LANG_LIST_H

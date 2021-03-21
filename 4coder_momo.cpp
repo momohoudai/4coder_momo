@@ -451,7 +451,6 @@ typedef int socklen_t;
 #include "4coder_fleury_command_server.cpp"
 #endif
 #include "4coder_fleury_casey.cpp"
-#include "4coder_fleury_momo.cpp"
 #include "4coder_fleury_hooks.cpp"
 
 //~ NOTE(rjf): Plots Demo File
@@ -461,6 +460,7 @@ typedef int socklen_t;
 #include "generated/managed_id_metadata.cpp"
 
 //~ NOTE(Momo): Momo's stuff
+#include "4coder_momo_commands.cpp"
 #include "4coder_momo_hooks.cpp"
 
 //~ NOTE(rjf): @f4_custom_layer_initialization
