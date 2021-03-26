@@ -37,9 +37,9 @@ defcolor_text_cycle            = { 0xFFA00000, 0xFF00A000, 0xFF0030B0, 0xFFA0A00
 defcolor_line_numbers_back     = 0xFF181818;
 defcolor_line_numbers_text     = 0xFF404040;
 
-fleury_color_syntax_crap           = 0xff90b080;
-fleury_color_operators             = 0xff90b080;
-fleury_color_inactive_pane_overlay = 0x44000000;
+fleury_color_syntax_crap           = defcolor_text_default;
+fleury_color_operators             = defcolor_text_default;
+fleury_color_inactive_pane_overlay = 0x33000000;
 fleury_color_inactive_pane_background = 0xff101010;
 fleury_color_file_progress_bar     = 0xff4E4E43;
 fleury_color_brace_highlight       = { 0xf0bd2d2d };
