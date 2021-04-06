@@ -1,6 +1,14 @@
 #ifndef FCODER_FLEURY_MOMO
 #define FCODER_FLEURY_MOMO
 
+// TODO(Momo): 
+// - Window action mode
+// - :q should slowly close panels. If no panels, exit.
+// - diw/ciw
+
+
+
+
 static b32 global_insert_mode = false;
 
 function void
@@ -141,9 +149,14 @@ CUSTOM_DOC("Alias for opening files")
 }
 
 CUSTOM_COMMAND_SIG(q)
-CUSTOM_DOC("Alias for exiting")
+CUSTOM_DOC("Alias for closing panels. If no panels are left, exit")
 {
-    exit_4coder(app);
+    View_ID old_view = get_active_view(app, Access_ReadVisible);
+    close_panel(app);
+    View_ID cur_view = get_active_view(app, Access_ReadVisible);
+    if (old_view == cur_view) {
+        exit_4coder(app);
+    }
 }
 
 
@@ -212,6 +225,7 @@ CUSTOM_DOC("Write note and enter insert mode")
     write_note(app);
     momo_switch_to_insert_mode(app);
 }
+
 
 CUSTOM_COMMAND_SIG(momo_query_search)
 CUSTOM_DOC("Queries the user a string, and can do reverse and forward search with 'n' and 'N'")

@@ -341,6 +341,7 @@ keys_file_1 = {
 
 keys_code = {
     { "f4_go_to_definition", "Q" },
+    { "f4_go_to_definition_same_panel", "Q", "Shift" },
     { "comment_line_toggle",        "Semicolon" },
 	
     { "list_all_locations_of_type_definition",               "D", "Alt" },
