@@ -11,6 +11,8 @@
 
 static b32 global_insert_mode = false;
 
+
+
 function void
 momo_write_text_and_auto_indent_internal(Application_Links* app, String_Const_u8 insert) {
     ProfileScope(app, "write and auto indent");
@@ -242,6 +244,22 @@ CUSTOM_DOC("Vsplit panel but don't go")
     new_view_settings(app, new_view);
     
 }
+
+
+CUSTOM_COMMAND_SIG(momo_delete_inner_word)
+CUSTOM_DOC("Delete Inner Word")
+{
+    snipe_forward_whitespace_or_token_boundary(app);
+}
+
+CUSTOM_COMMAND_SIG(momo_change_inner_word)
+CUSTOM_DOC("Change Inner Word")
+{
+    momo_delete_inner_word(app);
+    momo_switch_to_insert_mode(app);
+}
+
+
 
 CUSTOM_COMMAND_SIG(momo_window_manip_mode)
 CUSTOM_DOC("Window manipulation mode")
