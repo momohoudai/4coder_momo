@@ -226,6 +226,73 @@ CUSTOM_DOC("Write note and enter insert mode")
     momo_switch_to_insert_mode(app);
 }
 
+CUSTOM_COMMAND_SIG(momo_open_panel_hsplit)
+CUSTOM_DOC("Hsplit panel but don't go")
+{
+    View_ID view = get_active_view(app, Access_Always);
+    View_ID new_view = open_view(app, view, ViewSplit_Bottom);
+    new_view_settings(app, new_view);
+}
+
+CUSTOM_COMMAND_SIG(momo_open_panel_vsplit)
+CUSTOM_DOC("Vsplit panel but don't go")
+{
+    View_ID view = get_active_view(app, Access_Always);
+    View_ID new_view = open_view(app, view, ViewSplit_Right);
+    new_view_settings(app, new_view);
+    
+}
+
+CUSTOM_COMMAND_SIG(momo_window_manip_mode)
+CUSTOM_DOC("Window manipulation mode")
+{
+    View_ID view = get_active_view(app, Access_ReadVisible);
+    Buffer_ID buffer = view_get_buffer(app, view, Access_ReadVisible);
+    if (buffer != 0){
+        Query_Bar_Group group(app);
+        Query_Bar bar = {};
+        bar.prompt = string_u8_litexpr("Window action mode!\n");
+        start_query_bar(app, &bar, 1);
+
+        User_Input in = {};
+        for (;;) {
+            in = get_next_input(app, EventProperty_AnyKey, EventProperty_MouseButton);
+            if (in.abort || match_key_code(&in, KeyCode_Escape)){
+                break;
+            }
+
+            Input_Modifier_Set *mods = &in.event.key.modifiers;
+            if (has_modifier(mods, KeyCode_Control)) {
+                if (match_key_code(&in, KeyCode_V)) {
+                    momo_open_panel_vsplit(app);
+                    break;
+                }
+                else if (match_key_code(&in, KeyCode_S)) {
+                    momo_open_panel_hsplit(app);
+                    break;
+                }
+                else if (match_key_code(&in, KeyCode_H)) {
+                    change_active_panel_backwards(app);
+                    break;
+                }
+                else if (match_key_code(&in, KeyCode_L)) {
+                    change_active_panel(app);
+                    break;
+                }
+                else if (match_key_code(&in, KeyCode_J)) {
+                    change_to_build_panel(app);
+                    break;
+                }
+                else if (match_key_code(&in, KeyCode_K)) {
+                    f4_toggle_compilation_expand(app);
+                    break;
+                }
+                
+            }
+        }
+    }
+}
+
 
 CUSTOM_COMMAND_SIG(momo_query_search)
 CUSTOM_DOC("Queries the user a string, and can do reverse and forward search with 'n' and 'N'")

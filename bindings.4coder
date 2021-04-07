@@ -29,6 +29,7 @@ keys_global = {
     { "project_fkey_command", "F16" },
     
 	{ "momo_query_search",              "ForwardSlash", },
+	{ "momo_window_manip_mode",         "W", "Control" },
     
 };
 
