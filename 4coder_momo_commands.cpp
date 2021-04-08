@@ -236,19 +236,15 @@ CUSTOM_DOC("Vsplit panel but don't go")
 }
 
 
-CUSTOM_COMMAND_SIG(momo_delete_inner_word)
-CUSTOM_DOC("Delete Inner Word")
-{
-    snipe_forward_whitespace_or_token_boundary(app);
-}
 
-CUSTOM_COMMAND_SIG(momo_change_inner_word)
-CUSTOM_DOC("Change Inner Word")
+CUSTOM_COMMAND_SIG(snipe_forward_whitespace_and_token_boundary)
+CUSTOM_DOC("Delete a single, whole token on or to the right of the cursor and post it to the clipboard.")
 {
-    momo_delete_inner_word(app);
-    momo_switch_to_insert_mode(app);
-}
+    Scratch_Block scratch(app);
+    current_view_snipe_delete(app, Scan_Forward,
+        push_boundary_list(scratch, F4_Boundary_TokenAndWhitespace));
 
+}
 
 CUSTOM_COMMAND_SIG(momo_change_mode)
 CUSTOM_DOC("Change mode")
@@ -276,7 +272,23 @@ CUSTOM_DOC("Change mode")
 
                 // ciw
                 if (match_key_code(&in, KeyCode_W)) {
-                    momo_change_inner_word(app);
+                    snipe_forward_whitespace_or_token_boundary(app);
+                    momo_switch_to_insert_mode(app);
+                    break;
+                }
+            }
+
+
+            else if (match_key_code(&in, KeyCode_A)) {
+                in = get_next_input(app, EventProperty_AnyKey, EventProperty_MouseButton);
+                if (in.abort || match_key_code(&in, KeyCode_Escape)) {
+                    break;
+                }
+
+                // caw
+                if (match_key_code(&in, KeyCode_W)) {
+                    snipe_forward_whitespace_and_token_boundary(app);
+                    momo_switch_to_insert_mode(app);
                     break;
                 }
             }
