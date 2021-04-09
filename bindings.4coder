@@ -1,8 +1,5 @@
 
 keys_global = {
-	{ "change_to_build_panel",         "J", "Control", "Shift" },
-    { "change_active_panel",           "L", "Control", "Shift" },
-	{ "change_active_panel_backwards", "H", "Control", "Shift" },
 	{ "view_buffer_other_panel",       "ForwardSlash", "Alt" },
     { "toggle_fullscreen",			 "Return", "Alt" },  
 	
@@ -30,6 +27,7 @@ keys_global = {
     
 	{ "momo_query_search",              "ForwardSlash", },
 	{ "momo_window_manip_mode",         "W", "Control" },
+	{ "center_view",            "Z" },
     
 };
 
@@ -302,10 +300,10 @@ keys_file = {
     { "page_down",              "PageDown" },
     { "goto_beginning_of_file", "PageUp", "Control" },
     { "goto_end_of_file",       "PageDown", "Control" },
-	{ "center_view",            "Z" },
+
     { "momo_teleport_to_line_and_center",  "G" },
-    { "set_mark",               "Space", "Control" },
-	{ "cursor_mark_swap",       "Space", "Shift", "Control" },
+    { "set_mark",               "V" },
+	{ "cursor_mark_swap",       "V", "Shift" },
 	{ "f4_backspace_alpha_numeric_or_camel_boundary",       "Backspace", "Control", "Shift"},	
 	{ "f4_delete_alpha_numeric_or_camel_boundary",       "Delete",  "Control", "Shift"},
 	{ "f4_backspace_token_boundary",       "Backspace", "Shift"},	
@@ -327,21 +325,23 @@ keys_file = {
     { "keyboard_macro_replay",           "Q", "Shift" },
     { "momo_write_todo",                 "T" },
     { "momo_write_note",                 "N" },
-	{ "f4_toggle_compilation_expand",	   "K", "Control", "Shift" },
+	{ "momo_cut_line",	   "D", "Shift" },
 };
 
 keys_file_1 = {
 	{ "momo_switch_to_edit_mode",	"Escape" 	},
 	{ "f4_leave_event_unhandled", "T" },
 	{ "f4_leave_event_unhandled", "N" },
+	{ "f4_leave_event_unhandled", "Q"	},
+    { "f4_leave_event_unhandled", "Q", "Shift" },
 	{ "delete_char",            "Delete" },
     { "backspace_char",         "Backspace" },
 };
 
 
 keys_code = {
-    { "f4_go_to_definition", "Q" },
-    { "f4_go_to_definition_same_panel", "Q", "Shift" },
+    { "f4_go_to_definition", "P"	},
+    { "f4_go_to_definition_same_panel", "P", "Shift" },
     { "comment_line_toggle",        "Semicolon" },
 	
     { "list_all_locations_of_type_definition",               "D", "Alt" },
