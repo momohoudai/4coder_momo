@@ -6,7 +6,8 @@ keys_global = {
 	
 	{ "exit_4coder",          "F4", "Alt" },
     { "command_lister",                "Semicolon", "Shift" },
-    { "quick_swap_buffer",             "BackwardSlash", "Alt" },
+    { "quick_swap_buffer",             "O", "Control" },
+
     { "list_all_functions_current_buffer_lister", "I", "Control", "Shift" },
     { "project_fkey_command", "F1" },
     { "project_fkey_command", "F2" },
@@ -340,10 +341,10 @@ keys_file_1 = {
 
 
 keys_code = {
-    { "f4_go_to_definition", "P"	},
-    { "f4_go_to_definition_same_panel", "P", "Shift" },
-    { "comment_line_toggle",        "Semicolon" },
+    { "momo_goto_mode", "G"	},
 	
+    { "if0_off", "Semicolon" },
+    { "momo_if0_on", "Semicolon", "Shift" }
     { "list_all_locations_of_type_definition",               "D", "Alt" },
     { "list_all_locations_of_type_definition_of_identifier", "T", "Alt", "Shift" },
     { "select_surrounding_scope",   "LeftBracket", "Alt" },

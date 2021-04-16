@@ -1,7 +1,12 @@
 #ifndef FCODER_FLEURY_MOMO
 #define FCODER_FLEURY_MOMO
 
+
+// TODO(Momo):
+// - #if 0 and #endif block insert and removal
 static b32 global_insert_mode = false;
+
+
 
 function void
 momo_write_text_and_auto_indent_internal(Application_Links* app, String_Const_u8 insert) {
@@ -350,6 +355,89 @@ CUSTOM_DOC("Window manipulation mode")
                 break;
             }
                 
+            
+        }
+    }
+}
+
+CUSTOM_COMMAND_SIG(momo_if0_on) 
+CUSTOM_DOC("Removes #if 0/#endif")
+{
+    // check the current line the cursor is in
+    Scratch_Block scratch(app);
+    
+    View_ID view = get_active_view(app, Access_ReadWriteVisible);
+    Buffer_ID buffer = view_get_buffer(app, view, Access_ReadWriteVisible);
+    i64 pos = view_get_cursor_pos(app, view);
+    i64 line = get_line_number_from_pos(app, buffer, pos);
+    Range_i64 line_range = get_line_pos_range(app, buffer, line);
+    line_range.end += 1;
+    i32 size = (i32)buffer_get_size(app, buffer);
+    line_range.end = clamp_top(line_range.end, size);
+    if (range_size(line_range) == 0 ||
+        buffer_get_char(app, buffer, line_range.end - 1) != '\n'){
+        line_range.start -= 1;
+        line_range.first = clamp_bot(0, line_range.first);
+    }
+    String_Const_u8 selected_str = push_buffer_range(app, scratch, buffer, line_range);
+    String_Const_u8 if0_str = string_u8_litexpr("#if 0");
+    String_Const_u8 endif_str = string_u8_litexpr("#endif");
+    if (string_match(selected_str, if0_str)) {
+        i64 search_from = line_range.end;
+        for (;;) {
+            // find the next #endif or #if0
+            i64 endif_pos;
+            i64 if0_pos;    
+            seek_string_forward(app, buffer, search_from, 0, if0_str, &if0_pos);
+            seek_string_forward(app, buffer, search_from, 0, endif_str, &endif_pos);
+            // if we found a #if0 behind a #endif, it is not the #endif we are
+            // looking for! Otherwise, it is.
+            if (if0_pos < endif_pos) {
+                // not the endif we are looking for
+                search_from = endif_pos;
+            }
+            else {
+                buffer_replace_range(app, buffer, line_range, string_u8_empty);
+                break;
+            }
+
+
+        }
+    }
+    else if (string_match(selected_str, endif_str)) {
+
+    }
+}
+
+
+CUSTOM_COMMAND_SIG(momo_goto_mode)
+CUSTOM_DOC("Goto mode")
+{
+    View_ID view = get_active_view(app, Access_ReadVisible);
+    Buffer_ID buffer = view_get_buffer(app, view, Access_ReadVisible);
+    if (buffer != 0){
+        Query_Bar_Group group(app);
+        Query_Bar bar = {};
+        bar.prompt = string_u8_litexpr("Goto mode!\n");
+        start_query_bar(app, &bar, 1);
+
+        User_Input in = {};
+        for (;;) {
+            in = get_next_input(app, EventProperty_AnyKey, EventProperty_MouseButton);
+            if (in.abort || match_key_code(&in, KeyCode_Escape)){
+                break;
+            }
+
+            if (match_key_code(&in, KeyCode_D)) {
+                Input_Modifier_Set *mods = &in.event.key.modifiers;
+                if (has_modifier(mods, KeyCode_Shift)){
+                    f4_go_to_definition_same_panel(app);
+                }
+                else {
+                    f4_go_to_definition(app);
+                } 
+                break;
+            }
             
         }
     }
