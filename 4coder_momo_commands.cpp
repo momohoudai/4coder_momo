@@ -380,32 +380,68 @@ CUSTOM_DOC("Removes #if 0/#endif")
         line_range.first = clamp_bot(0, line_range.first);
     }
     String_Const_u8 selected_str = push_buffer_range(app, scratch, buffer, line_range);
-    String_Const_u8 if0_str = string_u8_litexpr("#if 0");
-    String_Const_u8 endif_str = string_u8_litexpr("#endif");
+
+
+    // TODO(Momo): It doesn't have to be explicitly #if 0, right?
+    String_Const_u8 if0_str = string_u8_litexpr("#if 0\n");
+    String_Const_u8 endif_str = string_u8_litexpr("#endif\n");
     if (string_match(selected_str, if0_str)) {
         i64 search_from = line_range.end;
         for (;;) {
             // find the next #endif or #if0
             i64 endif_pos;
             i64 if0_pos;    
-            seek_string_forward(app, buffer, search_from, 0, if0_str, &if0_pos);
-            seek_string_forward(app, buffer, search_from, 0, endif_str, &endif_pos);
-            // if we found a #if0 behind a #endif, it is not the #endif we are
-            // looking for! Otherwise, it is.
-            if (if0_pos < endif_pos) {
-                // not the endif we are looking for
-                search_from = endif_pos;
-            }
-            else {
-                buffer_replace_range(app, buffer, line_range, string_u8_empty);
+            momo_seek_string_forward(app, buffer, -1, search_from, 0, if0_str, &if0_pos);
+            momo_seek_string_forward(app, buffer, -1, search_from, 0, endif_str, &endif_pos);
+            if (endif_pos == -1) {
                 break;
             }
+            // if we found a #if0 behind a #endif, it is not the #endif we are
+            // looking for.
+            if (if0_pos != -1 && if0_pos < endif_pos) {
+                // not the endif we are looking for
+                search_from = endif_pos;
+                continue;
+            }
+              
+            // replace the #if 0
+            buffer_replace_range(app, buffer, line_range, string_u8_empty);
 
-
+            // replace is #endif
+            i64 endif_line = get_line_number_from_pos(app, buffer, endif_pos);
+            Range_i64 endif_line_range = get_line_pos_range(app, buffer, endif_line);
+            buffer_replace_range(app, buffer, endif_line_range, string_u8_empty);
+            break;
         }
     }
     else if (string_match(selected_str, endif_str)) {
+        i64 search_from = line_range.end;
+        for (;;) {
+            // find the next #endif or #if0
+            i64 endif_pos;
+            i64 if0_pos;
+            momo_seek_string_backward(app, buffer, -1, search_from, 0, if0_str, &if0_pos);
+            momo_seek_string_backward(app, buffer, -1, search_from, 0, endif_str, &endif_pos);
+            if (if0_pos == -1) {
+                break;
+            }
 
+            // if we found an #endif in front of a #if, it is not the #if we are looking for 
+            if (endif_pos != -1 && if0_pos < endif_pos) {
+                // not the endif we are looking for
+                search_from = if0_pos;
+                continue;
+            }
+
+            // replace the #endif
+            buffer_replace_range(app, buffer, line_range, string_u8_empty);
+
+            // replace the #if 
+            i64 if0_line = get_line_number_from_pos(app, buffer, if0_pos);
+            Range_i64 if0_line_range = get_line_pos_range(app, buffer, if0_line);
+            buffer_replace_range(app, buffer, if0_line_range, string_u8_empty);
+            break;
+        }
     }
 }
 

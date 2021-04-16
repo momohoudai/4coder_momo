@@ -344,7 +344,7 @@ keys_code = {
     { "momo_goto_mode", "G"	},
 	
     { "if0_off", "Semicolon" },
-    { "momo_if0_on", "Semicolon", "Shift" }
+    { "momo_if0_on", "Semicolon", "Shift" },
     { "list_all_locations_of_type_definition",               "D", "Alt" },
     { "list_all_locations_of_type_definition_of_identifier", "T", "Alt", "Shift" },
     { "select_surrounding_scope",   "LeftBracket", "Alt" },
