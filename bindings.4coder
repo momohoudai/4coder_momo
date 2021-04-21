@@ -28,8 +28,7 @@ keys_global = {
     
 	{ "momo_query_search",              "ForwardSlash", },
 	{ "momo_window_manip_mode",         "W", "Control" },
-	{ "center_view",            "Z" },
-    
+    { "momo_z_mode", "Z" }
 };
 
 keys_global_1 = {
@@ -302,7 +301,7 @@ keys_file = {
     { "goto_beginning_of_file", "PageUp", "Control" },
     { "goto_end_of_file",       "PageDown", "Control" },
 
-    { "momo_teleport_to_line_and_center",  "G" },
+    { "momo_teleport_to_line_and_center",  "G", "Shift" },
     { "set_mark",               "V" },
 	{ "cursor_mark_swap",       "V", "Shift" },
 	{ "f4_backspace_alpha_numeric_or_camel_boundary",       "Backspace", "Control", "Shift"},	
@@ -335,6 +334,7 @@ keys_file_1 = {
 	{ "f4_leave_event_unhandled", "N" },
 	{ "f4_leave_event_unhandled", "Q"	},
     { "f4_leave_event_unhandled", "Q", "Shift" },
+    
 	{ "delete_char",            "Delete" },
     { "backspace_char",         "Backspace" },
 };
@@ -344,7 +344,7 @@ keys_code = {
     { "momo_goto_mode", "G"	},
 	
     { "if0_off", "Semicolon" },
-    { "momo_if0_on", "Semicolon", "Ctrl" },
+    { "momo_if0_on", "Semicolon", "Control" },
     { "list_all_locations_of_type_definition",               "D", "Alt" },
     { "list_all_locations_of_type_definition_of_identifier", "T", "Alt", "Shift" },
     { "select_surrounding_scope",   "LeftBracket", "Alt" },
@@ -362,4 +362,8 @@ keys_code = {
 keys_code_1 = {
     { "word_complete",              "Tab" },
     { "word_complete_drop_down",    "Tab", "Shift" },
+    { "f4_leave_event_unhandled", "Z" },
+    { "f4_leave_event_unhandled", "Semicolon" },
+    { "f4_leave_event_unhandled", "Semicolon", "Control" },
+    { "f4_leave_event_unhandled", "G", "Shift"	},
 };

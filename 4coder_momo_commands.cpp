@@ -2,10 +2,22 @@
 #define FCODER_FLEURY_MOMO
 
 
+#define AnonVarSub(x) zawarudo_ryojianon##x
+#define AnonVar(x) AnonVarSub(x)
+#define Defer auto AnonVar(__COUNTER__) = zawarudo::defer_dummy{} + [&]()
+
 // TODO(Momo):
 // - #if 0 and #endif block insert and removal
 static b32 global_insert_mode = false;
+static b32 global_query_mode = false;
 
+#define QueryModeLock \
+if (global_query_mode) {\
+    leave_current_input_unhandled(app);\
+    return; \
+}\
+global_query_mode = true; \
+Defer{ global_query_mode = false; }
 
 
 function void
@@ -255,6 +267,8 @@ CUSTOM_DOC("Delete a single, whole token on or to the right of the cursor and po
 CUSTOM_COMMAND_SIG(momo_change_mode)
 CUSTOM_DOC("Change mode")
 {
+    QueryModeLock;
+
     View_ID view = get_active_view(app, Access_ReadWriteVisible);
     Buffer_ID buffer = view_get_buffer(app, view, Access_ReadWriteVisible);
     if (buffer != 0) {
@@ -317,6 +331,8 @@ CUSTOM_DOC("Toggle recording")
 CUSTOM_COMMAND_SIG(momo_window_manip_mode)
 CUSTOM_DOC("Window manipulation mode")
 {
+    QueryModeLock;
+
     View_ID view = get_active_view(app, Access_ReadVisible);
     Buffer_ID buffer = view_get_buffer(app, view, Access_ReadVisible);
     if (buffer != 0) {
@@ -493,6 +509,8 @@ CUSTOM_DOC("Removes #if 0/#endif")
 CUSTOM_COMMAND_SIG(momo_goto_mode)
 CUSTOM_DOC("Goto mode")
 {
+    QueryModeLock;
+
     View_ID view = get_active_view(app, Access_ReadVisible);
     Buffer_ID buffer = view_get_buffer(app, view, Access_ReadVisible);
     if (buffer != 0) {
@@ -523,10 +541,42 @@ CUSTOM_DOC("Goto mode")
     }
 }
 
+CUSTOM_COMMAND_SIG(momo_z_mode)
+CUSTOM_DOC("Z mode")
+{
+    QueryModeLock;
+
+    View_ID view = get_active_view(app, Access_ReadVisible);
+    Buffer_ID buffer = view_get_buffer(app, view, Access_ReadVisible);
+    if (buffer != 0) {
+        Query_Bar_Group group(app);
+        Query_Bar bar = {};
+        bar.prompt = string_u8_litexpr("Z mode!\n");
+        start_query_bar(app, &bar, 1);
+
+        User_Input in = {};
+        for (;;) {
+            in = get_next_input(app, EventProperty_AnyKey, EventProperty_MouseButton);
+            if (in.abort || match_key_code(&in, KeyCode_Escape)) {
+                break;
+            }
+
+            if (match_key_code(&in, KeyCode_Z)) {
+                center_view(app);
+                break;
+            }
+
+        }
+    }
+}
+
+
 
 CUSTOM_COMMAND_SIG(momo_query_search)
 CUSTOM_DOC("Queries the user a string, and can do reverse and forward search with 'n' and 'N'")
 {
+    QueryModeLock;
+    
     View_ID view = get_active_view(app, Access_ReadVisible);
     Buffer_ID buffer = view_get_buffer(app, view, Access_ReadVisible);
     if (buffer != 0) {
