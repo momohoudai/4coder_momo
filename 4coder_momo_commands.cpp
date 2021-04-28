@@ -110,6 +110,103 @@ momo_seek_string_backward(Application_Links* app, Buffer_ID buffer, i64 fallback
     }
 }
 
+
+function void
+momo_number_mode(Application_Links* app, String_Const_u8 init_str) {
+     QueryModeLock;
+
+    View_ID view = get_active_view(app, Access_ReadVisible);
+    Buffer_ID buffer = view_get_buffer(app, view, Access_ReadVisible);
+    if (buffer != 0) {
+        Query_Bar_Group group(app);
+        Query_Bar find = {};
+        u8 number_buffer[1024];
+        find.prompt = string_u8_litexpr("Number: ");
+        find.string = SCu8(number_buffer, (u64)0);
+        find.string_capacity = sizeof(number_buffer);
+        if (!start_query_bar(app, &find, 0)) {
+            return;
+        }
+
+
+
+        // If the current input is a number, we can just append.
+        if (init_str.size > 0)
+        {
+            Scratch_Block scratch(app);
+            User_Input in = get_current_input(app);
+            init_str = string_replace(scratch, init_str,
+                                        string_u8_litexpr("\n"),
+                                        string_u8_litexpr(""));
+            init_str = string_replace(scratch, init_str,
+                                        string_u8_litexpr("\t"),
+                                        string_u8_litexpr(""));
+            if (string_is_integer(init_str, 10)){
+                String_u8 string = Su8(find.string.str, find.string.size, find.string_capacity);
+                string_append(&string, init_str);
+                find.string.size = string.string.size;
+            }
+            
+
+        }
+
+
+        for (;;) {
+            User_Input in = get_next_input(app, EventPropertyGroup_Any, 
+                                EventProperty_Escape|EventProperty_MouseButton);
+            if (in.abort) {
+                break;
+            }
+
+            // for all other cases, attempt to insert
+            Scratch_Block scratch(app);
+            b32 good_insert = false;
+            String_Const_u8 insert_string = to_writable(&in);
+            if (insert_string.str != 0 && insert_string.size > 0){
+                insert_string = string_replace(scratch, insert_string,
+                                            string_u8_litexpr("\n"),
+                                            string_u8_litexpr(""));
+                insert_string = string_replace(scratch, insert_string,
+                                                        string_u8_litexpr("\t"),
+                                                        string_u8_litexpr(""));
+                if (string_is_integer(insert_string, 10)){
+                    good_insert = true;
+                }
+            }
+
+            // Shift-G will go to line
+            if (match_key_code(&in, KeyCode_G)) {
+                Input_Modifier_Set* mods = &in.event.key.modifiers;
+                if (has_modifier(mods, KeyCode_Shift)) {
+                    i32 line_number = (i32)string_to_integer(find.string, 10);
+                    View_ID view = get_active_view(app, Access_ReadVisible);
+                    view_set_cursor_and_preferred_x(app, view, seek_line_col(line_number, 0));
+                    break;
+                }
+                
+            }
+
+            if (in.event.kind == InputEventKind_KeyStroke &&
+                (in.event.key.code == KeyCode_Return || in.event.key.code == KeyCode_Tab))
+            {
+                break;
+            }
+            else if (in.event.kind == InputEventKind_KeyStroke &&
+                    in.event.key.code == KeyCode_Backspace){
+                find.string = backspace_utf8(find.string);
+            }
+            else if (good_insert){
+                String_u8 string = Su8(find.string.str, find.string.size, find.string_capacity);
+                string_append(&string, insert_string);
+                find.string.size = string.string.size;
+            }
+            else{
+                leave_current_input_unhandled(app);
+            }
+        }
+    }
+}
+
 CUSTOM_COMMAND_SIG(page_up_half)
 CUSTOM_DOC("Page up halfway")
 {
@@ -253,6 +350,25 @@ CUSTOM_DOC("Vsplit panel but don't go")
 
 }
 
+// NOTE(Momo): Yeah this is pretty dumb, but hey
+CUSTOM_COMMAND_SIG(momo_number_mode_1) 
+CUSTOM_DOC("Number Mode 1") { momo_number_mode(app, string_u8_litexpr("1")); }
+CUSTOM_COMMAND_SIG(momo_number_mode_2) 
+CUSTOM_DOC("Number Mode 2") { momo_number_mode(app, string_u8_litexpr("2")); }
+CUSTOM_COMMAND_SIG(momo_number_mode_3) 
+CUSTOM_DOC("Number Mode 3") { momo_number_mode(app, string_u8_litexpr("3")); }
+CUSTOM_COMMAND_SIG(momo_number_mode_4) 
+CUSTOM_DOC("Number Mode 4") { momo_number_mode(app, string_u8_litexpr("4")); }
+CUSTOM_COMMAND_SIG(momo_number_mode_5) 
+CUSTOM_DOC("Number Mode 5") { momo_number_mode(app, string_u8_litexpr("5")); }
+CUSTOM_COMMAND_SIG(momo_number_mode_6) 
+CUSTOM_DOC("Number Mode 6") { momo_number_mode(app, string_u8_litexpr("6")); }
+CUSTOM_COMMAND_SIG(momo_number_mode_7) 
+CUSTOM_DOC("Number Mode 7") { momo_number_mode(app, string_u8_litexpr("7")); }
+CUSTOM_COMMAND_SIG(momo_number_mode_8) 
+CUSTOM_DOC("Number Mode 8") { momo_number_mode(app, string_u8_litexpr("8")); }
+CUSTOM_COMMAND_SIG(momo_number_mode_9) 
+CUSTOM_DOC("Number Mode 9") { momo_number_mode(app, string_u8_litexpr("9")); }
 
 
 CUSTOM_COMMAND_SIG(snipe_forward_whitespace_and_token_boundary)
@@ -275,41 +391,47 @@ CUSTOM_DOC("Change mode")
         Query_Bar_Group group(app);
         Query_Bar bar = {};
         bar.prompt = string_u8_litexpr("Change mode\n");
-        start_query_bar(app, &bar, 1);
+        if (!start_query_bar(app, &bar, 0)) {
+            return;
+        }
 
         User_Input in = {};
         for (;;) {
-            in = get_next_input(app, EventProperty_AnyKey, EventProperty_MouseButton);
-            if (in.abort || match_key_code(&in, KeyCode_Escape)) {
-                break;
+            in = get_next_input(app, EventPropertyGroup_Any, EventProperty_Escape|EventProperty_MouseButton);
+            if (in.abort) {
+                return;
             }
 
             else if (match_key_code(&in, KeyCode_I)) {
-                in = get_next_input(app, EventProperty_AnyKey, EventProperty_MouseButton);
-                if (in.abort || match_key_code(&in, KeyCode_Escape)) {
-                    break;
-                }
+                for (;;) {
+                    in = get_next_input(app, EventPropertyGroup_Any, EventProperty_Escape | EventProperty_MouseButton);
+                    if (in.abort) {
+                        return;
+                    }
 
-                // ciw
-                if (match_key_code(&in, KeyCode_W)) {
-                    snipe_forward_whitespace_or_token_boundary(app);
-                    momo_switch_to_insert_mode(app);
-                    break;
+                    // ciw
+                    if (match_key_code(&in, KeyCode_W)) {
+                        snipe_forward_whitespace_or_token_boundary(app);
+                        momo_switch_to_insert_mode(app);
+                        return;
+                    }
                 }
             }
 
 
             else if (match_key_code(&in, KeyCode_A)) {
-                in = get_next_input(app, EventProperty_AnyKey, EventProperty_MouseButton);
-                if (in.abort || match_key_code(&in, KeyCode_Escape)) {
-                    break;
-                }
+                for (;;) {
+                    in = get_next_input(app, EventPropertyGroup_Any, EventProperty_Escape | EventProperty_MouseButton);
+                    if (in.abort) {
+                        return;
+                    }
 
-                // caw
-                if (match_key_code(&in, KeyCode_W)) {
-                    snipe_forward_whitespace_and_token_boundary(app);
-                    momo_switch_to_insert_mode(app);
-                    break;
+                    // caw
+                    if (match_key_code(&in, KeyCode_W)) {
+                        snipe_forward_whitespace_and_token_boundary(app);
+                        momo_switch_to_insert_mode(app);
+                        return;
+                    }
                 }
             }
 
@@ -339,12 +461,12 @@ CUSTOM_DOC("Window manipulation mode")
         Query_Bar_Group group(app);
         Query_Bar bar = {};
         bar.prompt = string_u8_litexpr("Window action mode!\n");
-        start_query_bar(app, &bar, 1);
+        start_query_bar(app, &bar, 0);
 
         User_Input in = {};
         for (;;) {
-            in = get_next_input(app, EventProperty_AnyKey, EventProperty_MouseButton);
-            if (in.abort || match_key_code(&in, KeyCode_Escape)) {
+            in = get_next_input(app, EventPropertyGroup_Any, EventProperty_Escape|EventProperty_MouseButton);
+            if (in.abort) {
                 break;
             }
 
@@ -517,12 +639,12 @@ CUSTOM_DOC("Goto mode")
         Query_Bar_Group group(app);
         Query_Bar bar = {};
         bar.prompt = string_u8_litexpr("Goto mode!\n");
-        start_query_bar(app, &bar, 1);
+        start_query_bar(app, &bar, 0);
 
         User_Input in = {};
         for (;;) {
-            in = get_next_input(app, EventProperty_AnyKey, EventProperty_MouseButton);
-            if (in.abort || match_key_code(&in, KeyCode_Escape)) {
+            in = get_next_input(app, EventPropertyGroup_Any, EventProperty_Escape|EventProperty_MouseButton);
+            if (in.abort) {
                 break;
             }
 
@@ -552,12 +674,12 @@ CUSTOM_DOC("Z mode")
         Query_Bar_Group group(app);
         Query_Bar bar = {};
         bar.prompt = string_u8_litexpr("Z mode!\n");
-        start_query_bar(app, &bar, 1);
+        start_query_bar(app, &bar, 0);
 
         User_Input in = {};
         for (;;) {
-            in = get_next_input(app, EventProperty_AnyKey, EventProperty_MouseButton);
-            if (in.abort || match_key_code(&in, KeyCode_Escape)) {
+            in = get_next_input(app, EventPropertyGroup_Any, EventProperty_Escape|EventProperty_MouseButton);
+            if (in.abort) {
                 break;
             }
 
@@ -580,6 +702,7 @@ CUSTOM_DOC("Queries the user a string, and can do reverse and forward search wit
     View_ID view = get_active_view(app, Access_ReadVisible);
     Buffer_ID buffer = view_get_buffer(app, view, Access_ReadVisible);
     if (buffer != 0) {
+        
         Query_Bar_Group group(app);
         Query_Bar find = {};
         u8 find_buffer[1024];
@@ -592,7 +715,7 @@ CUSTOM_DOC("Queries the user a string, and can do reverse and forward search wit
 
                 Query_Bar bar = {};
                 bar.prompt = string_u8_litexpr("Navigate to: next(n), prev(N). Exit (Esc).\n");
-                start_query_bar(app, &bar, 1);
+                start_query_bar(app, &bar, 0);
 
                 i64 pos = view_get_cursor_pos(app, view);
                 //query_replace_parameter(app, find.string, pos, false);
@@ -603,8 +726,8 @@ CUSTOM_DOC("Queries the user a string, and can do reverse and forward search wit
                     Range_i64 match = Ii64(new_pos, new_pos + find.string.size);
                     isearch__update_highlight(app, view, match);
 
-                    in = get_next_input(app, EventProperty_AnyKey, EventProperty_MouseButton);
-                    if (in.abort || match_key_code(&in, KeyCode_Escape)) {
+                    in = get_next_input(app, EventPropertyGroup_Any, EventProperty_Escape|EventProperty_MouseButton);
+                    if (in.abort) {
                         break;
                     }
 

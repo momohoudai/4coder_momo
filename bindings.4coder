@@ -28,7 +28,16 @@ keys_global = {
     
 	{ "momo_query_search",              "ForwardSlash", },
 	{ "momo_window_manip_mode",         "W", "Control" },
-    { "momo_z_mode", "Z" }
+    { "momo_z_mode", "Z" },
+    { "momo_number_mode_1", "1" },
+    { "momo_number_mode_2", "2" },
+    { "momo_number_mode_3", "3" },
+    { "momo_number_mode_4", "4" },
+    { "momo_number_mode_5", "5" },
+    { "momo_number_mode_6", "6" },
+    { "momo_number_mode_7", "7" },
+    { "momo_number_mode_8", "8" },
+    { "momo_number_mode_9", "9" },
 };
 
 keys_global_1 = {
@@ -342,7 +351,6 @@ keys_file_1 = {
 
 keys_code = {
     { "momo_goto_mode", "G"	},
-	
     { "if0_off", "Semicolon" },
     { "momo_if0_on", "Semicolon", "Control" },
     { "list_all_locations_of_type_definition",               "D", "Alt" },
