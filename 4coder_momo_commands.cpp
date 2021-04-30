@@ -113,10 +113,11 @@ momo_seek_string_backward(Application_Links* app, Buffer_ID buffer, i64 fallback
 
 function void
 momo_number_mode(Application_Links* app, String_Const_u8 init_str) {
-     QueryModeLock;
+    QueryModeLock;
 
     View_ID view = get_active_view(app, Access_ReadVisible);
     Buffer_ID buffer = view_get_buffer(app, view, Access_ReadVisible);
+
     if (buffer != 0) {
         Query_Bar_Group group(app);
         Query_Bar find = {};
@@ -215,6 +216,13 @@ CUSTOM_DOC("Page up halfway")
     move_vertical_pixels(app, -page_jump);
 }
 
+CUSTOM_COMMAND_SIG(momo_interactive_open_or_new)
+CUSTOM_DOC("Momo interactive open or new")
+{
+    QueryModeLock;
+    interactive_open_or_new(app);
+}
+
 CUSTOM_COMMAND_SIG(page_down_half)
 CUSTOM_DOC("Page down halfway")
 {
@@ -252,7 +260,7 @@ CUSTOM_DOC("Alias for saving all dirty buffers")
 CUSTOM_COMMAND_SIG(E)
 CUSTOM_DOC("Alias for opening files")
 {
-    interactive_open_or_new(app);
+    momo_interactive_open_or_new(app);
 }
 
 CUSTOM_COMMAND_SIG(q)

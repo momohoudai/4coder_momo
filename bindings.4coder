@@ -3,7 +3,6 @@ keys_global = {
 	{ "view_buffer_other_panel",       "ForwardSlash", "Alt" },
     { "toggle_fullscreen",			 "Return", "Alt" },  
 	
-	
 	{ "exit_4coder",          "F4", "Alt" },
     { "command_lister",                "Semicolon", "Shift" },
     { "quick_swap_buffer",             "O", "Control" },
@@ -280,7 +279,6 @@ keys_file = {
 
     { "execute_previous_cli",    "1", "Control", "Shift" },
     { "execute_any_cli",         "1", "Shift" },
-    { "interactive_open_or_new", "O", "Control" },
 	{ "reopen",                 "O", "Control", "Shift" },
 	{ "open_in_other",          "O", "Alt" },
     { "move_up",                "K" },
@@ -338,6 +336,7 @@ keys_file = {
 };
 
 keys_file_1 = {
+
 	{ "momo_switch_to_edit_mode",	"Escape" 	},
 	{ "f4_leave_event_unhandled", "T" },
 	{ "f4_leave_event_unhandled", "N" },
