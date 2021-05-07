@@ -19,7 +19,6 @@ if (global_query_mode) {\
 global_query_mode = true; \
 Defer{ global_query_mode = false; }
 
-
 function void
 momo_write_text_and_auto_indent_internal(Application_Links* app, String_Const_u8 insert) {
     ProfileScope(app, "write and auto indent");
@@ -760,5 +759,40 @@ CUSTOM_DOC("Queries the user a string, and can do reverse and forward search wit
         }
     }
 }
+
+CUSTOM_COMMAND_SIG(momo_query_replace)
+CUSTOM_DOC("Queries the user for two strings, and incrementally replaces every occurence of the first string with the second string.")
+{
+    QueryModeLock;
+
+    View_ID view = get_active_view(app, Access_ReadWriteVisible);
+    Buffer_ID buffer = view_get_buffer(app, view, Access_ReadWriteVisible);
+    if (buffer != 0){
+        Query_Bar_Group group(app);
+        Query_Bar replace = {};
+        u8 replace_space[1024];
+        replace.prompt = string_u8_litexpr("Replace: ");
+        replace.string = SCu8(replace_space, (u64)0);
+        replace.string_capacity = sizeof(replace_space);
+        if (query_user_string(app, &replace)){
+            if (replace.string.size > 0){
+                i64 pos = view_get_cursor_pos(app, view);
+                query_replace_parameter(app, replace.string, pos, false);
+            }
+        }
+    }
+}
+
+CUSTOM_COMMAND_SIG(momo_replace_in_range)
+CUSTOM_DOC("Queries the user for a needle and string. Replaces all occurences of needle with string in the range between cursor and the mark in the active buffer.")
+{
+    QueryModeLock;
+    
+    View_ID view = get_active_view(app, Access_ReadWriteVisible);
+    Buffer_ID buffer = view_get_buffer(app, view, Access_ReadWriteVisible);
+    Range_i64 range = get_view_range(app, view);
+    replace_in_range_query_user(app, buffer, range);
+}
+
 
 #endif

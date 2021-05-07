@@ -322,8 +322,8 @@ keys_file = {
 	{ "redo",                   "R", "Control" },
     { "undo",                   "U" },
     { "momo_change_mode",       "C", },
-	{ "replace_in_range",       "ForwardSlash", "Control" },
-	{ "query_replace",          "ForwardSlash", "Control", "Shift"  },
+	{ "momo_replace_in_range",       "ForwardSlash", "Control" },
+	{ "momo_query_replace",          "ForwardSlash", "Control", "Shift"  },
 
 	{ "momo_switch_to_insert_mode",	"I" },
 	{ "momo_append_line_and_enter_insert",  "O" },
