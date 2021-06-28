@@ -378,6 +378,65 @@ CUSTOM_COMMAND_SIG(momo_number_mode_9)
 CUSTOM_DOC("Number Mode 9") { momo_number_mode(app, string_u8_litexpr("9")); }
 
 
+// NOTE(Momo): list project definitions
+function void
+momo_list_project_definitions(Application_Links* app, String_Const_u8 init_str){
+    char *query = "Index (Project):";
+    
+    Scratch_Block scratch(app);
+    Lister_Block lister(app, scratch);
+    lister_set_query(lister, query);
+    lister_set_key(lister, init_str);
+    lister_set_text_field(lister, init_str);
+    lister_set_default_handlers(lister);
+    
+    F4_Index_Lock();
+    {
+        for (Buffer_ID buffer = get_buffer_next(app, 0, Access_Always);
+             buffer != 0; buffer = get_buffer_next(app, buffer, Access_Always))
+        {
+            F4_Index_File *file = F4_Index_LookupFile(app, buffer);
+            if(file != 0)
+            {
+                for(F4_Index_Note *note = file->first_note; note; note = note->next_sibling)
+                {
+                    _F4_PushListerOptionForNote(app, scratch, lister, note);
+                }
+            }
+        }
+    }
+    F4_Index_Unlock();
+    
+    Lister_Result l_result = run_lister(app, lister);
+    Tiny_Jump result = {};
+    if (!l_result.canceled && l_result.user_data != 0){
+        block_copy_struct(&result, (Tiny_Jump*)l_result.user_data);
+    }
+    
+    if (result.buffer != 0)
+    {
+        View_ID view = get_this_ctx_view(app, Access_Always);
+        point_stack_push_view_cursor(app, view);
+        F4_JumpToLocation(app, view, result.buffer, result.pos);
+    }
+}
+
+CUSTOM_UI_COMMAND_SIG(momo_search_for_definition_under_cursor_project_wide)
+CUSTOM_DOC("List all definitions in the index and enter the token under the cursor")
+{
+    Scratch_Block scratch(app);
+    String_Const_u8 string = push_token_or_word_under_active_cursor(app, scratch);
+    momo_list_project_definitions(app, string);    
+}
+
+
+CUSTOM_UI_COMMAND_SIG(momo_search_for_definition_project_wide)
+CUSTOM_DOC("List all definitions in the index and jump to the one selected by the user.")
+{
+    String_Const_u8 str = {};
+    momo_list_project_definitions(app, str);
+}
+
 CUSTOM_COMMAND_SIG(snipe_forward_whitespace_and_token_boundary)
 CUSTOM_DOC("Delete a single, whole token on or to the right of the cursor and post it to the clipboard.")
 {
@@ -661,8 +720,12 @@ CUSTOM_DOC("Goto mode")
                     f4_go_to_definition_same_panel(app);
                 }
                 else {
-                    f4_go_to_definition(app);
+                    momo_search_for_definition_under_cursor_project_wide(app);
                 }
+                break;
+            }
+            else if (match_key_code(&in, KeyCode_G)) {
+                momo_search_for_definition_project_wide(app);
                 break;
             }
 
