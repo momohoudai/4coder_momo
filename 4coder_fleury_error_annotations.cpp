@@ -2,9 +2,9 @@
 
 function void
 F4_RenderErrorAnnotations(Application_Links *app, Buffer_ID buffer,
-                          Text_Layout_ID text_layout_id,
-                          Buffer_ID jump_buffer)
-{
+                              Text_Layout_ID text_layout_id,
+                              Buffer_ID jump_buffer)
+{ 
     if(def_get_config_b32(vars_save_string_lit("f4_disable_error_annotations")))
     {
         return;

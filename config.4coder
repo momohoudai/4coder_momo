@@ -53,15 +53,14 @@ automatically_indent_text_on_save = true;
 automatically_save_changes_on_build = true;
 
 // Load project on startup
-automatically_load_project = false;
+automatically_load_project = true;
 
 // Indentation
 indent_with_tabs = false;
 indent_width = 4;
 default_tab_width = 4;
 
-// Theme
-//default_theme_name = "theme-fleury";
+// theme
 default_theme_name = "theme-momo";
 // Font
 default_font_name = "liberation-mono.ttf";

@@ -451,6 +451,7 @@ typedef int socklen_t;
 #include "4coder_fleury_command_server.cpp"
 #endif
 #include "4coder_fleury_casey.cpp"
+
 #include "4coder_fleury_hooks.cpp"
 
 //~ NOTE(rjf): Plots Demo File
@@ -472,7 +473,7 @@ namespace zawarudo {
     }
 }
 
-
+#include "4coder_momo_error_annotations.cpp"
 #include "4coder_momo_commands.cpp"
 #include "4coder_momo_hooks.cpp"
 
@@ -489,7 +490,7 @@ void custom_layer_init(Application_Links *app)
         set_all_default_hooks(app);
         //t $          ($  , $                             , $                     );
         set_custom_hook(app, HookID_Tick,                    F4_Tick);
-        set_custom_hook(app, HookID_RenderCaller,            Momo_Render);
+        set_custom_hook(app, HookID_RenderCaller,            momo_render);
         set_custom_hook(app, HookID_BeginBuffer,             F4_BeginBuffer);
         set_custom_hook(app, HookID_Layout,                  F4_Layout);
         set_custom_hook(app, HookID_WholeScreenRenderCaller, F4_WholeScreenRender);
