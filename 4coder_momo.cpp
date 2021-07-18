@@ -402,54 +402,58 @@ typedef int socklen_t;
 #define COMMAND_SERVER_UPDATE_PERIOD_MS 200
 #define COMMAND_SERVER_AUTO_LAUNCH_IF_FILE_PRESENT "project_namespaces.txt"
 
+#include "4coder_momo_base.cpp"
+
 //~ NOTE(rjf): @f4_headers
-#include "4coder_fleury_ubiquitous.h"
+//#include "4coder_fleury_ubiquitous.h"
 #include "4coder_fleury_audio.h"
-#include "4coder_fleury_lang.h"
-#include "4coder_fleury_index.h"
-#include "4coder_fleury_colors.h"
+//#include "4coder_fleury_lang.h"
+//#include "4coder_fleury_index.h"
+//#include "4coder_fleury_colors.h"
 #include "4coder_fleury_render_helpers.h"
-#include "4coder_fleury_brace.h"
+//#include "4coder_fleury_brace.h"
 //#include "4coder_fleury_error_annotations.h"
 #include "4coder_fleury_divider_comments.h"
 //#include "4coder_fleury_power_mode.h"
 //#include "4coder_fleury_cursor.h"
-#include "4coder_fleury_plot.h"
-#include "4coder_fleury_calc.h"
-#include "4coder_fleury_lego.h"
-#include "4coder_fleury_pos_context_tooltips.h"
-#include "4coder_fleury_code_peek.h"
+//#include "4coder_fleury_plot.h"
+//#include "4coder_fleury_calc.h"
+//#include "4coder_fleury_lego.h"
+//#include "4coder_fleury_pos_context_tooltips.h"
+//#include "4coder_fleury_code_peek.h"
 #include "4coder_fleury_recent_files.h"
 //#include "4coder_fleury_bindings.h"
 //#include "4coder_fleury_base_commands.h"
-#if OS_WINDOWS
-#include "4coder_fleury_command_server.h"
-#endif
-#include "4coder_fleury_hooks.h"
+//#if OS_WINDOWS
+//#include "4coder_fleury_command_server.h"
+//#endif
+//#include "4coder_fleury_hooks.h"
+
+
 
 //~ NOTE(rjf): @f4_src
-#include "4coder_fleury_ubiquitous.cpp"
+//#include "4coder_fleury_ubiquitous.cpp"
 #include "4coder_fleury_audio.cpp"
-#include "4coder_fleury_lang.cpp"
-#include "4coder_fleury_index.cpp"
-#include "4coder_fleury_colors.cpp"
+//#include "4coder_fleury_lang.cpp"
+//#include "4coder_fleury_index.cpp"
+//#include "4coder_fleury_colors.cpp"
 #include "4coder_fleury_render_helpers.cpp"
-#include "4coder_fleury_brace.cpp"
+//#include "4coder_fleury_brace.cpp"
 //#include "4coder_fleury_error_annotations.cpp"
 #include "4coder_fleury_divider_comments.cpp"
 //#include "4coder_fleury_power_mode.cpp"
 //#include "4coder_fleury_cursor.cpp"
-#include "4coder_fleury_plot.cpp"
-#include "4coder_fleury_calc.cpp"
-#include "4coder_fleury_lego.cpp"
-#include "4coder_fleury_pos_context_tooltips.cpp"
-#include "4coder_fleury_code_peek.cpp"
+//#include "4coder_fleury_plot.cpp"
+//#include "4coder_fleury_calc.cpp"
+//#include "4coder_fleury_lego.cpp"
+//#include "4coder_fleury_pos_context_tooltips.cpp"
+//#include "4coder_fleury_code_peek.cpp"
 #include "4coder_fleury_recent_files.cpp"
 //#include "4coder_fleury_bindings.cpp"
 //#include "4coder_fleury_base_commands.cpp"
-#if OS_WINDOWS
-#include "4coder_fleury_command_server.cpp"
-#endif
+//#if OS_WINDOWS
+//#include "4coder_fleury_command_server.cpp"
+//#endif
 //#include "4coder_fleury_casey.cpp"
 
 //#include "4coder_fleury_hooks.cpp"
@@ -457,16 +461,24 @@ typedef int socklen_t;
 //~ NOTE(rjf): Plots Demo File
 #include "4coder_fleury_plots_demo.cpp"
 
-//~ NOTE(rjf): 4coder Stuff
-#include "generated/managed_id_metadata.cpp"
 
 
-#include "4coder_momo_base.cpp"
+
+#include "4coder_momo_index.h"
+#include "4coder_momo_lang.cpp"
+#include "4coder_momo_index.cpp"
+#include "4coder_momo_colors.cpp"
+#include "4coder_momo_brace.cpp"
 #include "4coder_momo_key_bindings.cpp"
 #include "4coder_momo_cursor.cpp"
 #include "4coder_momo_error_annotations.cpp"
 #include "4coder_momo_commands.cpp"
+
 #include "4coder_momo_hooks.cpp"
+
+
+//~ NOTE(rjf): 4coder Stuff
+#include "generated/managed_id_metadata.cpp"
 
 //~ NOTE(rjf): @f4_custom_layer_initialization
 
@@ -501,12 +513,12 @@ void custom_layer_init(Application_Links *app)
     
     // NOTE(rjf): Set up custom code index.
     {
-        F4_Index_Initialize();
+        Momo_Index_Initialize();
     }
     
     // NOTE(rjf): Register languages.
     {
-        F4_RegisterLanguages();
+        momo_register_languages();
     }
 }
 

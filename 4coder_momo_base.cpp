@@ -14,442 +14,246 @@ namespace zawarudo {
 #define AnonVar(x) AnonVarSub(x)
 #define Defer auto AnonVar(__COUNTER__) = zawarudo::defer_dummy{} + [&]()
 
+enum keybinding_mode
+{
+	KeyBindingMode_0,
+	KeyBindingMode_1,
+    KeyBindingMode_2,
+    KeyBindingMode_3,
+    KeyBindingMode_MAX
+};
 
-static b32 global_insert_mode = false;
-static b32 global_query_mode = false;
+static keybinding_mode GlobalKeybindingMode;
+static Face_ID global_styled_title_face = 0;
+static Face_ID global_styled_label_face = 0;
+static Face_ID global_small_code_face = 0;
+static Rect_f32 global_cursor_rect = {0};
+static Rect_f32 global_last_cursor_rect = {0};
+static Rect_f32 global_mark_rect = {0};
+static Rect_f32 global_last_mark_rect = {0};
+static b32 global_dark_mode = 1;
+static b32 global_battery_saver = 0;
+static View_ID global_compilation_view = 0;
+static b32 global_compilation_view_expanded = 0;
+global Arena permanent_arena = {};
 
-#define QueryModeLock \
-if (global_query_mode) {\
-    leave_current_input_unhandled(app);\
-    return; \
-}\
-global_query_mode = true; \
-Defer{ global_query_mode = false; }
+#define MemorySet                 memset
+#define MemoryCopy                memcpy
+#define CalculateCStringLength    strlen
+#define S8Lit(s)                  string_u8_litexpr(s)
 
 
+static struct
+{
+    String_Const_u8 string;
+    ARGB_Color color;
+}
+global_tooltips[32] = {0};
+static int global_tooltip_count = 0;
+static Arena global_frame_arena;
 
-function void
-momo_write_text_and_auto_indent_internal(Application_Links* app, String_Const_u8 insert) {
-    ProfileScope(app, "write and auto indent");
-    if (insert.str != 0 && insert.size > 0) {
-        b32 do_auto_indent = false;
-        for (u64 i = 0; !do_auto_indent && i < insert.size; i += 1) {
-            switch (insert.str[i]) {
-            case ';': case ':':
-            case '{': case '}':
-            case '(': case ')':
-            case '[': case ']':
-            case '#':
-            case '\n': case '\t':
-            {
-                do_auto_indent = true;
-            }break;
-            }
-        }
-        if (do_auto_indent) {
-            View_ID view = get_active_view(app, Access_ReadWriteVisible);
-            Buffer_ID buffer = view_get_buffer(app, view, Access_ReadWriteVisible);
-            Range_i64 pos = {};
-            pos.min = view_get_cursor_pos(app, view);
-            write_text(app, insert);
-            pos.max = view_get_cursor_pos(app, view);
-            auto_indent_buffer(app, buffer, pos, 0);
-            move_past_lead_whitespace(app, view, buffer);
-        }
-        else {
-            write_text(app, insert);
-        }
-    }
+static String_Const_u8
+StringStripBorderCharacters(String_Const_u8 string)
+{
+    string.str += 1;
+    string.size -= 2;
+    return string;
 }
 
-function i64
-momo_boundary_word(Application_Links* app, Buffer_ID buffer, Side side, Scan_Direction direction, i64 pos) {
-    i64 result = 0;
-    if (direction == Scan_Forward) {
-        result = Min(buffer_seek_character_class_change_0_1(app, buffer, &character_predicate_alpha_numeric_underscore_utf8, direction, pos),
-            buffer_seek_character_class_change_1_0(app, buffer, &character_predicate_alpha_numeric_underscore_utf8, direction, pos));
-        result = Min(result, buffer_seek_character_class_change_1_0(app, buffer, &character_predicate_whitespace, direction, pos));
-    }
-    else {
-        result = Max(buffer_seek_character_class_change_0_1(app, buffer, &character_predicate_alpha_numeric_underscore_utf8, direction, pos),
-            buffer_seek_character_class_change_1_0(app, buffer, &character_predicate_alpha_numeric_underscore_utf8, direction, pos));
-        result = Max(result, buffer_seek_character_class_change_1_0(app, buffer, &character_predicate_whitespace, direction, pos));
-    }
-
-    return result;
+static f32
+RandomF32(f32 low, f32 high)
+{
+    return low + (high - low) * (((int)rand() % 10000) / 10000.f);
 }
 
-function void
-momo_seek_string_forward(Application_Links* app, Buffer_ID buffer, i64 fallback_pos, i64 pos, i64 end, String_Const_u8 needle, i64* result) {
-    if (end == 0) {
-        end = (i32)buffer_get_size(app, buffer);
-    }
-    String_Match match = {};
-    match.range.first = pos;
-    for (;;) {
-        match = buffer_seek_string(app, buffer, needle, Scan_Forward, (i32)match.range.first);
-        if (HasFlag(match.flags, StringMatch_CaseSensitive) ||
-            match.buffer != buffer || match.range.first >= end) break;
-    }
-    if (match.range.first < end && match.buffer == buffer) {
-        *result = match.range.first;
-    }
-    else {
-        // Instead of returning end of buffer size, return pos
-        //*result = buffer_get_size(app, buffer);
-        *result = fallback_pos;
-    }
+static f32
+MinimumF32(f32 a, f32 b)
+{
+    return a < b ? a : b;
 }
 
-function void
-momo_seek_string_backward(Application_Links* app, Buffer_ID buffer, i64 fallback_pos, i64 pos, i64 min, String_Const_u8 needle, i64* result) {
-    String_Match match = {};
-    match.range.first = pos;
-    for (;;) {
-        match = buffer_seek_string(app, buffer, needle, Scan_Backward, (i32)match.range.first);
-        if (HasFlag(match.flags, StringMatch_CaseSensitive) ||
-            match.buffer != buffer || match.range.first < min) break;
-    }
-    if (match.range.first >= min && match.buffer == buffer) {
-        *result = match.range.first;
-    }
-    else {
-        *result = fallback_pos;
-    }
+static f32
+MaximumF32(f32 a, f32 b)
+{
+    return a > b ? a : b;
 }
 
+static b32
+CharIsAlpha(int c)
+{
+    return ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'));
+}
 
-function void
-momo_number_mode(Application_Links* app, String_Const_u8 init_str) {
-    QueryModeLock;
+static b32
+CharIsDigit(int c)
+{
+    return (c >= '0' && c <= '9');
+}
 
-    View_ID view = get_active_view(app, Access_ReadVisible);
-    Buffer_ID buffer = view_get_buffer(app, view, Access_ReadVisible);
+static b32
+CharIsSymbol(int c)
+{
+    return (c == '~' || c == '`' || c == '!' || c == '#' ||
+            c == '$' || c == '%' || c == '^' || c == '&' ||
+            c == '*' || c == '(' || c == ')' || c == '-' ||
+            c == '+' || c == '=' || c == '{' || c == '}' ||
+            c == '[' || c == ']' || c == ':' || c == ';' ||
+            c == '<' || c == '>' || c == ',' || c == '.' ||
+            c == '?' || c == '/');
+}
 
-    if (buffer != 0) {
-        Query_Bar_Group group(app);
-        Query_Bar find = {};
-        u8 number_buffer[1024];
-        find.prompt = string_u8_litexpr("Number: ");
-        find.string = SCu8(number_buffer, (u64)0);
-        find.string_capacity = sizeof(number_buffer);
-        if (!start_query_bar(app, &find, 0)) {
-            return;
-        }
-
-
-
-        // If the current input is a number, we can just append.
-        if (init_str.size > 0)
+static double
+GetFirstDoubleFromBuffer(char *buffer)
+{
+    char number_str[256];
+    int number_write_pos = 0;
+    double value = 0;
+    for(int i = 0; buffer[i] && number_write_pos < sizeof(number_str); ++i)
+    {
+        if(CharIsDigit(buffer[i]) || buffer[i] == '.' || buffer[i] == '-')
         {
-            Scratch_Block scratch(app);
-            User_Input in = get_current_input(app);
-            init_str = string_replace(scratch, init_str,
-                                        string_u8_litexpr("\n"),
-                                        string_u8_litexpr(""));
-            init_str = string_replace(scratch, init_str,
-                                        string_u8_litexpr("\t"),
-                                        string_u8_litexpr(""));
-            if (string_is_integer(init_str, 10)){
-                String_u8 string = Su8(find.string.str, find.string.size, find.string_capacity);
-                string_append(&string, init_str);
-                find.string.size = string.string.size;
-            }
-            
-
+            number_str[number_write_pos++] = buffer[i];
         }
+        else
+        {
+            number_str[number_write_pos++] = 0;
+            break;
+        }
+    }
+    number_str[sizeof(number_str)-1] = 0;
+    value = atof(number_str);
+    return value;
+}
 
-
-        for (;;) {
-            User_Input in = get_next_input(app, EventPropertyGroup_Any, 
-                                EventProperty_Escape|EventProperty_MouseButton);
-            if (in.abort) {
+static unsigned int CStringCRC32(char *string);
+static unsigned int StringCRC32(char *string, int string_length);
+static unsigned int CRC32(unsigned char *buf, int len);
+static int
+StringMatchCaseSensitive(char *a, int a_length, char *b, int b_length)
+{
+    int match = 0;
+    if(a && b && a[0] && b[0] && a_length == b_length)
+    {
+        match = 1;
+        for(int i = 0; i < a_length; ++i)
+        {
+            if(a[i] != b[i])
+            {
+                match = 0;
                 break;
             }
-
-            // for all other cases, attempt to insert
-            Scratch_Block scratch(app);
-            b32 good_insert = false;
-            String_Const_u8 insert_string = to_writable(&in);
-            if (insert_string.str != 0 && insert_string.size > 0){
-                insert_string = string_replace(scratch, insert_string,
-                                            string_u8_litexpr("\n"),
-                                            string_u8_litexpr(""));
-                insert_string = string_replace(scratch, insert_string,
-                                                        string_u8_litexpr("\t"),
-                                                        string_u8_litexpr(""));
-                if (string_is_integer(insert_string, 10)){
-                    good_insert = true;
-                }
-            }
-
-            // Shift-G will go to line
-            if (match_key_code(&in, KeyCode_G)) {
-                Input_Modifier_Set* mods = &in.event.key.modifiers;
-                if (has_modifier(mods, KeyCode_Shift)) {
-                    i32 line_number = (i32)string_to_integer(find.string, 10);
-                    View_ID view = get_active_view(app, Access_ReadVisible);
-                    view_set_cursor_and_preferred_x(app, view, seek_line_col(line_number, 0));
-                    break;
-                }
-                
-            }
-
-            if (in.event.kind == InputEventKind_KeyStroke &&
-                (in.event.key.code == KeyCode_Return || in.event.key.code == KeyCode_Tab))
-            {
-                break;
-            }
-            else if (in.event.kind == InputEventKind_KeyStroke &&
-                    in.event.key.code == KeyCode_Backspace){
-                find.string = backspace_utf8(find.string);
-            }
-            else if (good_insert){
-                String_u8 string = Su8(find.string.str, find.string.size, find.string_capacity);
-                string_append(&string, insert_string);
-                find.string.size = string.string.size;
-            }
-            else{
-                leave_current_input_unhandled(app);
-            }
         }
     }
+    return match;
 }
 
-internal void
-momo_jump_to_location(Application_Links *app, View_ID view, Buffer_ID buffer, i64 pos)
+static unsigned int
+CRC32(unsigned char *buf, int len)
 {
-    // NOTE(rjf): This function was ripped from 4coder's jump_to_location. It was copied
-    // and modified so that jumping to a location didn't cause a selection in notepad-like
-    // mode.
-    
-    view_set_active(app, view);
-    Buffer_Seek seek = seek_pos(pos);
-    set_view_to_location(app, view, buffer, seek);
-    
-    if (auto_center_after_jumps)
+    static unsigned int init = 0xffffffff;
+    static const unsigned int crc32_table[] =
     {
-        center_view(app);
+        0x00000000, 0x04c11db7, 0x09823b6e, 0x0d4326d9,
+        0x130476dc, 0x17c56b6b, 0x1a864db2, 0x1e475005,
+        0x2608edb8, 0x22c9f00f, 0x2f8ad6d6, 0x2b4bcb61,
+        0x350c9b64, 0x31cd86d3, 0x3c8ea00a, 0x384fbdbd,
+        0x4c11db70, 0x48d0c6c7, 0x4593e01e, 0x4152fda9,
+        0x5f15adac, 0x5bd4b01b, 0x569796c2, 0x52568b75,
+        0x6a1936c8, 0x6ed82b7f, 0x639b0da6, 0x675a1011,
+        0x791d4014, 0x7ddc5da3, 0x709f7b7a, 0x745e66cd,
+        0x9823b6e0, 0x9ce2ab57, 0x91a18d8e, 0x95609039,
+        0x8b27c03c, 0x8fe6dd8b, 0x82a5fb52, 0x8664e6e5,
+        0xbe2b5b58, 0xbaea46ef, 0xb7a96036, 0xb3687d81,
+        0xad2f2d84, 0xa9ee3033, 0xa4ad16ea, 0xa06c0b5d,
+        0xd4326d90, 0xd0f37027, 0xddb056fe, 0xd9714b49,
+        0xc7361b4c, 0xc3f706fb, 0xceb42022, 0xca753d95,
+        0xf23a8028, 0xf6fb9d9f, 0xfbb8bb46, 0xff79a6f1,
+        0xe13ef6f4, 0xe5ffeb43, 0xe8bccd9a, 0xec7dd02d,
+        0x34867077, 0x30476dc0, 0x3d044b19, 0x39c556ae,
+        0x278206ab, 0x23431b1c, 0x2e003dc5, 0x2ac12072,
+        0x128e9dcf, 0x164f8078, 0x1b0ca6a1, 0x1fcdbb16,
+        0x018aeb13, 0x054bf6a4, 0x0808d07d, 0x0cc9cdca,
+        0x7897ab07, 0x7c56b6b0, 0x71159069, 0x75d48dde,
+        0x6b93dddb, 0x6f52c06c, 0x6211e6b5, 0x66d0fb02,
+        0x5e9f46bf, 0x5a5e5b08, 0x571d7dd1, 0x53dc6066,
+        0x4d9b3063, 0x495a2dd4, 0x44190b0d, 0x40d816ba,
+        0xaca5c697, 0xa864db20, 0xa527fdf9, 0xa1e6e04e,
+        0xbfa1b04b, 0xbb60adfc, 0xb6238b25, 0xb2e29692,
+        0x8aad2b2f, 0x8e6c3698, 0x832f1041, 0x87ee0df6,
+        0x99a95df3, 0x9d684044, 0x902b669d, 0x94ea7b2a,
+        0xe0b41de7, 0xe4750050, 0xe9362689, 0xedf73b3e,
+        0xf3b06b3b, 0xf771768c, 0xfa325055, 0xfef34de2,
+        0xc6bcf05f, 0xc27dede8, 0xcf3ecb31, 0xcbffd686,
+        0xd5b88683, 0xd1799b34, 0xdc3abded, 0xd8fba05a,
+        0x690ce0ee, 0x6dcdfd59, 0x608edb80, 0x644fc637,
+        0x7a089632, 0x7ec98b85, 0x738aad5c, 0x774bb0eb,
+        0x4f040d56, 0x4bc510e1, 0x46863638, 0x42472b8f,
+        0x5c007b8a, 0x58c1663d, 0x558240e4, 0x51435d53,
+        0x251d3b9e, 0x21dc2629, 0x2c9f00f0, 0x285e1d47,
+        0x36194d42, 0x32d850f5, 0x3f9b762c, 0x3b5a6b9b,
+        0x0315d626, 0x07d4cb91, 0x0a97ed48, 0x0e56f0ff,
+        0x1011a0fa, 0x14d0bd4d, 0x19939b94, 0x1d528623,
+        0xf12f560e, 0xf5ee4bb9, 0xf8ad6d60, 0xfc6c70d7,
+        0xe22b20d2, 0xe6ea3d65, 0xeba91bbc, 0xef68060b,
+        0xd727bbb6, 0xd3e6a601, 0xdea580d8, 0xda649d6f,
+        0xc423cd6a, 0xc0e2d0dd, 0xcda1f604, 0xc960ebb3,
+        0xbd3e8d7e, 0xb9ff90c9, 0xb4bcb610, 0xb07daba7,
+        0xae3afba2, 0xaafbe615, 0xa7b8c0cc, 0xa379dd7b,
+        0x9b3660c6, 0x9ff77d71, 0x92b45ba8, 0x9675461f,
+        0x8832161a, 0x8cf30bad, 0x81b02d74, 0x857130c3,
+        0x5d8a9099, 0x594b8d2e, 0x5408abf7, 0x50c9b640,
+        0x4e8ee645, 0x4a4ffbf2, 0x470cdd2b, 0x43cdc09c,
+        0x7b827d21, 0x7f436096, 0x7200464f, 0x76c15bf8,
+        0x68860bfd, 0x6c47164a, 0x61043093, 0x65c52d24,
+        0x119b4be9, 0x155a565e, 0x18197087, 0x1cd86d30,
+        0x029f3d35, 0x065e2082, 0x0b1d065b, 0x0fdc1bec,
+        0x3793a651, 0x3352bbe6, 0x3e119d3f, 0x3ad08088,
+        0x2497d08d, 0x2056cd3a, 0x2d15ebe3, 0x29d4f654,
+        0xc5a92679, 0xc1683bce, 0xcc2b1d17, 0xc8ea00a0,
+        0xd6ad50a5, 0xd26c4d12, 0xdf2f6bcb, 0xdbee767c,
+        0xe3a1cbc1, 0xe760d676, 0xea23f0af, 0xeee2ed18,
+        0xf0a5bd1d, 0xf464a0aa, 0xf9278673, 0xfde69bc4,
+        0x89b8fd09, 0x8d79e0be, 0x803ac667, 0x84fbdbd0,
+        0x9abc8bd5, 0x9e7d9662, 0x933eb0bb, 0x97ffad0c,
+        0xafb010b1, 0xab710d06, 0xa6322bdf, 0xa2f33668,
+        0xbcb4666d, 0xb8757bda, 0xb5365d03, 0xb1f740b4
+    };
+    
+    unsigned int crc = init;
+    while(len--)
+    {
+        crc = (crc << 8) ^ crc32_table[((crc >> 24) ^ *buf) & 255];
+        buf++;
     }
-    view_set_cursor(app, view, seek);
-    view_set_mark(app, view, seek);
+    return crc;
 }
 
-
-
-internal void
-momo_push_lister_with_note(Application_Links *app, Arena *arena, Lister *lister, F4_Index_Note *note)
+static unsigned int
+StringCRC32(char *string, int string_length)
 {
-    if(note && note->file)
-    {
-        F4_Index_File *file = note->file;
-        Buffer_ID buffer = file->buffer;
-        
-        Tiny_Jump *jump = push_array(arena, Tiny_Jump, 1);
-        jump->buffer = buffer;
-        jump->pos = note->range.first;
-        
-        String_Const_u8 buffer_name = push_buffer_unique_name(app, arena, buffer);
-        String_Const_u8 name = push_stringf(arena, "[%.*s] %.*s", string_expand(buffer_name), string_expand(note->string));
-        String_Const_u8 sort = S8Lit("");
-        switch(note->kind)
-        {
-            case F4_Index_NoteKind_Type:
-            {
-                sort = push_stringf(arena, "type [%s] [%s]",
-                                    note->flags & F4_Index_NoteFlag_Prototype ? "prototype" : "def",
-                                    note->flags & F4_Index_NoteFlag_SumType ? "sum" : "product");
-            }break;
-            
-            case F4_Index_NoteKind_Function:
-            {
-                sort = push_stringf(arena, "function [%s]", note->flags & F4_Index_NoteFlag_Prototype ? "prototype" : "def");
-            }break;
-            
-            case F4_Index_NoteKind_Macro:
-            {
-                sort = S8Lit("macro");
-            }break;
-            
-            case F4_Index_NoteKind_Constant:
-            {
-                sort = S8Lit("constant");
-            }break;
-            
-            case F4_Index_NoteKind_CommentTag:
-            {
-                sort = S8Lit("comment tag");
-            }break;
-            
-            case F4_Index_NoteKind_CommentToDo:
-            {
-                sort = S8Lit("TODO");
-            }break;
-            
-            default: break;
-        }
-        lister_add_item(lister, name, sort, jump, 0);
-    }
+    unsigned int hash = CRC32((unsigned char *)string, string_length);
+    return hash;
 }
 
-
-// NOTE(Momo): list project definitions
-function void
-momo_list_project_definitions(Application_Links* app, String_Const_u8 init_str, b32 same_panel){
-    char *query = "Index (Project):";
-    
-    Scratch_Block scratch(app);
-    Lister_Block lister(app, scratch);
-    lister_set_query(lister, query);
-    lister_set_key(lister, init_str);
-    lister_set_text_field(lister, init_str);
-    lister_set_default_handlers(lister);
-    
-    F4_Index_Lock();
-    {
-        for (Buffer_ID buffer = get_buffer_next(app, 0, Access_Always);
-             buffer != 0; buffer = get_buffer_next(app, buffer, Access_Always))
-        {
-            F4_Index_File *file = F4_Index_LookupFile(app, buffer);
-            if(file != 0)
-            {
-                for(F4_Index_Note *note = file->first_note; note; note = note->next_sibling)
-                {
-                    momo_push_lister_with_note(app, scratch, lister, note);
-                }
-            }
-        }
-    }
-    F4_Index_Unlock();
-    
-    Lister_Result l_result = run_lister(app, lister);
-    Tiny_Jump result = {};
-    if (!l_result.canceled && l_result.user_data != 0){
-        block_copy_struct(&result, (Tiny_Jump*)l_result.user_data);
-    }
-    
-    if (result.buffer != 0)
-    {
-        View_ID view = get_this_ctx_view(app, Access_Always);
-        if(!same_panel)
-        {
-            view = get_next_view_looped_primary_panels(app, view, Access_Always);
-        }
-        point_stack_push_view_cursor(app, view);
-        momo_jump_to_location(app, view, result.buffer, result.pos);
-    }
-}
-
-function i64
-momo_boundary_token_and_whitespace(Application_Links *app, Buffer_ID buffer, 
-                               Side side, Scan_Direction direction, i64 pos)
+static unsigned int
+CStringCRC32(char *string)
 {
-    i64 result = boundary_non_whitespace(app, buffer, side, direction, pos);
-    Token_Array tokens = get_token_array_from_buffer(app, buffer);
-    if (tokens.tokens != 0){
-        switch (direction){
-            case Scan_Forward:
-            {
-                i64 buffer_size = buffer_get_size(app, buffer);
-                result = buffer_size;
-                if(tokens.count > 0)
-                {
-                    Token_Iterator_Array it = token_iterator_pos(0, &tokens, pos);
-                    Token *token = token_it_read(&it);
-                    
-                    if(token == 0)
-                    {
-                        break;
-                    }
-                    
-                    // NOTE(rjf): Comments/Strings
-                    if(token->kind == TokenBaseKind_Comment ||
-                       token->kind == TokenBaseKind_LiteralString)
-                    {
-                        result = boundary_non_whitespace(app, buffer, side, direction, pos);
-                        break;
-                    }
-                    
-                    // NOTE(rjf): All other cases.
-                    else
-                    {
-                        if (token->kind == TokenBaseKind_Whitespace)
-                        {
-                            // token_it_inc_non_whitespace(&it);
-                            // token = token_it_read(&it);
-                        }
-                        
-                        if (side == Side_Max){
-                            result = token->pos + token->size;
-                            
-                            token_it_inc_all(&it);
-                            Token *ws = token_it_read(&it);
-                            if(ws != 0 && ws->kind == TokenBaseKind_Whitespace &&
-                               get_line_number_from_pos(app, buffer, ws->pos + ws->size) ==
-                               get_line_number_from_pos(app, buffer, token->pos))
-                            {
-                                result = ws->pos + ws->size;
-                            }
-                        }
-                        else{
-                            if (token->pos <= pos){
-                                token_it_inc_non_whitespace(&it);
-                                token = token_it_read(&it);
-                            }
-                            if (token != 0){
-                                result = token->pos;
-                            }
-                        }
-                    }
-                    
-                }
-            }break;
-            
-            case Scan_Backward:
-            {
-                result = 0;
-                if (tokens.count > 0){
-                    Token_Iterator_Array it = token_iterator_pos(0, &tokens, pos);
-                    Token *token = token_it_read(&it);
-                    
-                    Token_Iterator_Array it2 = it;
-                    token_it_dec_non_whitespace(&it2);
-                    Token *token2 = token_it_read(&it2);
-                    
-                    // NOTE(rjf): Comments/Strings
-                    if(token->kind == TokenBaseKind_Comment ||
-                       token->kind == TokenBaseKind_LiteralString ||
-                       (token2 && 
-                        token2->kind == TokenBaseKind_Comment ||
-                        token2->kind == TokenBaseKind_LiteralString))
-                    {
-                        result = boundary_non_whitespace(app, buffer, side, direction, pos);
-                        break;
-                    }
-                    
-                    if (token->kind == TokenBaseKind_Whitespace){
-                        token_it_dec_non_whitespace(&it);
-                        token = token_it_read(&it);
-                    }
-                    if (token != 0){
-                        if (side == Side_Min){
-                            if (token->pos >= pos){
-                                token_it_dec_non_whitespace(&it);
-                                token = token_it_read(&it);
-                            }
-                            result = token->pos;
-                        }
-                        else{
-                            if (token->pos + token->size >= pos){
-                                token_it_dec_non_whitespace(&it);
-                                token = token_it_read(&it);
-                            }
-                            result = token->pos + token->size;
-                        }
-                    }
-                }
-            }break;
+    int string_length = (int)CalculateCStringLength(string);
+    unsigned int hash = CRC32((unsigned char *)string, string_length);
+    return hash;
+}
+
+internal u64
+BitOffset(u64 value)
+{
+    u64 offset = 0;
+    for(u64 i = 0; i < 64; i += 1)
+    {
+        if(value == ((u64)1 << i))
+        {
+            offset = i;
+            break;
         }
     }
-    return(result);
+    return offset;
 }

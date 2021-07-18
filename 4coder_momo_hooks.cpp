@@ -1,3 +1,9 @@
+enum Momo_Range_Highlight_Kind
+{
+    MOMO_RANGE_HIGHLIGHT_KIND_WHOLE,
+    MOMO_RANGE_HIGHLIGHT_KIND_UNDERLINE,
+    MOMO_RANGE_HIGHLIGHT_KIND_MINOR_UNDERLINE,
+};
 
 function void
 momo_do_full_lex_async_sub(Async_Context *actx, Buffer_ID buffer_id)
@@ -20,12 +26,12 @@ momo_do_full_lex_async_sub(Async_Context *actx, Buffer_ID buffer_id)
     Token_List list = {};
     b32 canceled = false;
     
-    F4_Language *language = F4_LanguageFromBuffer(app, buffer_id);
+    Momo_Language *language = momo_get_language_from_buffer(app, buffer_id);
     
     // NOTE(rjf): Fall back to C++ if we don't have a proper language.
     if(language == 0)
     {
-        language = F4_LanguageFromString(S8Lit("cpp"));
+        language = momo_get_language_from_string(S8Lit("cpp"));
     }
     
     if(language != 0)
@@ -80,6 +86,33 @@ momo_do_full_lex_async(Async_Context *actx, String_Const_u8 data)
     }
 }
 
+
+function void
+momo_render_range_highlight(Application_Links *app, View_ID view_id, Text_Layout_ID text_layout_id,
+                            Range_i64 range, Range_Highlight_Kind kind, ARGB_Color color)
+{
+    Rect_f32 range_start_rect = text_layout_character_on_screen(app, text_layout_id, range.start);
+    Rect_f32 range_end_rect = text_layout_character_on_screen(app, text_layout_id, range.end-1);
+    Rect_f32 total_range_rect = {0};
+    total_range_rect.x0 = MinimumF32(range_start_rect.x0, range_end_rect.x0);
+    total_range_rect.y0 = MinimumF32(range_start_rect.y0, range_end_rect.y0);
+    total_range_rect.x1 = MaximumF32(range_start_rect.x1, range_end_rect.x1);
+    total_range_rect.y1 = MaximumF32(range_start_rect.y1, range_end_rect.y1);
+    
+    switch (kind) {
+        case MOMO_RANGE_HIGHLIGHT_KIND_UNDERLINE: {
+            total_range_rect.y0 = total_range_rect.y1 - 1.f;
+            total_range_rect.y1 += 1.f;
+        } break;
+        
+        case MOMO_RANGE_HIGHLIGHT_KIND_MINOR_UNDERLINE: {
+            total_range_rect.y0 = total_range_rect.y1 - 1.f;
+            total_range_rect.y1 += 1.f;
+        }
+    }
+    draw_rectangle(app, total_range_rect, 4.f, color);
+}
+
 function void
 momo_render_buffer(Application_Links *app, View_ID view_id, Face_ID face_id,
                    Buffer_ID buffer, Text_Layout_ID text_layout_id,
@@ -96,7 +129,7 @@ momo_render_buffer(Application_Links *app, View_ID view_id, Face_ID face_id,
     Token_Array token_array = get_token_array_from_buffer(app, buffer);
     if(token_array.tokens != 0)
     {
-        F4_SyntaxHighlight(app, text_layout_id, &token_array);
+        momo_syntax_highlight(app, text_layout_id, &token_array);
         
         // NOTE(allen): Scan for TODOs and NOTEs
         b32 use_comment_keywords = def_get_config_b32(vars_save_string_lit("use_comment_keywords"));
@@ -131,10 +164,10 @@ momo_render_buffer(Application_Links *app, View_ID view_id, Face_ID face_id,
     // NOTE(rjf): Brace highlight
     {
         Color_Array colors = finalize_color_array(fleury_color_brace_highlight);
-        if(colors.count >= 1 && F4_ARGBIsValid(colors.vals[0]))
+        if(colors.count >= 1 && momo_is_argb_valid(colors.vals[0]))
         {
-            F4_Brace_RenderHighlight(app, buffer, text_layout_id, cursor_pos,
-                                     colors.vals, colors.count);
+            momo_brace_render_highlight(app, buffer, text_layout_id, cursor_pos,
+                                        colors.vals, colors.count);
         }
     }
     
@@ -219,16 +252,16 @@ momo_render_buffer(Application_Links *app, View_ID view_id, Face_ID face_id,
                     // NOTE(jack) If this is the buffers cursor token, highlight it with an Underline
                     if (range_contains(token_range, view_get_cursor_pos(app, view_id)))
                     {
-                        F4_RenderRangeHighlight(app, view_id, text_layout_id,
-                                                token_range, F4_RangeHighlightKind_Underline,
+                        momo_render_range_highlight(app, view_id, text_layout_id,
+                                                token_range, MOMO_RANGE_HIGHLIGHT_KIND_UNDERLINE,
                                                 fcolor_resolve(fcolor_id(fleury_color_token_highlight)));
                     }
                     // NOTE(jack): If the token matches the active buffer token. highlight it with a Minor Underline
                     else if(active_cursor_token->kind == TokenBaseKind_Identifier && 
                             string_match(token_string, active_cursor_string))
                     {
-                        F4_RenderRangeHighlight(app, view_id, text_layout_id,
-                                                token_range, F4_RangeHighlightKind_MinorUnderline,
+                        momo_render_range_highlight(app, view_id, text_layout_id,
+                                                token_range, MOMO_RANGE_HIGHLIGHT_KIND_MINOR_UNDERLINE,
                                                 fcolor_resolve(fcolor_id(fleury_color_token_minor_highlight)));
                         
                     } 
@@ -250,10 +283,10 @@ momo_render_buffer(Application_Links *app, View_ID view_id, Face_ID face_id,
         Token *token = token_it_read(&it);
         if(token && token->kind == TokenBaseKind_Identifier)
         {
-            F4_RenderRangeHighlight(app, view_id, text_layout_id,
-                                    Ii64(token->pos, token->pos + token->size),
-                                    F4_RangeHighlightKind_Underline,
-                                    fcolor_resolve(fcolor_id(fleury_color_token_highlight)));
+            momo_render_range_highlight(app, view_id, text_layout_id,
+                                        Ii64(token->pos, token->pos + token->size),
+                                        MOMO_RANGE_HIGHLIGHT_KIND_UNDERLINE,
+                                        fcolor_resolve(fcolor_id(fleury_color_token_highlight)));
         }
     }
         
@@ -296,20 +329,16 @@ momo_render_buffer(Application_Links *app, View_ID view_id, Face_ID face_id,
             break;
         }
     }
-    
-    // NOTE(rjf): Brace annotations
-    {
-        F4_Brace_RenderCloseBraceAnnotation(app, buffer, text_layout_id, cursor_pos);
-    }
-    
-    // NOTE(rjf): Brace lines
-    {
-        F4_Brace_RenderLines(app, buffer, view_id, text_layout_id, cursor_pos);
-    }
+
+    // NOTE(Momo): render brace ending annotation and brace lines
+    momo_brace_render_close_brace_annotation(app, buffer, text_layout_id, cursor_pos);
+    momo_brace_render_lines(app, buffer, view_id, text_layout_id, cursor_pos);
     
     // NOTE(allen): put the actual text on the actual screen
     draw_text_layout_default(app, text_layout_id);
     
+#if 0 
+    // NOTE(Momo) Right now, calc is useless to me. But we can think of something nice for it next time.
     // NOTE(rjf): Interpret buffer as calc code, if it's the calc buffer.
     {
         Buffer_ID calc_buffer_id = get_buffer_by_name(app, string_u8_litexpr("*calc*"), AccessFlag_Read);
@@ -323,9 +352,11 @@ momo_render_buffer(Application_Links *app, View_ID view_id, Face_ID face_id,
     {
         F4_CLC_RenderComments(app, buffer, view_id, text_layout_id, frame_info);
     }
-    
+#endif 
+
     draw_set_clip(app, prev_clip);
     
+#if 0
     // NOTE(rjf): Draw tooltips and stuff.
     if(active_view == view_id)
     {
@@ -373,13 +404,14 @@ momo_render_buffer(Application_Links *app, View_ID view_id, Face_ID face_id,
             }
         }
     }
+#endif
     
     // NOTE(rjf): Draw inactive rectangle
     if(is_active_view == 0)
     {
         Rect_f32 view_rect = view_get_screen_rect(app, view_id);
         ARGB_Color color = fcolor_resolve(fcolor_id(fleury_color_inactive_pane_overlay));
-        if(F4_ARGBIsValid(color))
+        if(momo_is_argb_valid(color))
         {
             draw_rectangle(app, view_rect, 0.f, color);
         }
@@ -424,7 +456,7 @@ momo_draw_file_bar(Application_Links *app, View_ID view_id, Buffer_ID buffer, Fa
             bar.y1,
         };
         ARGB_Color progress_bar_color = fcolor_resolve(fcolor_id(fleury_color_file_progress_bar));
-        if(F4_ARGBIsValid(progress_bar_color))
+        if(momo_is_argb_valid(progress_bar_color))
         {
             draw_rectangle(app, progress_bar_rect, 0, progress_bar_color);
         }
@@ -472,7 +504,7 @@ momo_draw_file_bar(Application_Links *app, View_ID view_id, Buffer_ID buffer, Fa
     }
     
     push_fancy_string(scratch, &list, base_color, S8Lit(" Syntax Mode: "));
-    push_fancy_string(scratch, &list, base_color, F4_SyntaxOptionString());
+    push_fancy_string(scratch, &list, base_color, momo_syntax_option_string());
     
     Vec2_f32 p = bar.p0 + V2f32(2.f, 2.f);
     draw_fancy_line(app, face_id, fcolor_zero(), &list, p);
@@ -595,7 +627,7 @@ momo_render(Application_Links *app, Frame_Info frame_info, View_ID view_id)
         else if(is_active_view == 0)
         {
             ARGB_Color inactive_bg_color = fcolor_resolve(fcolor_id(fleury_color_inactive_pane_background));
-            if(F4_ARGBIsValid(inactive_bg_color))
+            if(momo_is_argb_valid(inactive_bg_color))
             {
                 color = inactive_bg_color;
             }
@@ -610,7 +642,7 @@ momo_render(Application_Links *app, Frame_Info frame_info, View_ID view_id)
         if(def_get_config_b32(vars_save_string_lit("f4_margin_use_mode_color")) &&
            is_active_view)
         {
-            color = F4_GetColor(app, ColorCtx_Cursor(0, GlobalKeybindingMode));
+            color = momo_get_color(app, momo_get_color_ctx_from_cursor(0, GlobalKeybindingMode));
         }
         draw_margin(app, view_rect, region, color);
     }
@@ -692,12 +724,7 @@ momo_render(Application_Links *app, Frame_Info frame_info, View_ID view_id)
     
     // NOTE(allen): draw the buffer
     momo_render_buffer(app, view_id, face_id, buffer, text_layout_id, region, frame_info);
-    
-    // NOTE(rjf): Render command server
-#if OS_WINDOWS
-    CS_render_caller(app, frame_info, view_id);
-#endif
-    
+      
     text_layout_free(app, text_layout_id);
     draw_set_clip(app, prev_clip);
 }
@@ -750,7 +777,7 @@ function BUFFER_HOOK_SIG(momo_begin_buffer)
     // NOTE(rjf): Treat as code if we've identified the language of a file.
     if(treat_as_code == false)
     {
-        F4_Language *language = F4_LanguageFromBuffer(app, buffer_id);
+        Momo_Language *language = momo_get_language_from_buffer(app, buffer_id);
         if(language)
         {
             treat_as_code = true;
@@ -959,13 +986,13 @@ function BUFFER_EDIT_RANGE_SIG(momo_buffer_edit_range)
             String_Const_u8 partial_text = push_buffer_range(app, scratch, buffer_id, relex_range);
             
             //~ NOTE(rjf): Lex
-            F4_Language *language = F4_LanguageFromBuffer(app, buffer_id);
+            Momo_Language *language = momo_get_language_from_buffer(app, buffer_id);
             // NOTE(rjf): Fall back to C++ if we don't have a proper language.
             if(language == 0)
             {
-                language = F4_LanguageFromString(S8Lit("cpp"));
+                language = momo_get_language_from_string(S8Lit("cpp"));
             }
-            Token_List relex_list = F4_Language_LexFullInput_NoBreaks(app, language, scratch, partial_text);
+            Token_List relex_list = Momo_Language_LexFullInput_NoBreaks(app, language, scratch, partial_text);
             //~
             
             if (relex_range.one_past_last < buffer_get_size(app, buffer_id)){
@@ -1032,10 +1059,10 @@ momo_tick(Application_Links *app, Frame_Info frame_info)
     linalloc_clear(&global_frame_arena);
     global_tooltip_count = 0;
     
-    F4_TickColors(app, frame_info);
-    F4_Index_Tick(app);
-    F4_CLC_Tick(frame_info);
-    F4_UpdateFlashes(app, frame_info);
+    momo_tick_colors(app, frame_info);
+    Momo_Index_Tick(app);
+    //F4_CLC_Tick(frame_info);
+    //F4_UpdateFlashes(app, frame_info);
     
     // NOTE(rjf): Default tick stuff from the 4th dimension:
     default_tick(app, frame_info);
