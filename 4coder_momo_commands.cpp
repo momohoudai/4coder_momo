@@ -1,5 +1,5 @@
-#ifndef FCODER_FLEURY_MOMO
-#define FCODER_FLEURY_MOMO
+#ifndef FCODER_MOMO_COMMANDS
+#define FCODER_MOMO_COMMANDS
 
 
 #define AnonVarSub(x) zawarudo_ryojianon##x
@@ -18,6 +18,304 @@ if (global_query_mode) {\
 }\
 global_query_mode = true; \
 Defer{ global_query_mode = false; }
+
+
+internal void
+momo_push_lister_with_note(Application_Links *app, Arena *arena, Lister *lister, F4_Index_Note *note)
+{
+    if(note && note->file)
+    {
+        F4_Index_File *file = note->file;
+        Buffer_ID buffer = file->buffer;
+        
+        Tiny_Jump *jump = push_array(arena, Tiny_Jump, 1);
+        jump->buffer = buffer;
+        jump->pos = note->range.first;
+        
+        String_Const_u8 buffer_name = push_buffer_unique_name(app, arena, buffer);
+        String_Const_u8 name = push_stringf(arena, "[%.*s] %.*s", string_expand(buffer_name), string_expand(note->string));
+        String_Const_u8 sort = S8Lit("");
+        switch(note->kind)
+        {
+            case F4_Index_NoteKind_Type:
+            {
+                sort = push_stringf(arena, "type [%s] [%s]",
+                                    note->flags & F4_Index_NoteFlag_Prototype ? "prototype" : "def",
+                                    note->flags & F4_Index_NoteFlag_SumType ? "sum" : "product");
+            }break;
+            
+            case F4_Index_NoteKind_Function:
+            {
+                sort = push_stringf(arena, "function [%s]", note->flags & F4_Index_NoteFlag_Prototype ? "prototype" : "def");
+            }break;
+            
+            case F4_Index_NoteKind_Macro:
+            {
+                sort = S8Lit("macro");
+            }break;
+            
+            case F4_Index_NoteKind_Constant:
+            {
+                sort = S8Lit("constant");
+            }break;
+            
+            case F4_Index_NoteKind_CommentTag:
+            {
+                sort = S8Lit("comment tag");
+            }break;
+            
+            case F4_Index_NoteKind_CommentToDo:
+            {
+                sort = S8Lit("TODO");
+            }break;
+            
+            default: break;
+        }
+        lister_add_item(lister, name, sort, jump, 0);
+    }
+}
+
+function i64
+momo_boundary_token_and_whitespace(Application_Links *app, Buffer_ID buffer, 
+                               Side side, Scan_Direction direction, i64 pos)
+{
+    i64 result = boundary_non_whitespace(app, buffer, side, direction, pos);
+    Token_Array tokens = get_token_array_from_buffer(app, buffer);
+    if (tokens.tokens != 0){
+        switch (direction){
+            case Scan_Forward:
+            {
+                i64 buffer_size = buffer_get_size(app, buffer);
+                result = buffer_size;
+                if(tokens.count > 0)
+                {
+                    Token_Iterator_Array it = token_iterator_pos(0, &tokens, pos);
+                    Token *token = token_it_read(&it);
+                    
+                    if(token == 0)
+                    {
+                        break;
+                    }
+                    
+                    // NOTE(rjf): Comments/Strings
+                    if(token->kind == TokenBaseKind_Comment ||
+                       token->kind == TokenBaseKind_LiteralString)
+                    {
+                        result = boundary_non_whitespace(app, buffer, side, direction, pos);
+                        break;
+                    }
+                    
+                    // NOTE(rjf): All other cases.
+                    else
+                    {
+                        if (token->kind == TokenBaseKind_Whitespace)
+                        {
+                            // token_it_inc_non_whitespace(&it);
+                            // token = token_it_read(&it);
+                        }
+                        
+                        if (side == Side_Max){
+                            result = token->pos + token->size;
+                            
+                            token_it_inc_all(&it);
+                            Token *ws = token_it_read(&it);
+                            if(ws != 0 && ws->kind == TokenBaseKind_Whitespace &&
+                               get_line_number_from_pos(app, buffer, ws->pos + ws->size) ==
+                               get_line_number_from_pos(app, buffer, token->pos))
+                            {
+                                result = ws->pos + ws->size;
+                            }
+                        }
+                        else{
+                            if (token->pos <= pos){
+                                token_it_inc_non_whitespace(&it);
+                                token = token_it_read(&it);
+                            }
+                            if (token != 0){
+                                result = token->pos;
+                            }
+                        }
+                    }
+                    
+                }
+            }break;
+            
+            case Scan_Backward:
+            {
+                result = 0;
+                if (tokens.count > 0){
+                    Token_Iterator_Array it = token_iterator_pos(0, &tokens, pos);
+                    Token *token = token_it_read(&it);
+                    
+                    Token_Iterator_Array it2 = it;
+                    token_it_dec_non_whitespace(&it2);
+                    Token *token2 = token_it_read(&it2);
+                    
+                    // NOTE(rjf): Comments/Strings
+                    if(token->kind == TokenBaseKind_Comment ||
+                       token->kind == TokenBaseKind_LiteralString ||
+                       (token2 && 
+                        token2->kind == TokenBaseKind_Comment ||
+                        token2->kind == TokenBaseKind_LiteralString))
+                    {
+                        result = boundary_non_whitespace(app, buffer, side, direction, pos);
+                        break;
+                    }
+                    
+                    if (token->kind == TokenBaseKind_Whitespace){
+                        token_it_dec_non_whitespace(&it);
+                        token = token_it_read(&it);
+                    }
+                    if (token != 0){
+                        if (side == Side_Min){
+                            if (token->pos >= pos){
+                                token_it_dec_non_whitespace(&it);
+                                token = token_it_read(&it);
+                            }
+                            result = token->pos;
+                        }
+                        else{
+                            if (token->pos + token->size >= pos){
+                                token_it_dec_non_whitespace(&it);
+                                token = token_it_read(&it);
+                            }
+                            result = token->pos + token->size;
+                        }
+                    }
+                }
+            }break;
+        }
+    }
+    return(result);
+}
+
+
+CUSTOM_COMMAND_SIG(momo_toggle_compilation_expand)
+CUSTOM_DOC("Expand the compilation window.")
+{
+    Buffer_ID buffer = view_get_buffer(app, global_compilation_view, Access_Always);
+    Face_ID face_id = get_face_id(app, buffer);
+    Face_Metrics metrics = get_face_metrics(app, face_id);
+    if(global_compilation_view_expanded ^= 1)
+    {
+        view_set_split_pixel_size(app, global_compilation_view, (i32)(metrics.line_height*32.f));
+    }
+    else
+    {
+        view_set_split_pixel_size(app, global_compilation_view, (i32)(metrics.line_height*4.f));
+    }
+}
+
+
+internal void
+momo_jump_to_location(Application_Links *app, View_ID view, Buffer_ID buffer, i64 pos)
+{
+    // NOTE(rjf): This function was ripped from 4coder's jump_to_location. It was copied
+    // and modified so that jumping to a location didn't cause a selection in notepad-like
+    // mode.
+    
+    view_set_active(app, view);
+    Buffer_Seek seek = seek_pos(pos);
+    set_view_to_location(app, view, buffer, seek);
+    
+    if (auto_center_after_jumps)
+    {
+        center_view(app);
+    }
+    view_set_cursor(app, view, seek);
+    view_set_mark(app, view, seek);
+}
+
+CUSTOM_COMMAND_SIG(momo_home)
+CUSTOM_DOC("Goes to the beginning of the line.")
+{
+    seek_pos_of_visual_line(app, Side_Min);
+    View_ID view = get_active_view(app, Access_ReadWriteVisible);
+    Buffer_Scroll scroll = view_get_buffer_scroll(app, view);
+    scroll.target.pixel_shift.x = 0;
+    view_set_buffer_scroll(app, view, scroll, SetBufferScroll_NoCursorChange);
+}
+
+CUSTOM_UI_COMMAND_SIG(momo_search_for_definition__project_wide)
+CUSTOM_DOC("List all definitions in the index and jump to the one selected by the user.")
+{
+    char *query = "Index (Project):";
+    
+    Scratch_Block scratch(app);
+    Lister_Block lister(app, scratch);
+    lister_set_query(lister, query);
+    lister_set_default_handlers(lister);
+    
+    F4_Index_Lock();
+    {
+        for (Buffer_ID buffer = get_buffer_next(app, 0, Access_Always);
+             buffer != 0; buffer = get_buffer_next(app, buffer, Access_Always))
+        {
+            F4_Index_File *file = F4_Index_LookupFile(app, buffer);
+            if(file != 0)
+            {
+                for(F4_Index_Note *note = file->first_note; note; note = note->next_sibling)
+                {
+                    momo_push_lister_with_note(app, scratch, lister, note);
+                }
+            }
+        }
+    }
+    F4_Index_Unlock();
+    
+    Lister_Result l_result = run_lister(app, lister);
+    Tiny_Jump result = {};
+    if (!l_result.canceled && l_result.user_data != 0){
+        block_copy_struct(&result, (Tiny_Jump*)l_result.user_data);
+    }
+    
+    if (result.buffer != 0)
+    {
+        View_ID view = get_this_ctx_view(app, Access_Always);
+        point_stack_push_view_cursor(app, view);
+        momo_jump_to_location(app, view, result.buffer, result.pos);
+    }
+}
+
+CUSTOM_UI_COMMAND_SIG(momo_search_for_definition__current_file)
+CUSTOM_DOC("List all definitions in the current file and jump to the one selected by the user.")
+{
+    char *query = "Index (File):";
+    
+    View_ID view = get_active_view(app, Access_Always);
+    Buffer_ID buffer = view_get_buffer(app, view, Access_Always);
+    
+    Scratch_Block scratch(app);
+    Lister_Block lister(app, scratch);
+    lister_set_query(lister, query);
+    lister_set_default_handlers(lister);
+    
+    F4_Index_Lock();
+    {
+        F4_Index_File *file = F4_Index_LookupFile(app, buffer);
+        if(file != 0)
+        {
+            for(F4_Index_Note *note = file->first_note; note; note = note->next_sibling)
+            {
+                momo_push_lister_with_note(app, scratch, lister, note);
+            }
+        }
+    }
+    F4_Index_Unlock();
+    
+    Lister_Result l_result = run_lister(app, lister);
+    Tiny_Jump result = {};
+    if (!l_result.canceled && l_result.user_data != 0){
+        block_copy_struct(&result, (Tiny_Jump*)l_result.user_data);
+    }
+    
+    if (result.buffer != 0)
+    {
+        View_ID view_id = get_this_ctx_view(app, Access_Always);
+        point_stack_push_view_cursor(app, view_id);
+        momo_jump_to_location(app, view_id, result.buffer, result.pos);
+    }
+}
 
 function void
 momo_write_text_and_auto_indent_internal(Application_Links* app, String_Const_u8 insert) {
@@ -380,7 +678,7 @@ CUSTOM_DOC("Number Mode 9") { momo_number_mode(app, string_u8_litexpr("9")); }
 
 // NOTE(Momo): list project definitions
 function void
-momo_list_project_definitions(Application_Links* app, String_Const_u8 init_str){
+momo_list_project_definitions(Application_Links* app, String_Const_u8 init_str, b32 same_panel){
     char *query = "Index (Project):";
     
     Scratch_Block scratch(app);
@@ -400,7 +698,7 @@ momo_list_project_definitions(Application_Links* app, String_Const_u8 init_str){
             {
                 for(F4_Index_Note *note = file->first_note; note; note = note->next_sibling)
                 {
-                    _F4_PushListerOptionForNote(app, scratch, lister, note);
+                    momo_push_lister_with_note(app, scratch, lister, note);
                 }
             }
         }
@@ -416,8 +714,12 @@ momo_list_project_definitions(Application_Links* app, String_Const_u8 init_str){
     if (result.buffer != 0)
     {
         View_ID view = get_this_ctx_view(app, Access_Always);
+        if(!same_panel)
+        {
+            view = get_next_view_looped_primary_panels(app, view, Access_Always);
+        }
         point_stack_push_view_cursor(app, view);
-        F4_JumpToLocation(app, view, result.buffer, result.pos);
+        momo_jump_to_location(app, view, result.buffer, result.pos);
     }
 }
 
@@ -426,23 +728,31 @@ CUSTOM_DOC("List all definitions in the index and enter the token under the curs
 {
     Scratch_Block scratch(app);
     String_Const_u8 string = push_token_or_word_under_active_cursor(app, scratch);
-    momo_list_project_definitions(app, string);    
+    momo_list_project_definitions(app, string, 1);    
 }
+
+CUSTOM_UI_COMMAND_SIG(momo_search_for_definition_under_cursor_project_wide_other_panel)
+CUSTOM_DOC("List all definitions in the index and enter the token under the cursor")
+{
+    Scratch_Block scratch(app);
+    String_Const_u8 string = push_token_or_word_under_active_cursor(app, scratch);
+    momo_list_project_definitions(app, string, 0);    
+}
+
 
 
 CUSTOM_UI_COMMAND_SIG(momo_search_for_definition_project_wide)
 CUSTOM_DOC("List all definitions in the index and jump to the one selected by the user.")
 {
     String_Const_u8 str = {};
-    momo_list_project_definitions(app, str);
+    momo_list_project_definitions(app, str, 1);
 }
 
 CUSTOM_COMMAND_SIG(snipe_forward_whitespace_and_token_boundary)
 CUSTOM_DOC("Delete a single, whole token on or to the right of the cursor and post it to the clipboard.")
 {
     Scratch_Block scratch(app);
-    current_view_snipe_delete(app, Scan_Forward,
-        push_boundary_list(scratch, F4_Boundary_TokenAndWhitespace));
+    current_view_snipe_delete(app, Scan_Forward, push_boundary_list(scratch, momo_boundary_token_and_whitespace));
 
 }
 
@@ -557,7 +867,7 @@ CUSTOM_DOC("Window manipulation mode")
                 break;
             }
             else if (match_key_code(&in, KeyCode_K)) {
-                f4_toggle_compilation_expand(app);
+                momo_toggle_compilation_expand(app);
                 break;
             }
 
@@ -717,7 +1027,7 @@ CUSTOM_DOC("Goto mode")
             if (match_key_code(&in, KeyCode_D)) {
                 Input_Modifier_Set* mods = &in.event.key.modifiers;
                 if (has_modifier(mods, KeyCode_Shift)) {
-                    f4_go_to_definition_same_panel(app);
+                    momo_search_for_definition_under_cursor_project_wide_other_panel(app);
                 }
                 else {
                     momo_search_for_definition_under_cursor_project_wide(app);
@@ -855,6 +1165,44 @@ CUSTOM_DOC("Queries the user for a needle and string. Replaces all occurences of
     Buffer_ID buffer = view_get_buffer(app, view, Access_ReadWriteVisible);
     Range_i64 range = get_view_range(app, view);
     replace_in_range_query_user(app, buffer, range);
+}
+
+CUSTOM_COMMAND_SIG(momo_leave_event_unhandled)
+CUSTOM_DOC("when bound to keystroke, ensures the event falls through to text insertion")
+{
+    leave_current_input_unhandled(app);
+}
+
+CUSTOM_COMMAND_SIG(momo_backspace_token_boundary)
+CUSTOM_DOC("Deletes left to a token boundary.")
+{
+    Scratch_Block scratch(app);
+    current_view_boundary_delete(app, Scan_Backward, push_boundary_list(scratch, momo_boundary_token_and_whitespace));
+}
+
+CUSTOM_COMMAND_SIG(momo_delete_token_boundary)
+CUSTOM_DOC("Deletes right to a token boundary.")
+{
+    Scratch_Block scratch(app);
+    current_view_boundary_delete(app, Scan_Forward, push_boundary_list(scratch, momo_boundary_token_and_whitespace));
+}
+
+CUSTOM_COMMAND_SIG(momo_backspace_alpha_numeric_or_camel_boundary)
+CUSTOM_DOC("Deletes left to a alphanumeric or camel boundary.")
+{
+    Scratch_Block scratch(app);
+    current_view_boundary_delete(app, Scan_Backward, push_boundary_list(scratch,
+                                                                        boundary_alpha_numeric,
+                                                                        boundary_alpha_numeric_camel));
+}
+
+CUSTOM_COMMAND_SIG(momo_delete_alpha_numeric_or_camel_boundary)
+CUSTOM_DOC("Deletes right to an alphanumeric or camel boundary.")
+{
+    Scratch_Block scratch(app);
+    current_view_boundary_delete(app, Scan_Forward, push_boundary_list(scratch,
+                                                                       boundary_alpha_numeric,
+                                                                       boundary_alpha_numeric_camel));
 }
 
 

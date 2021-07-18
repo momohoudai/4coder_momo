@@ -410,18 +410,18 @@ typedef int socklen_t;
 #include "4coder_fleury_colors.h"
 #include "4coder_fleury_render_helpers.h"
 #include "4coder_fleury_brace.h"
-#include "4coder_fleury_error_annotations.h"
+//#include "4coder_fleury_error_annotations.h"
 #include "4coder_fleury_divider_comments.h"
-#include "4coder_fleury_power_mode.h"
-#include "4coder_fleury_cursor.h"
+//#include "4coder_fleury_power_mode.h"
+//#include "4coder_fleury_cursor.h"
 #include "4coder_fleury_plot.h"
 #include "4coder_fleury_calc.h"
 #include "4coder_fleury_lego.h"
 #include "4coder_fleury_pos_context_tooltips.h"
 #include "4coder_fleury_code_peek.h"
 #include "4coder_fleury_recent_files.h"
-#include "4coder_fleury_bindings.h"
-#include "4coder_fleury_base_commands.h"
+//#include "4coder_fleury_bindings.h"
+//#include "4coder_fleury_base_commands.h"
 #if OS_WINDOWS
 #include "4coder_fleury_command_server.h"
 #endif
@@ -435,24 +435,24 @@ typedef int socklen_t;
 #include "4coder_fleury_colors.cpp"
 #include "4coder_fleury_render_helpers.cpp"
 #include "4coder_fleury_brace.cpp"
-#include "4coder_fleury_error_annotations.cpp"
+//#include "4coder_fleury_error_annotations.cpp"
 #include "4coder_fleury_divider_comments.cpp"
-#include "4coder_fleury_power_mode.cpp"
-#include "4coder_fleury_cursor.cpp"
+//#include "4coder_fleury_power_mode.cpp"
+//#include "4coder_fleury_cursor.cpp"
 #include "4coder_fleury_plot.cpp"
 #include "4coder_fleury_calc.cpp"
 #include "4coder_fleury_lego.cpp"
 #include "4coder_fleury_pos_context_tooltips.cpp"
 #include "4coder_fleury_code_peek.cpp"
 #include "4coder_fleury_recent_files.cpp"
-#include "4coder_fleury_bindings.cpp"
-#include "4coder_fleury_base_commands.cpp"
+//#include "4coder_fleury_bindings.cpp"
+//#include "4coder_fleury_base_commands.cpp"
 #if OS_WINDOWS
 #include "4coder_fleury_command_server.cpp"
 #endif
-#include "4coder_fleury_casey.cpp"
+//#include "4coder_fleury_casey.cpp"
 
-#include "4coder_fleury_hooks.cpp"
+//#include "4coder_fleury_hooks.cpp"
 
 //~ NOTE(rjf): Plots Demo File
 #include "4coder_fleury_plots_demo.cpp"
@@ -473,6 +473,8 @@ namespace zawarudo {
     }
 }
 
+#include "4coder_momo_key_bindings.cpp"
+#include "4coder_momo_cursor.cpp"
 #include "4coder_momo_error_annotations.cpp"
 #include "4coder_momo_commands.cpp"
 #include "4coder_momo_hooks.cpp"
@@ -489,13 +491,13 @@ void custom_layer_init(Application_Links *app)
     {
         set_all_default_hooks(app);
         //t $          ($  , $                             , $                     );
-        set_custom_hook(app, HookID_Tick,                    F4_Tick);
+        set_custom_hook(app, HookID_Tick,                    momo_tick);
         set_custom_hook(app, HookID_RenderCaller,            momo_render);
-        set_custom_hook(app, HookID_BeginBuffer,             F4_BeginBuffer);
-        set_custom_hook(app, HookID_Layout,                  F4_Layout);
-        set_custom_hook(app, HookID_WholeScreenRenderCaller, F4_WholeScreenRender);
-        set_custom_hook(app, HookID_DeltaRule,               F4_DeltaRule);
-        set_custom_hook(app, HookID_BufferEditRange,         F4_BufferEditRange);
+        set_custom_hook(app, HookID_BeginBuffer,             momo_begin_buffer);
+        set_custom_hook(app, HookID_Layout,                  momo_layout);
+        set_custom_hook(app, HookID_WholeScreenRenderCaller, default_whole_screen_render_caller);
+        set_custom_hook(app, HookID_DeltaRule,               momo_delta_rule);
+        set_custom_hook(app, HookID_BufferEditRange,         momo_buffer_edit_range);
         set_custom_hook_memory_size(app, HookID_DeltaRule, delta_ctx_size(sizeof(Vec2_f32)));
     }
     
@@ -504,12 +506,8 @@ void custom_layer_init(Application_Links *app)
         Thread_Context *tctx = get_thread_context(app);
         mapping_init(tctx, &framework_mapping);
         String_Const_u8 bindings_file = string_u8_litexpr("bindings.4coder");
-        F4_SetAbsolutelyNecessaryBindings(&framework_mapping);
-        if(!dynamic_binding_load_from_file(app, &framework_mapping, bindings_file))
-        {
-            F4_SetDefaultBindings(&framework_mapping);
-        }
-        F4_SetAbsolutelyNecessaryBindings(&framework_mapping);
+        dynamic_binding_load_from_file(app, &framework_mapping, bindings_file);
+        momo_set_essential_bindings(&framework_mapping);
     }
     
     // NOTE(rjf): Set up custom code index.
@@ -542,8 +540,8 @@ IsFileReadable(String_Const_u8 path)
     return result;
 }
 
-CUSTOM_COMMAND_SIG(fleury_startup)
-CUSTOM_DOC("Fleury startup event")
+CUSTOM_COMMAND_SIG(momo_startup)
+CUSTOM_DOC("Momo startup event")
 {
     ProfileScope(app, "default startup");
     
@@ -657,12 +655,8 @@ CUSTOM_DOC("Fleury startup event")
     //~ NOTE(rjf): Initialize bindings.
     {
         String_Const_u8 bindings_file = string_u8_litexpr("bindings.4coder");
-        F4_SetAbsolutelyNecessaryBindings(&framework_mapping);
-        if(!dynamic_binding_load_from_file(app, &framework_mapping, bindings_file))
-        {
-            F4_SetDefaultBindings(&framework_mapping);
-        }
-        F4_SetAbsolutelyNecessaryBindings(&framework_mapping);
+        dynamic_binding_load_from_file(app, &framework_mapping, bindings_file);
+        momo_set_essential_bindings(&framework_mapping);
     }
     
     //~ NOTE(rjf): Initialize stylish fonts.
