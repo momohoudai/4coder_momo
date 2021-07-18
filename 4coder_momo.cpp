@@ -460,19 +460,8 @@ typedef int socklen_t;
 //~ NOTE(rjf): 4coder Stuff
 #include "generated/managed_id_metadata.cpp"
 
-//~ NOTE(Momo): Momo's stuff
-// Defer 
-namespace zawarudo {
-    template<class F> struct ScopeGuard {
-        F f;
-        ~ScopeGuard() { f(); }
-    };
-    struct defer_dummy {};
-    template<class F> ScopeGuard<F> operator+(defer_dummy, F f) {
-        return { f };
-    }
-}
 
+#include "4coder_momo_base.cpp"
 #include "4coder_momo_key_bindings.cpp"
 #include "4coder_momo_cursor.cpp"
 #include "4coder_momo_error_annotations.cpp"

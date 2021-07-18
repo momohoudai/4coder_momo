@@ -1,6 +1,15 @@
-// NOTE(Momo): Collection of unorganized stuff
-
-
+//~ NOTE(Momo): Momo's stuff
+// Defer 
+namespace zawarudo {
+    template<class F> struct ScopeGuard {
+        F f;
+        ~ScopeGuard() { f(); }
+    };
+    struct defer_dummy {};
+    template<class F> ScopeGuard<F> operator+(defer_dummy, F f) {
+        return { f };
+    }
+}
 #define AnonVarSub(x) zawarudo_ryojianon##x
 #define AnonVar(x) AnonVarSub(x)
 #define Defer auto AnonVar(__COUNTER__) = zawarudo::defer_dummy{} + [&]()
@@ -16,6 +25,7 @@ if (global_query_mode) {\
 }\
 global_query_mode = true; \
 Defer{ global_query_mode = false; }
+
 
 
 function void
@@ -206,9 +216,84 @@ momo_number_mode(Application_Links* app, String_Const_u8 init_str) {
     }
 }
 
+internal void
+momo_jump_to_location(Application_Links *app, View_ID view, Buffer_ID buffer, i64 pos)
+{
+    // NOTE(rjf): This function was ripped from 4coder's jump_to_location. It was copied
+    // and modified so that jumping to a location didn't cause a selection in notepad-like
+    // mode.
+    
+    view_set_active(app, view);
+    Buffer_Seek seek = seek_pos(pos);
+    set_view_to_location(app, view, buffer, seek);
+    
+    if (auto_center_after_jumps)
+    {
+        center_view(app);
+    }
+    view_set_cursor(app, view, seek);
+    view_set_mark(app, view, seek);
+}
+
+
+
+internal void
+momo_push_lister_with_note(Application_Links *app, Arena *arena, Lister *lister, F4_Index_Note *note)
+{
+    if(note && note->file)
+    {
+        F4_Index_File *file = note->file;
+        Buffer_ID buffer = file->buffer;
+        
+        Tiny_Jump *jump = push_array(arena, Tiny_Jump, 1);
+        jump->buffer = buffer;
+        jump->pos = note->range.first;
+        
+        String_Const_u8 buffer_name = push_buffer_unique_name(app, arena, buffer);
+        String_Const_u8 name = push_stringf(arena, "[%.*s] %.*s", string_expand(buffer_name), string_expand(note->string));
+        String_Const_u8 sort = S8Lit("");
+        switch(note->kind)
+        {
+            case F4_Index_NoteKind_Type:
+            {
+                sort = push_stringf(arena, "type [%s] [%s]",
+                                    note->flags & F4_Index_NoteFlag_Prototype ? "prototype" : "def",
+                                    note->flags & F4_Index_NoteFlag_SumType ? "sum" : "product");
+            }break;
+            
+            case F4_Index_NoteKind_Function:
+            {
+                sort = push_stringf(arena, "function [%s]", note->flags & F4_Index_NoteFlag_Prototype ? "prototype" : "def");
+            }break;
+            
+            case F4_Index_NoteKind_Macro:
+            {
+                sort = S8Lit("macro");
+            }break;
+            
+            case F4_Index_NoteKind_Constant:
+            {
+                sort = S8Lit("constant");
+            }break;
+            
+            case F4_Index_NoteKind_CommentTag:
+            {
+                sort = S8Lit("comment tag");
+            }break;
+            
+            case F4_Index_NoteKind_CommentToDo:
+            {
+                sort = S8Lit("TODO");
+            }break;
+            
+            default: break;
+        }
+        lister_add_item(lister, name, sort, jump, 0);
+    }
+}
+
 
 // NOTE(Momo): list project definitions
-// TODO(Momo): make it smarter? If there is only one definition, just go to that one.
 function void
 momo_list_project_definitions(Application_Links* app, String_Const_u8 init_str, b32 same_panel){
     char *query = "Index (Project):";
@@ -220,22 +305,22 @@ momo_list_project_definitions(Application_Links* app, String_Const_u8 init_str, 
     lister_set_text_field(lister, init_str);
     lister_set_default_handlers(lister);
     
-    Momo_Index_Lock();
+    F4_Index_Lock();
     {
         for (Buffer_ID buffer = get_buffer_next(app, 0, Access_Always);
              buffer != 0; buffer = get_buffer_next(app, buffer, Access_Always))
         {
-            Momo_Index_File *file = Momo_Index_LookupFile(app, buffer);
+            F4_Index_File *file = F4_Index_LookupFile(app, buffer);
             if(file != 0)
             {
-                for(Momo_Index_Note *note = file->first_note; note; note = note->next_sibling)
+                for(F4_Index_Note *note = file->first_note; note; note = note->next_sibling)
                 {
-                    _Momo_PushListerOptionForNote(app, scratch, lister, note);
+                    momo_push_lister_with_note(app, scratch, lister, note);
                 }
             }
         }
     }
-    Momo_Index_Unlock();
+    F4_Index_Unlock();
     
     Lister_Result l_result = run_lister(app, lister);
     Tiny_Jump result = {};
@@ -246,12 +331,125 @@ momo_list_project_definitions(Application_Links* app, String_Const_u8 init_str, 
     if (result.buffer != 0)
     {
         View_ID view = get_this_ctx_view(app, Access_Always);
-        if (!same_panel) {
+        if(!same_panel)
+        {
             view = get_next_view_looped_primary_panels(app, view, Access_Always);
         }
         point_stack_push_view_cursor(app, view);
-        Momo_JumpToLocation(app, view, result.buffer, result.pos);
-        
-     
+        momo_jump_to_location(app, view, result.buffer, result.pos);
     }
+}
+
+function i64
+momo_boundary_token_and_whitespace(Application_Links *app, Buffer_ID buffer, 
+                               Side side, Scan_Direction direction, i64 pos)
+{
+    i64 result = boundary_non_whitespace(app, buffer, side, direction, pos);
+    Token_Array tokens = get_token_array_from_buffer(app, buffer);
+    if (tokens.tokens != 0){
+        switch (direction){
+            case Scan_Forward:
+            {
+                i64 buffer_size = buffer_get_size(app, buffer);
+                result = buffer_size;
+                if(tokens.count > 0)
+                {
+                    Token_Iterator_Array it = token_iterator_pos(0, &tokens, pos);
+                    Token *token = token_it_read(&it);
+                    
+                    if(token == 0)
+                    {
+                        break;
+                    }
+                    
+                    // NOTE(rjf): Comments/Strings
+                    if(token->kind == TokenBaseKind_Comment ||
+                       token->kind == TokenBaseKind_LiteralString)
+                    {
+                        result = boundary_non_whitespace(app, buffer, side, direction, pos);
+                        break;
+                    }
+                    
+                    // NOTE(rjf): All other cases.
+                    else
+                    {
+                        if (token->kind == TokenBaseKind_Whitespace)
+                        {
+                            // token_it_inc_non_whitespace(&it);
+                            // token = token_it_read(&it);
+                        }
+                        
+                        if (side == Side_Max){
+                            result = token->pos + token->size;
+                            
+                            token_it_inc_all(&it);
+                            Token *ws = token_it_read(&it);
+                            if(ws != 0 && ws->kind == TokenBaseKind_Whitespace &&
+                               get_line_number_from_pos(app, buffer, ws->pos + ws->size) ==
+                               get_line_number_from_pos(app, buffer, token->pos))
+                            {
+                                result = ws->pos + ws->size;
+                            }
+                        }
+                        else{
+                            if (token->pos <= pos){
+                                token_it_inc_non_whitespace(&it);
+                                token = token_it_read(&it);
+                            }
+                            if (token != 0){
+                                result = token->pos;
+                            }
+                        }
+                    }
+                    
+                }
+            }break;
+            
+            case Scan_Backward:
+            {
+                result = 0;
+                if (tokens.count > 0){
+                    Token_Iterator_Array it = token_iterator_pos(0, &tokens, pos);
+                    Token *token = token_it_read(&it);
+                    
+                    Token_Iterator_Array it2 = it;
+                    token_it_dec_non_whitespace(&it2);
+                    Token *token2 = token_it_read(&it2);
+                    
+                    // NOTE(rjf): Comments/Strings
+                    if(token->kind == TokenBaseKind_Comment ||
+                       token->kind == TokenBaseKind_LiteralString ||
+                       (token2 && 
+                        token2->kind == TokenBaseKind_Comment ||
+                        token2->kind == TokenBaseKind_LiteralString))
+                    {
+                        result = boundary_non_whitespace(app, buffer, side, direction, pos);
+                        break;
+                    }
+                    
+                    if (token->kind == TokenBaseKind_Whitespace){
+                        token_it_dec_non_whitespace(&it);
+                        token = token_it_read(&it);
+                    }
+                    if (token != 0){
+                        if (side == Side_Min){
+                            if (token->pos >= pos){
+                                token_it_dec_non_whitespace(&it);
+                                token = token_it_read(&it);
+                            }
+                            result = token->pos;
+                        }
+                        else{
+                            if (token->pos + token->size >= pos){
+                                token_it_dec_non_whitespace(&it);
+                                token = token_it_read(&it);
+                            }
+                            result = token->pos + token->size;
+                        }
+                    }
+                }
+            }break;
+        }
+    }
+    return(result);
 }
