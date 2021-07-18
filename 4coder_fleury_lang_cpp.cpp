@@ -387,8 +387,26 @@ internal F4_LANGUAGE_INDEXFILE(F4_CPP_IndexFile)
             b32 prototype = 0;
             if(F4_CPP_ParseFunctionBodyIFuckingHateCPlusPlus(ctx, &prototype))
             {
+#if 0
                 F4_Index_MakeNote(ctx->app, ctx->file, containing_struct, F4_Index_StringFromToken(ctx, name),
                                   F4_Index_NoteKind_Function, prototype ? F4_Index_NoteFlag_ProductType : 0, Ii64(name));
+#endif
+
+                u8 buffer[512];
+                String_u8 str = Su8(buffer, 0, ArrayCount(buffer));
+                if (containing_struct != 0) {
+                    string_append(&str, containing_struct->string);
+                    string_append(&str, string_u8_litexpr("::"));
+                    string_append(&str, F4_Index_StringFromToken(ctx, name));
+                    F4_Index_MakeNote(ctx->app, ctx->file, 0, str.string,
+                        F4_Index_NoteKind_Function, prototype ? F4_Index_NoteFlag_ProductType : 0, Ii64(name));
+                }
+                else {
+                    F4_Index_MakeNote(ctx->app, ctx->file, 0, F4_Index_StringFromToken(ctx,name),
+                        F4_Index_NoteKind_Function, prototype ? F4_Index_NoteFlag_ProductType : 0, Ii64(name));
+                }
+
+              
             }
         }
         
