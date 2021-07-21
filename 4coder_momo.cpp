@@ -653,13 +653,6 @@ CUSTOM_DOC("Momo startup event")
         def_audio_init();
     }
     
-    //~ NOTE(rjf): Initialize bindings.
-    {
-        String_Const_u8 bindings_file = string_u8_litexpr("bindings.4coder");
-        dynamic_binding_load_from_file(app, &framework_mapping, bindings_file);
-        momo_set_essential_bindings(&framework_mapping);
-    }
-    
     //~ NOTE(rjf): Initialize stylish fonts.
     {
         Scratch_Block scratch(app);
