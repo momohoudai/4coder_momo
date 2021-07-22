@@ -321,86 +321,19 @@
 //
 // - f4_uncomment_selection: VS-style uncommenting.
 
-//~ TODO FOR SHAWN
-//
-// [ ] Project File Opener: Ignore directories, recursively list options.
-// [X] Ctrl+Arrows: It's still weird... it skips punctuation weridly.
-// [ ] Recent Files Menu: this isn't bad!  If it just defaulted to the first one
-//     (but still allowed typing), and if the key that opened it continued to cycle
-//     the items in the list (rather than closing the lister), that'd be pretty much
-//     it!
-// [ ] Tabbing: This is really close, the only problem is if the end of the selection
-//     isn't at the beginning of a line it does something really weird -- I'm not sure 
-//     what.  It shouldn't matter where the caret is, if multiple lines are selected
-//     then tab should move the lines
-// [ ] Comments: Very close!  The only problem is the multiple selection, single line 
-//     comments: instead of putting the // at the start of each line after the whitespace, 
-//     the // should be lined up with the shallowest whitespace..
-// [ ] Pressing tab on an empty line inside a scope still doesn't do anything.
-// [X] If the caret is at the start of the line and you press home, it doesn't take you to 
-//     the first non-whitespace character... basically pressing home more than once should 
-//     cycle between the first non-whitespace character and column 0
-// [X] Token-like movement inside of comments.
-// [ ] ctrl E centres the buffer on the current line,  vim has z. There's:
-//     zz -> middle, zt-> top, zb->bottom, but also: z5t will centre it 5
-//     lines from the top or whatever... is that something that's easy to add? 
-//
-// ORIGINAL REQUEST:
-// [ ] Fix not showing .-lister when cursor is at end of query
-// [ ] Cycle overloads, or list them all
-// [ ] Ctrl+I but just for the project buffers
-// [ ] Vertical edits
-//
-// DONE:
+//~ TODO for Momo
+// [ ] lister should have insert and normal mode just like vim
+// [ ] C# lexer
+// [ ] Figure out why we need to bind twice/clean up key_bindings
+// [ ] Find out some way to identify same name functions in same file
 //
 
-//~ TODO FOR CASEY
-//
-// [X] Active pane frame color/thickness control in Fleury config options, to allow turning it
-//     off entirely or changing the color
-//     done: f4_margin_size and f4_margin_use_mode_color
-// [X] Inactive pane color cursor differences
-// [X] Filenames to disambiguate indexed stuff with the same name
-// [X] Way to get to forward decl for an indexed thing too
-//     done: use go-to-definition again, at the definition site, and it should cycle between
-//     all the definitions
-// [ ] Fix clipboard stuff
-// [ ] CPM counter shenanigans
-
-//~ TODO PLOTS
-// [ ] Un-Bust Histograms
-// [ ] Fix plot clip rect bugs when the plot is not 100% in the visible range
-//     (caused by 4coder laying out characters off the screen as being at 0, 0)
-// [ ] Labels for histogram bins
-// [ ] Plots and Calc are so coupled and I hate it, please rewrite or something
-
-//~ TODO META
-// [X] Project-wide todo list (by searching for TODO and DONE comments, lister for toggling)
-// [ ] Project switcher
-// [ ] Plan + do modal input scheme... Identifier-mode, text-mode, semantics mode, search mode...?
-
-//~ NOTE(rjf): For DION team docs server stuff.
-// {
-#if OS_WINDOWS
-#include <WinSock2.h>
-#include <Ws2tcpip.h>
-#include <windows.h>
-typedef int socklen_t;
-#pragma comment(lib, "Ws2_32.lib")
-#endif
-// }
-
-//~ NOTE(rjf): Macros and pragmase stuff that have to be put here for various
-// reasons
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include "4coder_default_include.cpp"
 #pragma warning(disable : 4706)
 #pragma warning(disable : 4456)
-#define COMMAND_SERVER_PORT 4041
-#define COMMAND_SERVER_UPDATE_PERIOD_MS 200
-#define COMMAND_SERVER_AUTO_LAUNCH_IF_FILE_PRESENT "project_namespaces.txt"
 
 #include "4coder_momo_base.cpp"
 
@@ -463,8 +396,16 @@ typedef int socklen_t;
 
 
 
-
+#include "4coder_momo_lang.h"
 #include "4coder_momo_index.h"
+#include "4coder_momo_colors.h"
+#include "4coder_momo_brace.h"
+#include "4coder_momo_key_bindings.h"
+#include "4coder_momo_cursor.h"
+#include "4coder_momo_error_annotations.h"
+#include "4coder_momo_lister.h"
+#include "4coder_momo_commands.h"
+
 #include "4coder_momo_lang.cpp"
 #include "4coder_momo_index.cpp"
 #include "4coder_momo_colors.cpp"
@@ -472,6 +413,7 @@ typedef int socklen_t;
 #include "4coder_momo_key_bindings.cpp"
 #include "4coder_momo_cursor.cpp"
 #include "4coder_momo_error_annotations.cpp"
+#include "4coder_momo_lister.cpp"
 #include "4coder_momo_commands.cpp"
 
 #include "4coder_momo_hooks.cpp"
@@ -652,6 +594,15 @@ CUSTOM_DOC("Momo startup event")
     {
         def_audio_init();
     }
+
+    //~ NOTE(Momo): Initialize key bindings
+    // TODO: Why are we key binding twice?
+    {
+        String_Const_u8 bindings_file = string_u8_litexpr("bindings.4coder");
+        dynamic_binding_load_from_file(app, &framework_mapping, bindings_file);
+        momo_set_essential_bindings(&framework_mapping);
+    }
+    
     
     //~ NOTE(rjf): Initialize stylish fonts.
     {

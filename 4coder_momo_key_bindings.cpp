@@ -7,12 +7,7 @@
 // Consider moving the commands to 4coder_momo_commands too
 //
 
-struct Command_Map_ID_Pair
-{
-	Command_Map_ID From;
-	Command_Map_ID To;
-};
-static Command_Map_ID_Pair GlobalCommandMapReroute[4] = {};
+
 
 CUSTOM_COMMAND_SIG(switch_to_keybinding_0)
 CUSTOM_DOC("Switch the keybindings to mode 0.")

@@ -14,6 +14,31 @@ if (global_query_mode) {\
 global_query_mode = true; \
 Defer{ global_query_mode = false; }
 
+internal void
+momo_go_to_definition(Application_Links *app, Momo_Index_Note *note, b32 same_panel)
+{
+    if(note != 0 && note->file != 0)
+    {
+        View_ID view = get_active_view(app, Access_Always);
+        Rect_f32 region = view_get_buffer_region(app, view);
+        f32 view_height = rect_height(region);
+        Buffer_ID buffer = note->file->buffer;
+        if(!same_panel)
+        {
+            view = get_next_view_looped_primary_panels(app, view, Access_Always);
+        }
+        point_stack_push_view_cursor(app, view);
+        view_set_buffer(app, view, buffer, 0);
+        i64 line_number = get_line_number_from_pos(app, buffer, note->range.min);
+        Buffer_Scroll scroll = view_get_buffer_scroll(app, view);
+        scroll.position.line_number = line_number;
+        scroll.target.line_number = line_number;
+        scroll.position.pixel_shift.y = scroll.target.pixel_shift.y = -view_height*0.5f;
+        view_set_buffer_scroll(app, view, scroll, SetBufferScroll_SnapCursorIntoView);
+        view_set_cursor(app, view, seek_pos(note->range.min));
+        view_set_mark(app, view, seek_pos(note->range.min));
+    }
+}
 
 
 function void
@@ -226,7 +251,7 @@ momo_jump_to_location(Application_Links *app, View_ID view, Buffer_ID buffer, i6
 
 
 internal void
-momo_push_lister_with_note(Application_Links *app, Arena *arena, Lister *lister, Momo_Index_Note *note)
+momo_push_lister_with_note(Application_Links *app, Arena *arena, Momo_Lister *lister, Momo_Index_Note *note)
 {
     if(note && note->file)
     {
@@ -276,22 +301,22 @@ momo_push_lister_with_note(Application_Links *app, Arena *arena, Lister *lister,
             
             default: break;
         }
-        lister_add_item(lister, name, sort, jump, 0);
+        momo_lister_add_item(lister, name, sort, jump, 0);
     }
 }
 
-
-// NOTE(Momo): list project definitions
+// NOTE(Momo): Pred must be of type: b32(Momo_Index_Note*)
+template<typename Pred>
 function void
-momo_list_project_definitions(Application_Links* app, String_Const_u8 init_str, b32 same_panel){
+momo_list_project_notes_custom(Application_Links* app, String_Const_u8 init_str, b32 same_panel, Pred pred){
     char *query = "Index (Project):";
     
     Scratch_Block scratch(app);
-    Lister_Block lister(app, scratch);
-    lister_set_query(lister, query);
-    lister_set_key(lister, init_str);
-    lister_set_text_field(lister, init_str);
-    lister_set_default_handlers(lister);
+    Momo_Lister_Block lister(app, scratch);
+    momo_lister_set_query(lister, query);
+    momo_lister_set_key(lister, init_str);
+    momo_lister_set_text_field(lister, init_str);
+    momo_lister_set_default_handlers(lister);
     
     Momo_Index_Lock();
     {
@@ -303,14 +328,15 @@ momo_list_project_definitions(Application_Links* app, String_Const_u8 init_str, 
             {
                 for(Momo_Index_Note *note = file->first_note; note; note = note->next_sibling)
                 {
-                    momo_push_lister_with_note(app, scratch, lister, note);
+                    if (pred(note))
+                        momo_push_lister_with_note(app, scratch, lister, note);
                 }
             }
         }
     }
     Momo_Index_Unlock();
     
-    Lister_Result l_result = run_lister(app, lister);
+    Momo_Lister_Result l_result = momo_run_lister(app, lister);
     Tiny_Jump result = {};
     if (!l_result.canceled && l_result.user_data != 0){
         block_copy_struct(&result, (Tiny_Jump*)l_result.user_data);
@@ -327,6 +353,16 @@ momo_list_project_definitions(Application_Links* app, String_Const_u8 init_str, 
         momo_jump_to_location(app, view, result.buffer, result.pos);
     }
 }
+
+function void
+momo_list_project_notes(Application_Links* app, String_Const_u8 init_str, b32 same_panel)
+{
+    momo_list_project_notes_custom(app, init_str, same_panel,   
+        [](Momo_Index_Note*) -> b32 { 
+            return true; 
+    });
+}
+
 
 function i64
 momo_boundary_token_and_whitespace(Application_Links *app, Buffer_ID buffer, 
@@ -477,9 +513,9 @@ CUSTOM_DOC("List all definitions in the index and jump to the one selected by th
     char *query = "Index (Project):";
     
     Scratch_Block scratch(app);
-    Lister_Block lister(app, scratch);
-    lister_set_query(lister, query);
-    lister_set_default_handlers(lister);
+    Momo_Lister_Block lister(app, scratch);
+    momo_lister_set_query(lister, query);
+    momo_lister_set_default_handlers(lister);
     
     Momo_Index_Lock();
     {
@@ -498,7 +534,7 @@ CUSTOM_DOC("List all definitions in the index and jump to the one selected by th
     }
     Momo_Index_Unlock();
     
-    Lister_Result l_result = run_lister(app, lister);
+    Momo_Lister_Result l_result = momo_run_lister(app, lister);
     Tiny_Jump result = {};
     if (!l_result.canceled && l_result.user_data != 0){
         block_copy_struct(&result, (Tiny_Jump*)l_result.user_data);
@@ -521,9 +557,9 @@ CUSTOM_DOC("List all definitions in the current file and jump to the one selecte
     Buffer_ID buffer = view_get_buffer(app, view, Access_Always);
     
     Scratch_Block scratch(app);
-    Lister_Block lister(app, scratch);
-    lister_set_query(lister, query);
-    lister_set_default_handlers(lister);
+    Momo_Lister_Block lister(app, scratch);
+    momo_lister_set_query(lister, query);
+    momo_lister_set_default_handlers(lister);
     
     Momo_Index_Lock();
     {
@@ -538,7 +574,7 @@ CUSTOM_DOC("List all definitions in the current file and jump to the one selecte
     }
     Momo_Index_Unlock();
     
-    Lister_Result l_result = run_lister(app, lister);
+    Momo_Lister_Result l_result = momo_run_lister(app, lister);
     Tiny_Jump result = {};
     if (!l_result.canceled && l_result.user_data != 0){
         block_copy_struct(&result, (Tiny_Jump*)l_result.user_data);
@@ -730,7 +766,20 @@ CUSTOM_DOC("List all definitions in the index and enter the token under the curs
 {
     Scratch_Block scratch(app);
     String_Const_u8 string = push_token_or_word_under_active_cursor(app, scratch);
-    momo_list_project_definitions(app, string, 1);    
+    Momo_Index_Note* note = Momo_Index_LookupNote(string);
+    if (note != 0) {
+        if (note->next == 0) {
+            // if there is only one exact match, just gooo
+            momo_go_to_definition(app, note, 1);
+        }
+        else {
+            // case for multiple notes
+            auto ignore_pred = [string](Momo_Index_Note* note) -> b32 {
+                return string_match(note->string, string);
+            };
+            momo_list_project_notes_custom(app, string, 1, ignore_pred);    
+        }
+    }
 }
 
 CUSTOM_UI_COMMAND_SIG(momo_search_for_definition_under_cursor_project_wide_other_panel)
@@ -738,7 +787,22 @@ CUSTOM_DOC("List all definitions in the index and enter the token under the curs
 {
     Scratch_Block scratch(app);
     String_Const_u8 string = push_token_or_word_under_active_cursor(app, scratch);
-    momo_list_project_definitions(app, string, 0);    
+    Momo_Index_Note* note = Momo_Index_LookupNote(string);
+    if (note != 0) {
+        if (note->next == 0) {
+            // if there is only one exact match, just gooo
+            momo_go_to_definition(app, note, 0);
+        }
+        else {
+            // case for multiple notes
+            auto ignore_pred = [string](Momo_Index_Note* note) -> b32 {
+                return string_match(note->string, string);
+            };
+            momo_list_project_notes_custom(app, string, 0, ignore_pred);    
+        }
+    }
+        
+    
 }
 
 
@@ -747,7 +811,7 @@ CUSTOM_UI_COMMAND_SIG(momo_search_for_definition_project_wide)
 CUSTOM_DOC("List all definitions in the index and jump to the one selected by the user.")
 {
     String_Const_u8 str = {};
-    momo_list_project_definitions(app, str, 1);
+    momo_list_project_notes(app, str, 1);
 }
 
 CUSTOM_COMMAND_SIG(snipe_forward_whitespace_and_token_boundary)
@@ -1029,10 +1093,11 @@ CUSTOM_DOC("Goto mode")
             if (match_key_code(&in, KeyCode_D)) {
                 Input_Modifier_Set* mods = &in.event.key.modifiers;
                 if (has_modifier(mods, KeyCode_Shift)) {
-                    momo_search_for_definition_under_cursor_project_wide_other_panel(app);
+                    momo_search_for_definition_under_cursor_project_wide(app);
                 }
                 else {
-                    momo_search_for_definition_under_cursor_project_wide(app);
+                    momo_search_for_definition_under_cursor_project_wide_other_panel(app);
+                    
                 }
                 break;
             }
@@ -1206,6 +1271,7 @@ CUSTOM_DOC("Deletes right to an alphanumeric or camel boundary.")
                                                                        boundary_alpha_numeric,
                                                                        boundary_alpha_numeric_camel));
 }
+
 
 
 #endif

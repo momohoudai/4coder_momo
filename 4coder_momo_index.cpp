@@ -201,6 +201,7 @@ Momo_Index_ClearFile(Momo_Index_File *file)
     }
 }
 
+
 internal Momo_Index_Note *
 Momo_Index_LookupNote(String_Const_u8 string, Momo_Index_Note *parent)
 {
