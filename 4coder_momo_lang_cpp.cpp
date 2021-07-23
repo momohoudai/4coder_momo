@@ -235,6 +235,13 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
                                   MOMO_INDEX_NOTE_KIND_TYPE, MOMO_INDEX_NOTE_FLAG_PRODUCT_TYPE, Ii64(name));
             }
         }
+
+        //~ NOTE(Momo): Class
+        else if(Momo_Index_ParsePattern(ctx, "%t", "class"))
+        {
+            handled = 1;
+            momo_cpp_parse_struct(ctx, MOMO_INDEX_NOTE_FLAG_PRODUCT_TYPE);
+        }
         
         //~ NOTE(rjf): Unions
         else if(Momo_Index_ParsePattern(ctx, "%t", "union"))
@@ -519,7 +526,7 @@ internal MOMO_LANGUAGE_POSCONTEXT(momo_cpp_poscontext)
                     Token *name = token_it_read(&it);
                     if(name && name->kind == TokenBaseKind_Identifier)
                     {
-                        momo_language_poscontext_push_data_call(arena, &first, &last, push_buffer_range(app, arena, buffer, Ii64(name)), arg_idx);
+                        Momo_Language_PosContext_PushDataCall(arena, &first, &last, push_buffer_range(app, arena, buffer, Ii64(name)), arg_idx);
                         count += 1;
                         arg_idx = 0;
                     }

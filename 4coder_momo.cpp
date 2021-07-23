@@ -323,10 +323,9 @@
 
 //~ TODO for Momo
 // [ ] lister should have insert and normal mode just like vim
-// [ ] C# lexer
 // [ ] Figure out why we need to bind twice/clean up key_bindings
 // [ ] Find out some way to identify same name functions in same file
-//
+// [ ] Added scope information to note index? 
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -460,7 +459,7 @@ void custom_layer_init(Application_Links *app)
     
     // NOTE(rjf): Register languages.
     {
-        momo_register_languages();
+        Momo_Language_RegisterAll();
     }
 }
 

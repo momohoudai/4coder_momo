@@ -751,6 +751,14 @@ momo_lister_add_item(Momo_Lister *lister, String_Const_u8 string, String_Const_u
                            user_data, extra_space));
 }
 
+function void*
+momo_lister_add_item(Momo_Lister *lister, String_Const_u8 string, String_Const_u8 status, String_Const_u8 info, void *user_data, u64 extra_space){
+    return(momo_lister_add_item(lister,
+                           momo_lister_prealloced(push_string_copy(lister->arena, string)),
+                           momo_lister_prealloced(push_string_copy(lister->arena, status)),
+                           user_data, extra_space));
+}
+
 function Lister_Activation_Code
 momo_lister__write_string__default(Application_Links *app){
     Lister_Activation_Code result = ListerActivation_Continue;

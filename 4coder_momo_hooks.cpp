@@ -26,12 +26,12 @@ momo_do_full_lex_async_sub(Async_Context *actx, Buffer_ID buffer_id)
     Token_List list = {};
     b32 canceled = false;
     
-    Momo_Language *language = momo_get_language_from_buffer(app, buffer_id);
+    Momo_Language *language = Momo_Language_GetFromBuffer(app, buffer_id);
     
     // NOTE(rjf): Fall back to C++ if we don't have a proper language.
     if(language == 0)
     {
-        language = momo_get_language_from_string(S8Lit("cpp"));
+        language = Momo_Language_GetFromString(S8Lit("cpp"));
     }
     
     if(language != 0)
@@ -777,7 +777,7 @@ function BUFFER_HOOK_SIG(momo_begin_buffer)
     // NOTE(rjf): Treat as code if we've identified the language of a file.
     if(treat_as_code == false)
     {
-        Momo_Language *language = momo_get_language_from_buffer(app, buffer_id);
+        Momo_Language *language = Momo_Language_GetFromBuffer(app, buffer_id);
         if(language)
         {
             treat_as_code = true;
@@ -986,11 +986,11 @@ function BUFFER_EDIT_RANGE_SIG(momo_buffer_edit_range)
             String_Const_u8 partial_text = push_buffer_range(app, scratch, buffer_id, relex_range);
             
             //~ NOTE(rjf): Lex
-            Momo_Language *language = momo_get_language_from_buffer(app, buffer_id);
+            Momo_Language *language = Momo_Language_GetFromBuffer(app, buffer_id);
             // NOTE(rjf): Fall back to C++ if we don't have a proper language.
             if(language == 0)
             {
-                language = momo_get_language_from_string(S8Lit("cpp"));
+                language = Momo_Language_GetFromString(S8Lit("cpp"));
             }
             Token_List relex_list = Momo_Language_LexFullInput_NoBreaks(app, language, scratch, partial_text);
             //~

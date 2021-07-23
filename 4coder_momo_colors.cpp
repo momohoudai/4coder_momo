@@ -273,7 +273,7 @@ momo_syntax_highlight(Application_Links *app, Text_Layout_ID text_layout_id, Tok
         }
     }
     
-    Momo_Language *lang = momo_get_language_from_buffer(app, buffer);
+    Momo_Language *lang = Momo_Language_GetFromBuffer(app, buffer);
     if(lang != 0 && lang->Highlight != 0)
     {
         lang->Highlight(app, text_layout_id, array, table);

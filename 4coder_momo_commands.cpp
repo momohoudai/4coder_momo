@@ -276,7 +276,16 @@ momo_push_lister_with_note(Application_Links *app, Arena *arena, Momo_Lister *li
             
             case MOMO_INDEX_NOTE_KIND_FUNCTION:
             {
-                sort = push_stringf(arena, "function [%s]", note->flags & MOMO_INDEX_NOTE_FLAG_PROTOTYPE ? "prototype" : "def");
+                if (note->additional_info.size > 0) {
+                    sort = push_stringf(arena, "func [%s] %.*s", 
+                                        note->flags & MOMO_INDEX_NOTE_FLAG_PROTOTYPE ? "prototype" : "def",
+                                        string_expand(note->additional_info));
+                }
+                else {
+                    sort = push_stringf(arena, "func [%s]", 
+                                        note->flags & MOMO_INDEX_NOTE_FLAG_PROTOTYPE ? "prototype" : "def");
+                }
+                
             }break;
             
             case MOMO_INDEX_NOTE_KIND_MACRO:
@@ -301,6 +310,7 @@ momo_push_lister_with_note(Application_Links *app, Arena *arena, Momo_Lister *li
             
             default: break;
         }
+        
         momo_lister_add_item(lister, name, sort, jump, 0);
     }
 }
