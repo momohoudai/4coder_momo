@@ -106,14 +106,12 @@ Momo_CS_Parse_StructBody(Momo_Index_ParseCtx *ctx)
     b32 valid = 0;
     
     // must have name
-    if(!Momo_Index_ParsePattern(ctx, "%k", TokenBaseKind_Identifier, &name))
-    {
+    if(!Momo_Index_ParsePattern(ctx, "%k", TokenBaseKind_Identifier, &name)) {
         return;
     }
 
     String_Const_u8 t = Momo_Index_StringFromToken(ctx, name);
-
-    // TODO: if we run into inheritance, ignore until '{'
+   
     b32 found_open_brace = 0;
     if(Momo_Index_ParsePattern(ctx, "%t", ":")) {
         for(;!ctx->done;) {
@@ -152,11 +150,9 @@ Momo_CS_Parse_StructBody(Momo_Index_ParseCtx *ctx)
                 }
 
                 if (!constructor) {
-                    if(Momo_CS_Parse_FunctionBody(ctx))
-                    {
+                    if(Momo_CS_Parse_FunctionBody(ctx)) {
                         Momo_Index_MakeNote(ctx->app, ctx->file, 0, Momo_Index_StringFromToken(ctx, func_name),
-                                        MOMO_INDEX_NOTE_KIND_FUNCTION, 0, Ii64(func_name),
-                                        Momo_Index_StringFromToken(ctx, name));
+                                        MOMO_INDEX_NOTE_KIND_FUNCTION, 0, Ii64(func_name));
                     }
                 }
                 
@@ -173,11 +169,7 @@ Momo_CS_Parse_StructBody(Momo_Index_ParseCtx *ctx)
         }
     }
     
-    
-
-   
-    if(valid)
-    {
+    if(valid) {
         Momo_Index_MakeNote(ctx->app, ctx->file, 0, Momo_Index_StringFromToken(ctx, name),
                           MOMO_INDEX_NOTE_KIND_TYPE, 0, Ii64(name));
     }

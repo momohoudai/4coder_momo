@@ -276,16 +276,9 @@ momo_push_lister_with_note(Application_Links *app, Arena *arena, Momo_Lister *li
             
             case MOMO_INDEX_NOTE_KIND_FUNCTION:
             {
-                if (note->additional_info.size > 0) {
-                    sort = push_stringf(arena, "func [%s] %.*s", 
-                                        note->flags & MOMO_INDEX_NOTE_FLAG_PROTOTYPE ? "prototype" : "def",
-                                        string_expand(note->additional_info));
-                }
-                else {
-                    sort = push_stringf(arena, "func [%s]", 
-                                        note->flags & MOMO_INDEX_NOTE_FLAG_PROTOTYPE ? "prototype" : "def");
-                }
-                
+                sort = push_stringf(arena, "func [%s]", 
+                                    note->flags & MOMO_INDEX_NOTE_FLAG_PROTOTYPE ? "prototype" : "def");
+               
             }break;
             
             case MOMO_INDEX_NOTE_KIND_MACRO:

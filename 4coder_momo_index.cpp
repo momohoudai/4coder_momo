@@ -235,8 +235,7 @@ Momo_Index_MakeNote(Application_Links *app,
                   String_Const_u8 string,
                   Momo_Index_Note_Kind note_kind,
                   Momo_Index_Note_Flags note_flags,
-                  Range_i64 range,
-                  String_Const_u8 additional_info)
+                  Range_i64 range)
 {
     ProfileScope(app, "[f] MakeNote");
     
@@ -325,10 +324,6 @@ Momo_Index_MakeNote(Application_Links *app,
             result->range = range;
             result->file = file;
             result->file_generation = file->generation;
-            if (additional_info.size > 0) {
-                result->additional_info = push_string_copy(&file->arena, additional_info);
-            }
-            
         }
     }
     return result;

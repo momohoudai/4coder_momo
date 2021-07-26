@@ -37,7 +37,6 @@ struct Momo_Index_Note
     Momo_Index_Note *last_child;
     
     u64 hash;
-    String_Const_u8 additional_info;
     String_Const_u8 string;
     Momo_Index_Note_Kind kind;
     Momo_Index_Note_Flags flags;
@@ -97,8 +96,7 @@ internal Momo_Index_Note *Momo_Index_MakeNote(Application_Links *app,
                                           String_Const_u8 string,
                                           Momo_Index_Note_Kind note_kind,
                                           Momo_Index_Note_Flags note_flags,
-                                          Range_i64 range,
-                                          String_Const_u8 additional_info = {});
+                                          Range_i64 range);
 internal void Momo_Index_ParseFile(Application_Links *app, Momo_Index_File *file, String_Const_u8 string, Token_Array tokens);
 internal b32 Momo_Index_ParseCtx_Inc(Momo_Index_ParseCtx *ctx, Momo_Index_Token_Skip_Flags flags);
 #define Momo_Index_ParseCtx_IncWs(ctx) Momo_Index_ParseCtx_Inc(ctx, MOMO_INDEX_TOKEN_SKIP_FLAG_WHITESPACE)
