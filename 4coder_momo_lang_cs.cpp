@@ -125,6 +125,9 @@ Momo_CS_Parse_StructBody(Momo_Index_ParseCtx *ctx)
         }
     }
 
+    Momo_Index_Note *parent_struct = Momo_Index_MakeNote(ctx->app, ctx->file, 0, Momo_Index_StringFromToken(ctx, name),
+                            MOMO_INDEX_NOTE_KIND_TYPE, 0, Ii64(name));
+
     // followed by open prases
     if(found_open_brace || Momo_Index_ParsePattern(ctx, "%t", "{")) {
         for(;!ctx->done;)
@@ -144,14 +147,15 @@ Momo_CS_Parse_StructBody(Momo_Index_ParseCtx *ctx)
                 b32 constructor = 0;
                 if (string_match(base_type_str, string_u8_litexpr("public")) || 
                     string_match(base_type_str, string_u8_litexpr("private")) || 
-                    string_match(base_type_str, string_u8_litexpr("protected"))){
+                    string_match(base_type_str, string_u8_litexpr("protected")))
+                {
                     // probably a constructor?
                     constructor = 1;
                 }
 
                 if (!constructor) {
                     if(Momo_CS_Parse_FunctionBody(ctx)) {
-                        Momo_Index_MakeNote(ctx->app, ctx->file, 0, Momo_Index_StringFromToken(ctx, func_name),
+                        Momo_Index_MakeNote(ctx->app, ctx->file, parent_struct, Momo_Index_StringFromToken(ctx, func_name),
                                         MOMO_INDEX_NOTE_KIND_FUNCTION, 0, Ii64(func_name));
                     }
                 }
@@ -169,9 +173,10 @@ Momo_CS_Parse_StructBody(Momo_Index_ParseCtx *ctx)
         }
     }
     
-    if(valid) {
-        Momo_Index_MakeNote(ctx->app, ctx->file, 0, Momo_Index_StringFromToken(ctx, name),
-                          MOMO_INDEX_NOTE_KIND_TYPE, 0, Ii64(name));
+    if(!valid) {
+        // Invalidate the note?
+        //Momo_Index_MakeNote(ctx->app, ctx->file, 0, Momo_Index_StringFromToken(ctx, name),
+        //                    MOMO_INDEX_NOTE_KIND_TYPE, 0, Ii64(name));
     }
 }
 

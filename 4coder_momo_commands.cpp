@@ -333,6 +333,10 @@ momo_list_project_notes_custom(Application_Links* app, String_Const_u8 init_str,
                 {
                     if (pred(note))
                         momo_push_lister_with_note(app, scratch, lister, note);
+                    
+                    for(Momo_Index_Note *note_child = note->first_child; note_child; note_child = note_child->next_sibling) {
+                        momo_push_lister_with_note(app, scratch, lister, note_child);
+                    }
                 }
             }
         }
