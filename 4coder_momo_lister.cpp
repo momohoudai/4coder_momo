@@ -683,6 +683,7 @@ momo_run_lister(Application_Links *app, Momo_Lister *lister){
         }
         
         if (!handled){
+#if 0
             Mapping *mapping = lister->mapping;
             Command_Map *map = lister->map;
             
@@ -692,12 +693,16 @@ momo_run_lister(Application_Links *app, Momo_Lister *lister){
                 call_after_ctx_shutdown(app, view, disp_result.func);
                 break;
             }
+
             if (disp_result.code == FallbackDispatch_Unhandled){
                 leave_current_input_unhandled(app);
             }
             else{
                 momo_lister_call_refresh_handler(app, lister);
             }
+#else
+            leave_current_input_unhandled(app);
+#endif
         }
     }
     

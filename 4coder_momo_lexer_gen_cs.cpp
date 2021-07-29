@@ -159,6 +159,8 @@ build_language_model(void){
     sm_select_base_kind(TokenBaseKind_Keyword);
     sm_key("Void");
     sm_key("Delegate");
+    sm_key("In");
+    sm_key("Foreach");
     sm_key("Event");
     sm_key("Bool");
     sm_key("Uint");

@@ -338,11 +338,11 @@
 
 //~ NOTE(rjf): @f4_headers
 //#include "4coder_fleury_ubiquitous.h"
-#include "4coder_fleury_audio.h"
+//#include "4coder_fleury_audio.h"
 //#include "4coder_fleury_lang.h"
 //#include "4coder_fleury_index.h"
 //#include "4coder_fleury_colors.h"
-#include "4coder_fleury_render_helpers.h"
+//#include "4coder_fleury_render_helpers.h"
 //#include "4coder_fleury_brace.h"
 //#include "4coder_fleury_error_annotations.h"
 #include "4coder_fleury_divider_comments.h"
@@ -365,11 +365,11 @@
 
 //~ NOTE(rjf): @f4_src
 //#include "4coder_fleury_ubiquitous.cpp"
-#include "4coder_fleury_audio.cpp"
+//#include "4coder_fleury_audio.cpp"
 //#include "4coder_fleury_lang.cpp"
 //#include "4coder_fleury_index.cpp"
 //#include "4coder_fleury_colors.cpp"
-#include "4coder_fleury_render_helpers.cpp"
+//#include "4coder_fleury_render_helpers.cpp"
 //#include "4coder_fleury_brace.cpp"
 //#include "4coder_fleury_error_annotations.cpp"
 #include "4coder_fleury_divider_comments.cpp"
@@ -391,7 +391,7 @@
 //#include "4coder_fleury_hooks.cpp"
 
 //~ NOTE(rjf): Plots Demo File
-#include "4coder_fleury_plots_demo.cpp"
+//#include "4coder_fleury_plots_demo.cpp"
 
 
 
@@ -414,6 +414,7 @@
 #include "4coder_momo_error_annotations.cpp"
 #include "4coder_momo_lister.cpp"
 #include "4coder_momo_commands.cpp"
+
 
 #include "4coder_momo_hooks.cpp"
 

@@ -202,6 +202,28 @@ Momo_Index_ClearFile(Momo_Index_File *file)
 }
 
 
+
+
+internal Momo_Index_Note *
+Momo_Index_LookupNote(String_Const_u8 string)
+{
+    Momo_Index_Note *result = 0;
+    u64 hash = table_hash_u8(string.str, string.size);
+    u64 slot = hash % ArrayCount(momo_index.note_table);
+    for(Momo_Index_Note *note = momo_index.note_table[slot]; note; note = note->hash_next)
+    {
+        if(note->hash == hash)
+        {
+            if(string_match(string, note->string))
+            {
+                result = note;
+                break;
+            }
+        }
+    }
+    return result;
+}
+
 internal Momo_Index_Note *
 Momo_Index_LookupNote(String_Const_u8 string, Momo_Index_Note *parent)
 {
@@ -222,11 +244,13 @@ Momo_Index_LookupNote(String_Const_u8 string, Momo_Index_Note *parent)
     return result;
 }
 
+#if 0
 internal Momo_Index_Note *
 Momo_Index_LookupNote(String_Const_u8 string)
 {
     return Momo_Index_LookupNote(string, 0);
 }
+#endif
 
 internal Momo_Index_Note *
 Momo_Index_MakeNote(Application_Links *app,

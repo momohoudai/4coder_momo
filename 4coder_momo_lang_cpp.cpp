@@ -390,30 +390,31 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
                                        TokenBaseKind_Identifier, &name,
                                        "(")))
         {
-            handled = 1;
-            b32 prototype = 0;
-            if(momo_cpp_parse_function_body(ctx, &prototype))
-            {
-#if 0
-                Momo_Index_MakeNote(ctx->app, ctx->file, containing_struct, Momo_Index_StringFromToken(ctx, name),
-                                  MOMO_INDEX_NOTE_KIND_FUNCTION, prototype ? MOMO_INDEX_NOTE_FLAG_PRODUCT_TYPE : 0, Ii64(name));
-#endif
+            String_Const_u8 name_str = Momo_Index_StringFromToken(ctx, name);
 
-                u8 buffer[512];
-                String_u8 str = Su8(buffer, 0, ArrayCount(buffer));
-                if (containing_struct != 0) {
-                    string_append(&str, containing_struct->string);
-                    string_append(&str, string_u8_litexpr("::"));
-                    string_append(&str, Momo_Index_StringFromToken(ctx, name));
-                    Momo_Index_MakeNote(ctx->app, ctx->file, 0, str.string,
-                        MOMO_INDEX_NOTE_KIND_FUNCTION, prototype ? MOMO_INDEX_NOTE_FLAG_PRODUCT_TYPE : 0, Ii64(name));
-                }
-                else {
-                    Momo_Index_MakeNote(ctx->app, ctx->file, 0, Momo_Index_StringFromToken(ctx,name),
-                        MOMO_INDEX_NOTE_KIND_FUNCTION, prototype ? MOMO_INDEX_NOTE_FLAG_PRODUCT_TYPE : 0, Ii64(name));
-                }
+            // ignore constructors
+            if(!string_match(containing_struct->string, name_str)) {
+                
+                handled = 1;
+                b32 prototype = 0;
+                if(momo_cpp_parse_function_body(ctx, &prototype))
+                {
+                    u8 buffer[512];
+                    String_u8 str = Su8(buffer, 0, ArrayCount(buffer));
+                    if (containing_struct != 0) {
+                        string_append(&str, containing_struct->string);
+                        string_append(&str, string_u8_litexpr("::"));
+                        string_append(&str, Momo_Index_StringFromToken(ctx, name));
+                        Momo_Index_MakeNote(ctx->app, ctx->file, 0, str.string,
+                            MOMO_INDEX_NOTE_KIND_FUNCTION, prototype ? MOMO_INDEX_NOTE_FLAG_PRODUCT_TYPE : 0, Ii64(name));
+                    }
+                    else {
+                        Momo_Index_MakeNote(ctx->app, ctx->file, 0, Momo_Index_StringFromToken(ctx,name),
+                            MOMO_INDEX_NOTE_KIND_FUNCTION, prototype ? MOMO_INDEX_NOTE_FLAG_PRODUCT_TYPE : 0, Ii64(name));
+                    }
 
-              
+                
+                }
             }
         }
         

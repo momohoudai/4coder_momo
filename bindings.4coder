@@ -4,7 +4,7 @@ keys_global = {
     { "toggle_fullscreen",			 "Return", "Alt" },  
 	
 	{ "exit_4coder",          "F4", "Alt" },
-    { "command_lister",                "Semicolon", "Shift" },
+    { "momo_command_lister",                "Semicolon", "Shift" },
     { "quick_swap_buffer",             "O", "Control" },
 
     { "list_all_functions_current_buffer_lister", "I", "Control", "Shift" },
@@ -133,6 +133,7 @@ keys_global_1 = {
     { "momo_leave_event_unhandled", "BackwardSlash", "Shift" },
     { "momo_leave_event_unhandled", "Tab", "Shift" },
 	{ "momo_leave_event_unhandled", "Semicolon", "Shift" },
+
 
     { "momo_leave_event_unhandled", "1", "Control" },
     { "momo_leave_event_unhandled", "2", "Control" },
