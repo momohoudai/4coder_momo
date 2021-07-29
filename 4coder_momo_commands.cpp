@@ -15,28 +15,28 @@ momo_push_lister_with_directory_files(Application_Links *app, Momo_Lister *liste
     if (!character_is_slash(string_get_character(hot, hot.size - 1))){
         hot = push_u8_stringf(lister->arena, "%.*s/", string_expand(hot));
     }
-    momo_lister_set_text_field(lister, hot);
-    momo_lister_set_key(lister, string_front_of_path(hot));
+    Momo_Lister_SetTextField(lister, hot);
+    Momo_Lister_SetKey(lister, string_front_of_path(hot));
     
     File_List file_list = system_get_file_list(scratch, hot);
     end_temp(temp);
     
     File_Info **one_past_last = file_list.infos + file_list.count;
     
-    momo_lister_begin_new_item_set(app, lister);
+    Momo_Lister_BeginNewItemSet(app, lister);
     
     hot = push_hot_directory(app, lister->arena);
     push_align(lister->arena, 8);
     if (hot.str != 0){
         String_Const_u8 empty_string = string_u8_litexpr("");
-        Momo_Lister_Prealloced_String empty_string_prealloced = momo_lister_prealloced(empty_string);
+        Momo_Lister_Prealloced_String empty_string_prealloced = Momo_Lister_PreAlloced(empty_string);
         for (File_Info **info = file_list.infos;
              info < one_past_last;
              info += 1){
             if (!HasFlag((**info).attributes.flags, FileAttribute_IsDirectory)) continue;
             String_Const_u8 file_name = push_u8_stringf(lister->arena, "%.*s/",
                                                         string_expand((**info).file_name));
-            momo_lister_add_item(lister, momo_lister_prealloced(file_name), empty_string_prealloced, file_name.str, 0);
+            Momo_Lister_AddItem(lister, Momo_Lister_PreAlloced(file_name), empty_string_prealloced, file_name.str, 0);
         }
         
         for (File_Info **info = file_list.infos;
@@ -69,21 +69,20 @@ momo_push_lister_with_directory_files(Application_Links *app, Momo_Lister *liste
                 }
             }
             String_Const_u8 status = push_u8_stringf(lister->arena, "%s%s", is_loaded, status_flag);
-            momo_lister_add_item(lister, momo_lister_prealloced(file_name), momo_lister_prealloced(status), file_name.str, 0);
+            Momo_Lister_AddItem(lister, Momo_Lister_PreAlloced(file_name), Momo_Lister_PreAlloced(status), file_name.str, 0);
         }
     }
 }
 
 function File_Name_Result
 momo_get_file_name_from_user(Application_Links *app, Arena *arena, String_Const_u8 query, View_ID view){
-    Scratch_Block scratch(app);
-    Momo_Lister_Block lister(app, scratch);
-    momo_lister_set_query(lister, query);
-    momo_push_lister_with_directory_files(app, lister);
-    momo_lister_set_default_handlers(lister);
+  
+    Momo_Lister_Handlers handlers = Momo_Lister_GetDefaultHandlers();
+    handlers.refresh = momo_push_lister_with_directory_files;
+    handlers.write_character = lister__write_character__file_path;
+    handlers.backspace = lister__backspace_text_field__file_path;
 
-
-    Momo_Lister_Result l_result = momo_run_lister(app, lister);
+    Momo_Lister_Result l_result = Momo_Lister_RunWithRefreshHandler(app, arena, query, handlers);
     
     File_Name_Result result = {};
     result.canceled = l_result.canceled;
@@ -118,8 +117,9 @@ momo_get_file_name_from_user(Application_Links *app, Arena *arena, char *query, 
     return(momo_get_file_name_from_user(app, arena, SCu8(query), view));
 }
 
-internal void
-momo_interactive_open_or_new(Application_Links* app) {
+CUSTOM_COMMAND_SIG(momo_interactive_open_or_new)
+CUSTOM_DOC("Interactively open a file out of the file system.") 
+{
     for (;;){
         Scratch_Block scratch(app);
         View_ID view = get_this_ctx_view(app, Access_Always);
@@ -169,6 +169,7 @@ momo_interactive_open_or_new(Application_Links* app) {
 internal void
 momo_go_to_definition(Application_Links *app, Momo_Index_Note *note, b32 same_panel)
 {
+    
     if(note != 0 && note->file != 0)
     {
         View_ID view = get_active_view(app, Access_Always);
@@ -458,7 +459,7 @@ momo_push_lister_with_note(Application_Links *app, Arena *arena, Momo_Lister *li
             default: break;
         }
         
-        momo_lister_add_item(lister, name, sort, jump, 0);
+        Momo_Lister_AddItem(lister, name, sort, jump, 0);
     }
 }
 
@@ -485,10 +486,10 @@ momo_list_project_notes_custom(Application_Links* app, String_Const_u8 init_str,
     
     Scratch_Block scratch(app);
     Momo_Lister_Block lister(app, scratch);
-    momo_lister_set_query(lister, query);
-    momo_lister_set_key(lister, init_str);
-    momo_lister_set_text_field(lister, init_str);
-    momo_lister_set_default_handlers(lister);
+    Momo_Lister_SetQuery(lister, query);
+    Momo_Lister_SetKey(lister, init_str);
+    Momo_Lister_SetTextField(lister, init_str);
+    Momo_Lister_SetDefaultHandlers(lister);
     
 
     Momo_Index_Lock();
@@ -508,7 +509,7 @@ momo_list_project_notes_custom(Application_Links* app, String_Const_u8 init_str,
     }
     Momo_Index_Unlock();
     
-    Momo_Lister_Result l_result = momo_run_lister(app, lister);
+    Momo_Lister_Result l_result = Momo_Lister_Run(app, lister);
     Tiny_Jump result = {};
     if (!l_result.canceled && l_result.user_data != 0){
         block_copy_struct(&result, (Tiny_Jump*)l_result.user_data);
@@ -686,8 +687,8 @@ CUSTOM_DOC("List all definitions in the index and jump to the one selected by th
     
     Scratch_Block scratch(app);
     Momo_Lister_Block lister(app, scratch);
-    momo_lister_set_query(lister, query);
-    momo_lister_set_default_handlers(lister);
+    Momo_Lister_SetQuery(lister, query);
+    Momo_Lister_SetDefaultHandlers(lister);
     
     Momo_Index_Lock();
     {
@@ -706,7 +707,7 @@ CUSTOM_DOC("List all definitions in the index and jump to the one selected by th
     }
     Momo_Index_Unlock();
     
-    Momo_Lister_Result l_result = momo_run_lister(app, lister);
+    Momo_Lister_Result l_result = Momo_Lister_Run(app, lister);
     Tiny_Jump result = {};
     if (!l_result.canceled && l_result.user_data != 0){
         block_copy_struct(&result, (Tiny_Jump*)l_result.user_data);
@@ -729,8 +730,8 @@ momo_get_command_from_user(Application_Links *app, String_Const_u8 query, i32 *c
     
     Scratch_Block scratch(app);
     Momo_Lister_Block lister(app, scratch);
-    momo_lister_set_query(lister, query);
-    momo_lister_set_default_handlers(lister);
+    Momo_Lister_SetQuery(lister, query);
+    Momo_Lister_SetDefaultHandlers(lister);
     
     for (i32 i = 0; i < command_id_count; i += 1){
         i32 j = i;
@@ -764,11 +765,11 @@ momo_get_command_from_user(Application_Links *app, String_Const_u8 query, i32 *c
             }break;
         }
         
-        momo_lister_add_item(lister, SCu8(fcoder_metacmd_table[j].name), status,
+        Momo_Lister_AddItem(lister, SCu8(fcoder_metacmd_table[j].name), status,
                         (void*)proc, 0);
     }
     
-    Momo_Lister_Result l_result = momo_run_lister(app, lister);
+    Momo_Lister_Result l_result = Momo_Lister_Run(app, lister);
     
     Custom_Command_Function *result = 0;
     if (!l_result.canceled){

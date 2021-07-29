@@ -1,22 +1,22 @@
 function f32
-momo_lister_get_text_field_height(f32 line_height){
+Momo_Lister_GetTextFileHeight(f32 line_height){
     return(line_height);
 }
 
 function f32
-momo_lister_get_block_height(f32 line_height){
+Momo_Lister_GetBlockHeight(f32 line_height){
     return(line_height*2);
 }
 
 function Rect_f32_Pair
-momo_lister_get_top_level_layout(Rect_f32 rect, f32 text_field_height){
+Momo_Lister_GetTopLevelLayout(Rect_f32 rect, f32 text_field_height){
     return(rect_split_top_bottom(rect, text_field_height));
 }
 
 ////////////////////////////////
 
 function Momo_Lister*
-momo_view_get_lister(Application_Links *app, View_ID view){
+Momo_Lister_GetFromView(Application_Links *app, View_ID view){
     Managed_Scope scope = view_get_managed_scope(app, view);
     Momo_Lister **ptr = scope_attachment(app, scope, view_lister_loc, Momo_Lister*);
     Momo_Lister *result = 0;
@@ -27,7 +27,7 @@ momo_view_get_lister(Application_Links *app, View_ID view){
 }
 
 function Momo_Lister*
-momo_view_set_lister(Application_Links *app, View_ID view, Momo_Lister *lister){
+Momo_Lister_SetToView(Application_Links *app, View_ID view, Momo_Lister *lister){
     Managed_Scope scope = view_get_managed_scope(app, view);
     Momo_Lister **ptr = scope_attachment(app, scope, view_lister_loc, Momo_Lister*);
     Momo_Lister *result = 0;
@@ -39,19 +39,19 @@ momo_view_set_lister(Application_Links *app, View_ID view, Momo_Lister *lister){
 }
 
 function void
-momo_lister_set_map(Momo_Lister *lister, Mapping *mapping, Command_Map *map){
+Momo_Lister_SetMap(Momo_Lister *lister, Mapping *mapping, Command_Map *map){
     lister->mapping = mapping;
     lister->map = map;
 }
 
 function void
-momo_lister_set_map(Momo_Lister *lister, Mapping *mapping, Command_Map_ID map){
+Momo_Lister_SetMap(Momo_Lister *lister, Mapping *mapping, Command_Map_ID map){
     lister->mapping = mapping;
     lister->map = mapping_get_map(mapping, map);
 }
 
 function Momo_Lister_Prev_Current
-momo_begin_lister(Application_Links *app, Arena *arena){
+Momo_Lister_Begin(Application_Links *app, Arena *arena){
     Momo_Lister_Prev_Current result = {};
     Momo_Lister *lister = push_array_zero(arena, Momo_Lister, 1);
     lister->arena = arena;
@@ -59,23 +59,23 @@ momo_begin_lister(Application_Links *app, Arena *arena){
     lister->text_field = Su8(lister->text_field_space, 0, sizeof(lister->text_field_space));
     lister->key_string = Su8(lister->key_string_space, 0, sizeof(lister->key_string_space));
     View_ID view = get_this_ctx_view(app, Access_Always);
-    result.prev = momo_view_set_lister(app, view, lister);
+    result.prev = Momo_Lister_SetToView(app, view, lister);
     result.current = lister;
     lister->restore_all_point = begin_temp(lister->arena);
     View_Context ctx = view_current_context(app, view);
-    momo_lister_set_map(lister, ctx.mapping, ctx.map_id);
+    Momo_Lister_SetMap(lister, ctx.mapping, ctx.map_id);
     return(result);
 }
 
 Momo_Lister_Block::Momo_Lister_Block(Application_Links *a, Arena *arena){
-    Momo_Lister_Prev_Current new_lister = momo_begin_lister(a, arena);
+    Momo_Lister_Prev_Current new_lister = Momo_Lister_Begin(a, arena);
     this->app = a;
     this->lister = new_lister;
 }
 
 Momo_Lister_Block::~Momo_Lister_Block(){
     View_ID view = get_this_ctx_view(app, Access_Always);
-    momo_view_set_lister(this->app, view, this->lister.prev);
+    Momo_Lister_SetToView(this->app, view, this->lister.prev);
 }
 
 Momo_Lister_Block::operator Momo_Lister *(){
@@ -83,80 +83,80 @@ Momo_Lister_Block::operator Momo_Lister *(){
 }
 
 function void
-momo_lister_set_string(String_Const_u8 string, String_u8 *target){
+Momo_Lister_SetString(String_Const_u8 string, String_u8 *target){
     target->size = 0;
     string_append(target, string);
 }
 function void
-momo_lister_append_string(String_Const_u8 string, String_u8 *target){
+Momo_Lister_AppendString(String_Const_u8 string, String_u8 *target){
     string_append(target, string);
 }
 
 function void
-momo_lister_set_query(Momo_Lister *lister, String_Const_u8 string){
-    momo_lister_set_string(string, &lister->query);
+Momo_Lister_SetQuery(Momo_Lister *lister, String_Const_u8 string){
+    Momo_Lister_SetString(string, &lister->query);
 }
 function void
-momo_lister_set_query(Momo_Lister *lister, char *string){
-    momo_lister_set_string(SCu8(string), &lister->query);
+Momo_Lister_SetQuery(Momo_Lister *lister, char *string){
+    Momo_Lister_SetString(SCu8(string), &lister->query);
 }
 function void
-momo_lister_set_text_field(Momo_Lister *lister, String_Const_u8 string){
-    momo_lister_set_string(string, &lister->text_field);
+Momo_Lister_SetTextField(Momo_Lister *lister, String_Const_u8 string){
+    Momo_Lister_SetString(string, &lister->text_field);
 }
 function void
-momo_lister_set_text_field(Momo_Lister *lister, char *string){
-    momo_lister_set_string(SCu8(string), &lister->text_field);
+Momo_Lister_SetTextField(Momo_Lister *lister, char *string){
+    Momo_Lister_SetString(SCu8(string), &lister->text_field);
 }
 function void
-momo_lister_set_key(Momo_Lister *lister, String_Const_u8 string){
-    momo_lister_set_string(string, &lister->key_string);
+Momo_Lister_SetKey(Momo_Lister *lister, String_Const_u8 string){
+    Momo_Lister_SetString(string, &lister->key_string);
 }
 function void
-momo_lister_set_key(Momo_Lister *lister, char *string){
-    momo_lister_set_string(SCu8(string), &lister->key_string);
-}
-
-function void
-momo_lister_append_query(Momo_Lister *lister, String_Const_u8 string){
-    momo_lister_append_string(string, &lister->query);
-}
-function void
-momo_lister_append_query(Momo_Lister *lister, char *string){
-    momo_lister_append_string(SCu8(string), &lister->query);
-}
-function void
-momo_lister_append_text_field(Momo_Lister *lister, String_Const_u8 string){
-    momo_lister_append_string(string, &lister->text_field);
-}
-function void
-momo_lister_append_text_field(Momo_Lister *lister, char *string){
-    momo_lister_append_string(SCu8(string), &lister->text_field);
-}
-function void
-momo_lister_append_key(Momo_Lister *lister, String_Const_u8 string){
-    momo_lister_append_string(string, &lister->key_string);
-}
-function void
-momo_lister_append_key(Momo_Lister *lister, char *string){
-    momo_lister_append_string(SCu8(string), &lister->key_string);
+Momo_Lister_SetKey(Momo_Lister *lister, char *string){
+    Momo_Lister_SetString(SCu8(string), &lister->key_string);
 }
 
 function void
-momo_lister_set_handlers(Momo_Lister *lister, Momo_Lister_Handlers *handlers){
+Momo_Lister_AppendQuery(Momo_Lister *lister, String_Const_u8 string){
+    Momo_Lister_AppendString(string, &lister->query);
+}
+function void
+Momo_Lister_AppendQuery(Momo_Lister *lister, char *string){
+    Momo_Lister_AppendString(SCu8(string), &lister->query);
+}
+function void
+Momo_Lister_AppendTextField(Momo_Lister *lister, String_Const_u8 string){
+    Momo_Lister_AppendString(string, &lister->text_field);
+}
+function void
+Momo_Lister_AppendTextField(Momo_Lister *lister, char *string){
+    Momo_Lister_AppendString(SCu8(string), &lister->text_field);
+}
+function void
+Momo_Lister_AppendKey(Momo_Lister *lister, String_Const_u8 string){
+    Momo_Lister_AppendString(string, &lister->key_string);
+}
+function void
+Momo_Lister_AppendKey(Momo_Lister *lister, char *string){
+    Momo_Lister_AppendString(SCu8(string), &lister->key_string);
+}
+
+function void
+Momo_Lister_SetHandlers(Momo_Lister *lister, Momo_Lister_Handlers *handlers){
     block_copy_struct(&lister->handlers, handlers);
 }
 
 function void
-momo_lister_zero_scroll(Momo_Lister *lister){
+Momo_Lister_ZeroScroll(Momo_Lister *lister){
     block_zero_struct(&lister->scroll);
 }
 
 function void
-momo_lister_render(Application_Links *app, Frame_Info frame_info, View_ID view){
+Momo_Lister_Render(Application_Links *app, Frame_Info frame_info, View_ID view){
     Scratch_Block scratch(app);
     
-    Momo_Lister *lister = momo_view_get_lister(app, view);
+    Momo_Lister *lister = Momo_Lister_GetFromView(app, view);
     if (lister == 0){
         return;
     }
@@ -167,8 +167,8 @@ momo_lister_render(Application_Links *app, Frame_Info frame_info, View_ID view){
     Face_ID face_id = get_face_id(app, 0);
     Face_Metrics metrics = get_face_metrics(app, face_id);
     f32 line_height = metrics.line_height;
-    f32 block_height = momo_lister_get_block_height(line_height);
-    f32 text_field_height = momo_lister_get_text_field_height(line_height);
+    f32 block_height = Momo_Lister_GetBlockHeight(line_height);
+    f32 text_field_height = Momo_Lister_GetTextFileHeight(line_height);
     
     // NOTE(allen): file bar
     // TODO(allen): What's going on with 'showing_file_bar'? I found it like this.
@@ -191,7 +191,7 @@ momo_lister_render(Application_Links *app, Frame_Info frame_info, View_ID view){
     Rect_f32 text_field_rect = {};
     Rect_f32 list_rect = {};
     {
-        Rect_f32_Pair pair = momo_lister_get_top_level_layout(region, text_field_height);
+        Rect_f32_Pair pair = Momo_Lister_GetTopLevelLayout(region, text_field_height);
         text_field_rect = pair.min;
         list_rect = pair.max;
     }
@@ -316,7 +316,7 @@ momo_lister_render(Application_Links *app, Frame_Info frame_info, View_ID view){
 }
 
 function void*
-momo_lister_get_user_data(Momo_Lister *lister, i32 index){
+Momo_Lister_GetUserData(Momo_Lister *lister, i32 index){
     void *result = 0;
     if (0 <= index && index < lister->options.count){
         i32 counter = 0;
@@ -333,7 +333,7 @@ momo_lister_get_user_data(Momo_Lister *lister, i32 index){
 }
 
 function Momo_Lister_Filtered
-momo_lister_get_filtered(Arena *arena, Momo_Lister *lister){
+Momo_Lister_GetFiltered(Arena *arena, Momo_Lister *lister){
     i32 node_count = lister->options.count;
     
     Momo_Lister_Filtered filtered = {};
@@ -380,7 +380,7 @@ momo_lister_get_filtered(Arena *arena, Momo_Lister *lister){
 }
 
 function void
-momo_lister_update_selection_values(Momo_Lister *lister){
+Momo_Lister_UpdateSelectionValues(Momo_Lister *lister){
     lister->raw_item_index = -1;
     lister->highlighted_node = 0;
     i32 count = lister->filtered.count;
@@ -394,11 +394,11 @@ momo_lister_update_selection_values(Momo_Lister *lister){
 }
 
 function void
-momo_lister_update_filtered_list(Application_Links *app, Momo_Lister *lister){
+Momo_Lister_UpdateFilteredList(Application_Links *app, Momo_Lister *lister){
     Arena *arena = lister->arena;
     Scratch_Block scratch(app, arena);
     
-    Momo_Lister_Filtered filtered = momo_lister_get_filtered(scratch, lister);
+    Momo_Lister_Filtered filtered = Momo_Lister_GetFiltered(scratch, lister);
     
     Momo_Lister_Node_Ptr_Array node_ptr_arrays[] = {
         filtered.exact_matches,
@@ -427,27 +427,27 @@ momo_lister_update_filtered_list(Application_Links *app, Momo_Lister *lister){
         }
     }
     
-    momo_lister_update_selection_values(lister);
+    Momo_Lister_UpdateSelectionValues(lister);
 }
 
 function void
-momo_lister_call_refresh_handler(Application_Links *app, Momo_Lister *lister){
+Momo_Lister_CallRefreshHandler(Application_Links *app, Momo_Lister *lister){
     if (lister->handlers.refresh != 0){
         lister->handlers.refresh(app, lister);
         lister->filter_restore_point = begin_temp(lister->arena);
-        momo_lister_update_filtered_list(app, lister);
+        Momo_Lister_UpdateFilteredList(app, lister);
     }
 }
 
 function void
-momo_lister_activate(Application_Links *app, Momo_Lister *lister, void *user_data, b32 mouse){
+Momo_Lister_Activate(Application_Links *app, Momo_Lister *lister, void *user_data, b32 mouse){
     lister->out.activated_by_click = mouse;
     lister->out.text_field = lister->text_field.string;
     lister->out.user_data = user_data;
 }
 
 function void*
-momo_lister_user_data_at_p(Application_Links *app, View_ID view, Momo_Lister *lister, Vec2_f32 m_p){
+Momo_Lister_UserDataAtP(Application_Links *app, View_ID view, Momo_Lister *lister, Vec2_f32 m_p){
     Rect_f32 region = view_get_screen_rect(app, view);
     // TODO(allen): eliminate this. bad bad bad bad :(
     region = rect_inner(region, 3.f);
@@ -455,8 +455,8 @@ momo_lister_user_data_at_p(Application_Links *app, View_ID view, Momo_Lister *li
     Face_ID face_id = get_face_id(app, 0);
     Face_Metrics metrics = get_face_metrics(app, face_id);
     f32 line_height = metrics.line_height;
-    f32 block_height = momo_lister_get_block_height(line_height);
-    f32 text_field_height = momo_lister_get_text_field_height(line_height);
+    f32 block_height = Momo_Lister_GetBlockHeight(line_height);
+    f32 text_field_height = Momo_Lister_GetTextFileHeight(line_height);
     
     b64 showing_file_bar = false;
     b32 hide_file_bar_in_ui = def_get_config_b32(vars_save_string_lit("hide_file_bar_in_ui"));
@@ -466,7 +466,7 @@ momo_lister_user_data_at_p(Application_Links *app, View_ID view, Momo_Lister *li
         region = pair.max;
     }
     
-    Rect_f32_Pair pair = momo_lister_get_top_level_layout(region, text_field_height);
+    Rect_f32_Pair pair = Momo_Lister_GetTopLevelLayout(region, text_field_height);
     Rect_f32 list_rect = pair.max;
     
     void *result = 0;
@@ -483,13 +483,13 @@ momo_lister_user_data_at_p(Application_Links *app, View_ID view, Momo_Lister *li
 }
 
 function Momo_Lister_Result
-momo_run_lister(Application_Links *app, Momo_Lister *lister){
+Momo_Lister_Run(Application_Links *app, Momo_Lister *lister){
     lister->filter_restore_point = begin_temp(lister->arena);
-    momo_lister_update_filtered_list(app, lister);
+    Momo_Lister_UpdateFilteredList(app, lister);
     
     View_ID view = get_this_ctx_view(app, Access_Always);
     View_Context ctx = view_current_context(app, view);
-    ctx.render_caller = momo_lister_render;
+    ctx.render_caller = Momo_Lister_Render;
     ctx.hides_buffer = true;
     View_Context_Block ctx_block(app, view, &ctx);
     
@@ -520,9 +520,9 @@ momo_run_lister(Application_Links *app, Momo_Lister *lister){
                         void *user_data = 0;
                         if (0 <= lister->raw_item_index &&
                             lister->raw_item_index < lister->options.count){
-                            user_data = momo_lister_get_user_data(lister, lister->raw_item_index);
+                            user_data = Momo_Lister_GetUserData(lister, lister->raw_item_index);
                         }
-                        momo_lister_activate(app, lister, user_data, false);
+                        Momo_Lister_Activate(app, lister, user_data, false);
                         result = ListerActivation_Finished;
                     }break;
                     
@@ -611,7 +611,7 @@ momo_run_lister(Application_Links *app, Momo_Lister *lister){
                     case MouseCode_Left:
                     {
                         Vec2_f32 p = V2f32(in.event.mouse.p);
-                        void *clicked = momo_lister_user_data_at_p(app, view, lister, p);
+                        void *clicked = Momo_Lister_UserDataAtP(app, view, lister, p);
                         lister->hot_user_data = clicked;
                     }break;
                     
@@ -629,10 +629,10 @@ momo_run_lister(Application_Links *app, Momo_Lister *lister){
                     {
                         if (lister->hot_user_data != 0){
                             Vec2_f32 p = V2f32(in.event.mouse.p);
-                            void *clicked = momo_lister_user_data_at_p(app, view, lister, p);
+                            void *clicked = Momo_Lister_UserDataAtP(app, view, lister, p);
                             if (lister->hot_user_data == clicked){
-                                momo_lister_activate(app, lister, clicked, true);
-                                result = ListerActivation_Finished;
+                                Momo_Lister_Activate(app, lister, clicked, true);
+                                result = Momo_ListerActivation_Finished;
                             }
                         }
                         lister->hot_user_data = 0;
@@ -649,12 +649,12 @@ momo_run_lister(Application_Links *app, Momo_Lister *lister){
             {
                 Mouse_State mouse = get_mouse_state(app);
                 lister->scroll.target.y += mouse.wheel;
-                momo_lister_update_filtered_list(app, lister);
+                Momo_Lister_UpdateFilteredList(app, lister);
             }break;
             
             case InputEventKind_MouseMove:
             {
-                momo_lister_update_filtered_list(app, lister);
+                Momo_Lister_UpdateFilteredList(app, lister);
             }break;
             
             case InputEventKind_Core:
@@ -662,7 +662,7 @@ momo_run_lister(Application_Links *app, Momo_Lister *lister){
                 switch (in.event.core.code){
                     case CoreCode_Animate:
                     {
-                        momo_lister_update_filtered_list(app, lister);
+                        Momo_Lister_UpdateFilteredList(app, lister);
                     }break;
                     
                     default:
@@ -678,31 +678,12 @@ momo_run_lister(Application_Links *app, Momo_Lister *lister){
             }break;
         }
         
-        if (result == ListerActivation_Finished){
+        if (result == Momo_ListerActivation_Finished){
             break;
         }
         
         if (!handled){
-#if 0
-            Mapping *mapping = lister->mapping;
-            Command_Map *map = lister->map;
-            
-            Fallback_Dispatch_Result disp_result =
-                fallback_command_dispatch(app, mapping, map, &in);
-            if (disp_result.code == FallbackDispatch_DelayedUICall){
-                call_after_ctx_shutdown(app, view, disp_result.func);
-                break;
-            }
-
-            if (disp_result.code == FallbackDispatch_Unhandled){
-                leave_current_input_unhandled(app);
-            }
-            else{
-                momo_lister_call_refresh_handler(app, lister);
-            }
-#else
             leave_current_input_unhandled(app);
-#endif
         }
     }
     
@@ -710,21 +691,21 @@ momo_run_lister(Application_Links *app, Momo_Lister *lister){
 }
 
 function Momo_Lister_Prealloced_String
-momo_lister_prealloced(String_Const_u8 string){
+Momo_Lister_PreAlloced(String_Const_u8 string){
     Momo_Lister_Prealloced_String result = {};
     result.string = string;
     return(result);
 }
 
 function void
-momo_lister_begin_new_item_set(Application_Links *app, Momo_Lister *lister){
+Momo_Lister_BeginNewItemSet(Application_Links *app, Momo_Lister *lister){
     end_temp(lister->restore_all_point);
     block_zero_struct(&lister->options);
     block_zero_struct(&lister->filtered);
 }
 
 function void*
-momo_lister_add_item(Momo_Lister *lister, Momo_Lister_Prealloced_String string, Momo_Lister_Prealloced_String status, void *user_data, u64 extra_space){
+Momo_Lister_AddItem(Momo_Lister *lister, Momo_Lister_Prealloced_String string, Momo_Lister_Prealloced_String status, void *user_data, u64 extra_space){
     void *base_memory = push_array(lister->arena, u8, sizeof(Momo_Lister_Node) + extra_space);
     Momo_Lister_Node *node = (Momo_Lister_Node*)base_memory;
     node->string = string.string;
@@ -738,66 +719,66 @@ momo_lister_add_item(Momo_Lister *lister, Momo_Lister_Prealloced_String string, 
 }
 
 function void*
-momo_lister_add_item(Momo_Lister *lister, Momo_Lister_Prealloced_String string, String_Const_u8 status,
+Momo_Lister_AddItem(Momo_Lister *lister, Momo_Lister_Prealloced_String string, String_Const_u8 status,
                 void *user_data, u64  extra_space){
-    return(momo_lister_add_item(lister, string, momo_lister_prealloced(push_string_copy(lister->arena, status)), user_data, extra_space));
+    return(Momo_Lister_AddItem(lister, string, Momo_Lister_PreAlloced(push_string_copy(lister->arena, status)), user_data, extra_space));
 }
 
 function void*
-momo_lister_add_item(Momo_Lister *lister, String_Const_u8 string, Momo_Lister_Prealloced_String status, void *user_data, u64 extra_space){
-    return(momo_lister_add_item(lister, momo_lister_prealloced(push_string_copy(lister->arena, string)), status, user_data, extra_space));
+Momo_Lister_AddItem(Momo_Lister *lister, String_Const_u8 string, Momo_Lister_Prealloced_String status, void *user_data, u64 extra_space){
+    return(Momo_Lister_AddItem(lister, Momo_Lister_PreAlloced(push_string_copy(lister->arena, string)), status, user_data, extra_space));
 }
 
 function void*
-momo_lister_add_item(Momo_Lister *lister, String_Const_u8 string, String_Const_u8 status, void *user_data, u64 extra_space){
-    return(momo_lister_add_item(lister,
-                           momo_lister_prealloced(push_string_copy(lister->arena, string)),
-                           momo_lister_prealloced(push_string_copy(lister->arena, status)),
+Momo_Lister_AddItem(Momo_Lister *lister, String_Const_u8 string, String_Const_u8 status, void *user_data, u64 extra_space){
+    return(Momo_Lister_AddItem(lister,
+                           Momo_Lister_PreAlloced(push_string_copy(lister->arena, string)),
+                           Momo_Lister_PreAlloced(push_string_copy(lister->arena, status)),
                            user_data, extra_space));
 }
 
 function void*
-momo_lister_add_item(Momo_Lister *lister, String_Const_u8 string, String_Const_u8 status, String_Const_u8 info, void *user_data, u64 extra_space){
-    return(momo_lister_add_item(lister,
-                           momo_lister_prealloced(push_string_copy(lister->arena, string)),
-                           momo_lister_prealloced(push_string_copy(lister->arena, status)),
+Momo_Lister_AddItem(Momo_Lister *lister, String_Const_u8 string, String_Const_u8 status, String_Const_u8 info, void *user_data, u64 extra_space){
+    return(Momo_Lister_AddItem(lister,
+                           Momo_Lister_PreAlloced(push_string_copy(lister->arena, string)),
+                           Momo_Lister_PreAlloced(push_string_copy(lister->arena, status)),
                            user_data, extra_space));
 }
 
 function Lister_Activation_Code
-momo_lister__write_string__default(Application_Links *app){
+Momo_Lister__WriteStringDefault(Application_Links *app){
     Lister_Activation_Code result = ListerActivation_Continue;
     View_ID view = get_active_view(app, Access_Always);
-    Momo_Lister *lister = momo_view_get_lister(app, view);
+    Momo_Lister *lister = Momo_Lister_GetFromView(app, view);
     if (lister != 0){
         User_Input in = get_current_input(app);
         String_Const_u8 string = to_writable(&in);
         if (string.str != 0 && string.size > 0){
-            momo_lister_append_text_field(lister, string);
-            momo_lister_append_key(lister, string);
+            Momo_Lister_AppendTextField(lister, string);
+            Momo_Lister_AppendKey(lister, string);
             lister->item_index = 0;
-            momo_lister_zero_scroll(lister);
-            momo_lister_update_filtered_list(app, lister);
+            Momo_Lister_ZeroScroll(lister);
+            Momo_Lister_UpdateFilteredList(app, lister);
         }
     }
     return(result);
 }
 
 function void
-momo_lister__backspace_text_field__default(Application_Links *app){
+Momo_Lister__BackspaceTextFieldDefault(Application_Links *app){
     View_ID view = get_active_view(app, Access_Always);
-    Momo_Lister *lister = momo_view_get_lister(app, view);
+    Momo_Lister *lister = Momo_Lister_GetFromView(app, view);
     if (lister != 0){
         lister->text_field.string = backspace_utf8(lister->text_field.string);
         lister->key_string.string = backspace_utf8(lister->key_string.string);
         lister->item_index = 0;
-        momo_lister_zero_scroll(lister);
-        momo_lister_update_filtered_list(app, lister);
+        Momo_Lister_ZeroScroll(lister);
+        Momo_Lister_UpdateFilteredList(app, lister);
     }
 }
 
 function void
-momo_lister__navigate__default(Application_Links *app, View_ID view, Momo_Lister *lister, i32 delta){
+Momo_Lister__NavigateDefault(Application_Links *app, View_ID view, Momo_Lister *lister, i32 delta){
     i32 new_index = lister->item_index + delta;
     if (new_index < 0 && lister->item_index == 0){
         lister->item_index = lister->filtered.count - 1;
@@ -810,35 +791,35 @@ momo_lister__navigate__default(Application_Links *app, View_ID view, Momo_Lister
         lister->item_index = clamp(0, new_index, lister->filtered.count - 1);
     }
     lister->set_vertical_focus_to_item = true;
-    momo_lister_update_selection_values(lister);
+    Momo_Lister_UpdateSelectionValues(lister);
 }
 
 function Momo_Lister_Handlers
-momo_lister_get_default_handlers(void){
+Momo_Lister_GetDefaultHandlers(void){
     Momo_Lister_Handlers handlers = {};
-    handlers.write_character = momo_lister__write_string__default;
-    handlers.backspace       = momo_lister__backspace_text_field__default;
-    handlers.navigate        = momo_lister__navigate__default;
+    handlers.write_character = Momo_Lister__WriteStringDefault;
+    handlers.backspace       = Momo_Lister__BackspaceTextFieldDefault;
+    handlers.navigate        = Momo_Lister__NavigateDefault;
     return(handlers);
 }
 
 function void
-momo_lister_set_default_handlers(Momo_Lister *lister){
-    Momo_Lister_Handlers handlers = momo_lister_get_default_handlers();
-    momo_lister_set_handlers(lister, &handlers);
+Momo_Lister_SetDefaultHandlers(Momo_Lister *lister){
+    Momo_Lister_Handlers handlers = Momo_Lister_GetDefaultHandlers();
+    Momo_Lister_SetHandlers(lister, &handlers);
 }
 
 ////////////////////////////////
 
 function Momo_Lister_Result
-momo_run_lister_with_refresh_handler(Application_Links *app, Arena *arena, String_Const_u8 query, Momo_Lister_Handlers handlers){
+Momo_Lister_RunWithRefreshHandler(Application_Links *app, Arena *arena, String_Const_u8 query, Momo_Lister_Handlers handlers){
     Momo_Lister_Result result = {};
     if (handlers.refresh != 0){
         Momo_Lister_Block lister(app, arena);
-        momo_lister_set_query(lister, query);
-        momo_lister_set_handlers(lister, &handlers);
+        Momo_Lister_SetQuery(lister, query);
+        Momo_Lister_SetHandlers(lister, &handlers);
         handlers.refresh(app, lister);
-        result = momo_run_lister(app, lister);
+        result = Momo_Lister_Run(app, lister);
     }
     else{
 #define M "ERROR: No refresh handler specified for lister (query_string = \"%.*s\")\n"
@@ -851,26 +832,26 @@ momo_run_lister_with_refresh_handler(Application_Links *app, Arena *arena, Strin
 }
 
 function Momo_Lister_Result
-momo_run_lister_with_refresh_handler(Application_Links *app, String_Const_u8 query,  Momo_Lister_Handlers handlers){
+Momo_Lister_RunWithRefreshHandler(Application_Links *app, String_Const_u8 query,  Momo_Lister_Handlers handlers){
     Scratch_Block scratch(app);
-    return(momo_run_lister_with_refresh_handler(app, scratch, query, handlers));
+    return(Momo_Lister_RunWithRefreshHandler(app, scratch, query, handlers));
 }
 
 function Momo_Lister_Result
-momo_run_lister_with_refresh_handler(Application_Links *app, Arena *arena, char *query, Momo_Lister_Handlers handlers){
-    return(momo_run_lister_with_refresh_handler(app, arena, SCu8(query), handlers));
+Momo_Lister_RunWithRefreshHandler(Application_Links *app, Arena *arena, char *query, Momo_Lister_Handlers handlers){
+    return(Momo_Lister_RunWithRefreshHandler(app, arena, SCu8(query), handlers));
 }
 
 function Momo_Lister_Result
-momo_run_lister_with_refresh_handler(Application_Links *app, char *query, Momo_Lister_Handlers handlers){
-    return(momo_run_lister_with_refresh_handler(app, SCu8(query), handlers));
+Momo_Lister_RunWithRefreshHandler(Application_Links *app, char *query, Momo_Lister_Handlers handlers){
+    return(Momo_Lister_RunWithRefreshHandler(app, SCu8(query), handlers));
 }
 
 ////////////////////////////////
 
 function void
-momo_lister_choice(Arena *arena, Lister_Choice_List *list, String_Const_u8 string, String_Const_u8 status, Key_Code code, u64 user_data){
-    Lister_Choice *choice = push_array(arena, Lister_Choice, 1);
+Momo_Lister_Choose(Arena *arena, Momo_Lister_Choice_List *list, String_Const_u8 string, String_Const_u8 status, Key_Code code, u64 user_data){
+    Momo_Lister_Choice *choice = push_array(arena, Momo_Lister_Choice, 1);
     sll_queue_push(list->first, list->last, choice);
     choice->string = string;
     choice->status = status;
@@ -879,46 +860,46 @@ momo_lister_choice(Arena *arena, Lister_Choice_List *list, String_Const_u8 strin
 }
 
 function void
-momo_lister_choice(Arena *arena, Lister_Choice_List *list, char *string, String_Const_u8 status, Key_Code code, u64 user_data){
-    momo_lister_choice(arena, list, SCu8(string), status, code, (u64)PtrAsInt(user_data));
+Momo_Lister_Choose(Arena *arena, Momo_Lister_Choice_List *list, char *string, String_Const_u8 status, Key_Code code, u64 user_data){
+    Momo_Lister_Choose(arena, list, SCu8(string), status, code, (u64)PtrAsInt(user_data));
 }
 
 function void
-momo_lister_choice(Arena *arena, Lister_Choice_List *list, String_Const_u8 string, char *status, Key_Code code, u64 user_data){
-    momo_lister_choice(arena, list, string, SCu8(status), code, (u64)PtrAsInt(user_data));
+Momo_Lister_Choose(Arena *arena, Momo_Lister_Choice_List *list, String_Const_u8 string, char *status, Key_Code code, u64 user_data){
+    Momo_Lister_Choose(arena, list, string, SCu8(status), code, (u64)PtrAsInt(user_data));
 }
 
 function void
-momo_lister_choice(Arena *arena, Lister_Choice_List *list, char *string, char *status, Key_Code code, u64 user_data){
-    momo_lister_choice(arena, list, SCu8(string), SCu8(status), code,
+Momo_Lister_Choose(Arena *arena, Momo_Lister_Choice_List *list, char *string, char *status, Key_Code code, u64 user_data){
+    Momo_Lister_Choose(arena, list, SCu8(string), SCu8(status), code,
                   (u64)PtrAsInt(user_data));
 }
 
 function void
-momo_lister_choice(Arena *arena, Lister_Choice_List *list, String_Const_u8 string, String_Const_u8 status, Key_Code code, void *user_data){
-    momo_lister_choice(arena, list, string, status, code, (u64)PtrAsInt(user_data));
+Momo_Lister_Choose(Arena *arena, Momo_Lister_Choice_List *list, String_Const_u8 string, String_Const_u8 status, Key_Code code, void *user_data){
+    Momo_Lister_Choose(arena, list, string, status, code, (u64)PtrAsInt(user_data));
 }
 
 function void
-momo_lister_choice(Arena *arena, Lister_Choice_List *list, char *string, String_Const_u8 status, Key_Code code, void *user_data){
-    momo_lister_choice(arena, list, string, status, code, (u64)PtrAsInt(user_data));
+Momo_Lister_Choose(Arena *arena, Momo_Lister_Choice_List *list, char *string, String_Const_u8 status, Key_Code code, void *user_data){
+    Momo_Lister_Choose(arena, list, string, status, code, (u64)PtrAsInt(user_data));
 }
 
 function void
-momo_lister_choice(Arena *arena, Lister_Choice_List *list, String_Const_u8 string, char *status, Key_Code code, void *user_data){
-    momo_lister_choice(arena, list, string, status, code, (u64)PtrAsInt(user_data));
+Momo_Lister_Choose(Arena *arena, Momo_Lister_Choice_List *list, String_Const_u8 string, char *status, Key_Code code, void *user_data){
+    Momo_Lister_Choose(arena, list, string, status, code, (u64)PtrAsInt(user_data));
 }
 
 function void
-momo_lister_choice(Arena *arena, Lister_Choice_List *list, char *string, char *status, Key_Code code, void *user_data){
-    momo_lister_choice(arena, list, string, status, code, (u64)PtrAsInt(user_data));
+Momo_Lister_Choose(Arena *arena, Momo_Lister_Choice_List *list, char *string, char *status, Key_Code code, void *user_data){
+    Momo_Lister_Choose(arena, list, string, status, code, (u64)PtrAsInt(user_data));
 }
 
 function Lister_Activation_Code
-momo_lister__key_stroke__choice_list(Application_Links *app){
+Momo_Lister__KeyStrokeChoiceList(Application_Links *app){
     Lister_Activation_Code result = ListerActivation_Continue;
     View_ID view = get_active_view(app, Access_Always);
-    Momo_Lister *lister = momo_view_get_lister(app, view);
+    Momo_Lister *lister = Momo_Lister_GetFromView(app, view);
     if (lister != 0){
         User_Input in = get_current_input(app);
         if (in.event.kind == InputEventKind_KeyStroke){
@@ -935,44 +916,44 @@ momo_lister__key_stroke__choice_list(Application_Links *app){
                 }
             }
             if (did_shortcut_key){
-                momo_lister_activate(app, lister, user_data, false);
-                result = ListerActivation_Finished;
+                Momo_Lister_Activate(app, lister, user_data, false);
+                result = Momo_ListerActivation_Finished;
             }
         }
     }
     return(result);
 }
 
-function Lister_Choice*
-momo_get_choice_from_user(Application_Links *app, String_Const_u8 query,
-                     Lister_Choice_List list){
+function Momo_Lister_Choice*
+Momo_Lister_GetChoiceFromUser(Application_Links *app, String_Const_u8 query,
+                     Momo_Lister_Choice_List list){
     Scratch_Block scratch(app);
     Momo_Lister_Block lister(app, scratch);
-    for (Lister_Choice *choice = list.first;
+    for (Momo_Lister_Choice *choice = list.first;
          choice != 0;
          choice = choice->next){
         u64 code_size = sizeof(choice->key_code);
-        void *extra = momo_lister_add_item(lister, choice->string, choice->status,
+        void *extra = Momo_Lister_AddItem(lister, choice->string, choice->status,
                                       choice, code_size);
         block_copy(extra, &choice->key_code, code_size);
     }
-    momo_lister_set_query(lister, query);
+    Momo_Lister_SetQuery(lister, query);
     Momo_Lister_Handlers handlers = {};
-    handlers.navigate        = momo_lister__navigate__default;
-    handlers.key_stroke      = momo_lister__key_stroke__choice_list;
-    momo_lister_set_handlers(lister, &handlers);
+    handlers.navigate        = Momo_Lister__NavigateDefault;
+    handlers.key_stroke      = Momo_Lister__KeyStrokeChoiceList;
+    Momo_Lister_SetHandlers(lister, &handlers);
     
-    Momo_Lister_Result l_result = momo_run_lister(app, lister);
-    Lister_Choice *result = 0;
+    Momo_Lister_Result l_result = Momo_Lister_Run(app, lister);
+    Momo_Lister_Choice *result = 0;
     if (!l_result.canceled){
-        result = (Lister_Choice*)l_result.user_data;
+        result = (Momo_Lister_Choice*)l_result.user_data;
     }
     return(result);
 }
 
-function Lister_Choice*
-momo_get_choice_from_user(Application_Links *app, char *query, Lister_Choice_List list){
-    return(momo_get_choice_from_user(app, SCu8(query), list));
+function Momo_Lister_Choice*
+Momo_Lister_GetChoiceFromUser(Application_Links *app, char *query, Momo_Lister_Choice_List list){
+    return(Momo_Lister_GetChoiceFromUser(app, SCu8(query), list));
 }
 
 // BOTTOM
