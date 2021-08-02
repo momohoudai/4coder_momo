@@ -4,7 +4,15 @@
 
 
 static b32 global_insert_mode = false;
+static b32 global_query_lock = false;
 
+#define QueryLock \
+if (global_query_lock) { \
+    momo_leave_event_unhandled(app); \
+    return; \
+} \
+global_query_lock = true; \
+Defer { global_query_lock = false; }; 
 
 function void
 momo_push_lister_with_directory_files(Application_Links *app, Momo_Lister *lister){
@@ -48,7 +56,6 @@ momo_push_lister_with_directory_files(Application_Links *app, Momo_Lister *liste
             char *status_flag = "";
             
             Buffer_ID buffer = {};
-            
             {
                 Temp_Memory path_temp = begin_temp(lister->arena);
                 List_String_Const_u8 list = {};
@@ -167,11 +174,8 @@ CUSTOM_DOC("Interactively open a file out of the file system.")
 }
 
 internal void
-momo_go_to_definition(Application_Links *app, Momo_Index_Note *note, b32 same_panel)
-{
-    
-    if(note != 0 && note->file != 0)
-    {
+momo_go_to_definition(Application_Links *app, Momo_Index_Note *note, b32 same_panel) { 
+    if(note != 0 && note->file != 0) {
         View_ID view = get_active_view(app, Access_Always);
         Rect_f32 region = view_get_buffer_region(app, view);
         f32 view_height = rect_height(region);
@@ -287,6 +291,8 @@ momo_seek_string_backward(Application_Links* app, Buffer_ID buffer, i64 fallback
 
 function void
 momo_number_mode(Application_Links* app, String_Const_u8 init_str) {
+    QueryLock;
+
     View_ID view = get_active_view(app, Access_ReadVisible);
     Buffer_ID buffer = view_get_buffer(app, view, Access_ReadVisible);
 
@@ -1047,6 +1053,8 @@ CUSTOM_DOC("Delete a single, whole token on or to the right of the cursor and po
 CUSTOM_COMMAND_SIG(momo_change_mode)
 CUSTOM_DOC("Change mode")
 {
+    QueryLock;
+
     View_ID view = get_active_view(app, Access_ReadWriteVisible);
     Buffer_ID buffer = view_get_buffer(app, view, Access_ReadWriteVisible);
     if (buffer != 0) {
@@ -1237,12 +1245,10 @@ CUSTOM_DOC("Removes #if 0/#endif")
                 // Here, we ran out of #endif
                 break;
             }
-
         }
     }
     else if (string_match(selected_str6, endif_str)) {
         i64 search_from = line_range.start;
-
         u32 if0_count = 0;
         u32 endif_count = 1; // remember to count current line
         for (;;) {
@@ -1291,6 +1297,8 @@ CUSTOM_DOC("Removes #if 0/#endif")
 CUSTOM_COMMAND_SIG(momo_goto_mode)
 CUSTOM_DOC("Goto mode")
 {
+    QueryLock;
+
     View_ID view = get_active_view(app, Access_ReadVisible);
     Buffer_ID buffer = view_get_buffer(app, view, Access_ReadVisible);
     if (buffer != 0) {
@@ -1329,6 +1337,9 @@ CUSTOM_DOC("Goto mode")
 CUSTOM_COMMAND_SIG(momo_z_mode)
 CUSTOM_DOC("Z mode")
 {
+    QueryLock;
+
+
     View_ID view = get_active_view(app, Access_ReadVisible);
     Buffer_ID buffer = view_get_buffer(app, view, Access_ReadVisible);
     if (buffer != 0) {
@@ -1353,15 +1364,14 @@ CUSTOM_DOC("Z mode")
     }
 }
 
-
-
 CUSTOM_COMMAND_SIG(momo_query_search)
 CUSTOM_DOC("Queries the user a string, and can do reverse and forward search with 'n' and 'N'")
 {
+    QueryLock;
+
     View_ID view = get_active_view(app, Access_ReadVisible);
     Buffer_ID buffer = view_get_buffer(app, view, Access_ReadVisible);
-    if (buffer != 0) {
-        
+    if (buffer != 0) {        
         Query_Bar_Group group(app);
         Query_Bar find = {};
         u8 find_buffer[1024];
@@ -1415,6 +1425,8 @@ CUSTOM_DOC("Queries the user a string, and can do reverse and forward search wit
 CUSTOM_COMMAND_SIG(momo_query_replace)
 CUSTOM_DOC("Queries the user for two strings, and incrementally replaces every occurence of the first string with the second string.")
 {
+    QueryLock;
+
     View_ID view = get_active_view(app, Access_ReadWriteVisible);
     Buffer_ID buffer = view_get_buffer(app, view, Access_ReadWriteVisible);
     if (buffer != 0){
@@ -1436,6 +1448,8 @@ CUSTOM_DOC("Queries the user for two strings, and incrementally replaces every o
 CUSTOM_COMMAND_SIG(momo_replace_in_range)
 CUSTOM_DOC("Queries the user for a needle and string. Replaces all occurences of needle with string in the range between cursor and the mark in the active buffer.")
 {
+    QueryLock;
+
     View_ID view = get_active_view(app, Access_ReadWriteVisible);
     Buffer_ID buffer = view_get_buffer(app, view, Access_ReadWriteVisible);
     Range_i64 range = get_view_range(app, view);
