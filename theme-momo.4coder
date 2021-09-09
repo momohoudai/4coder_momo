@@ -31,7 +31,7 @@ defcolor_float_constant        = defcolor_str_constant;
 defcolor_bool_constant         = defcolor_str_constant;
 
 defcolor_preproc               = 0xFFa55a5a;
-defcolor_include               = 0xffffa900;
+defcolor_include               = 0xFFa55a5a;
 
 defcolor_special_character     = 0xFFFF0000;
 defcolor_ghost_character       = 0xFF5B4D3C;
@@ -59,7 +59,7 @@ fleury_color_index_function        = 0xffa5a549;
 fleury_color_index_macro           = 0xFF54abab;
 fleury_color_index_constant        = defcolor_str_constant;
 fleury_color_index_comment_tag     = defcolor_comment;
-fleury_color_index_decl            = defcolor_text_default;
+fleury_color_index_decl            = 0xffc3a771;
 fleury_color_cursor_macro          = 0xffde2368;
 fleury_color_cursor_power_mode     = 0xffefaf2f;
 fleury_color_cursor_inactive       = 0xFF888888;

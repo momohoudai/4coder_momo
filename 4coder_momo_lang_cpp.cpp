@@ -433,6 +433,10 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
                                        TokenBaseKind_Identifier, &name,
                                        "=") ||
                  Momo_Index_ParsePattern(ctx, "%k%o%k%t",
+                                       TokenBaseKind_Identifier, &base_type,
+                                       TokenBaseKind_Identifier, &name,
+                                       "[") ||
+                 Momo_Index_ParsePattern(ctx, "%k%o%k%t",
                                        TokenBaseKind_Keyword, &base_type,
                                        TokenBaseKind_Identifier, &name,
                                        "=")))
