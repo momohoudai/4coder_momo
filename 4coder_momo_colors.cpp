@@ -1,16 +1,16 @@
 
 
 function b32
-momo_is_argb_valid(ARGB_Color color)
+Momo_Colors_IsArgbValid(ARGB_Color color)
 {
     return color != 0xFF990099;
 }
 
 internal void
-momo_tick_colors(Application_Links *app, Frame_Info frame_info)
+Momo_Colors_Tick(Application_Links *app, Frame_Info frame_info)
 {
-    Syntax_Options opts = momo_syntax_opts[momo_active_syntax_opt_idx];
-    for(int i = 0; i < sizeof(Syntax_Flags)*8; i += 1)
+    Momo_Colors_SyntaxOptions opts = momo_syntax_opts[momo_active_syntax_opt_idx];
+    for(int i = 0; i < sizeof(Momo_Colors_SyntaxFlagType)*8; i += 1)
     {
         f32 delta = ((f32)!!(opts.flags & (1<<i)) - momo_syntax_flag_transitions[i]) * frame_info.animation_dt * 8.f;
         momo_syntax_flag_transitions[i] += delta;
@@ -33,40 +33,40 @@ momo_syntax_option_string(void)
     return momo_syntax_opts[momo_active_syntax_opt_idx].name;
 }
 
-typedef u32 Color_Flags;
+typedef u32 Momo_Colors_FlagType;
 enum 
 {
-    COLOR_FLAGS_MACRO = (1<<0),
+    Momo_Colors_FlagType_Macro = (1<<0),
 };
 
-struct Color_Ctx
+struct Momo_Colors_ColorCtx
 {
     Token token;
     Buffer_ID buffer;
-    Color_Flags flags;
+    Momo_Colors_FlagType flags;
     keybinding_mode mode;
 };
 
-internal Color_Ctx
-momo_get_color_ctx_from_token(Token token, Buffer_ID buffer)
+internal Momo_Colors_ColorCtx
+Momo_Colors_GetColorCtxFromToken(Token token, Buffer_ID buffer)
 {
-    Color_Ctx ctx = {0};
+    Momo_Colors_ColorCtx ctx = {0};
     ctx.token = token;
     ctx.buffer = buffer;
     return ctx;
 }
 
-internal Color_Ctx
-momo_get_color_ctx_from_cursor(Color_Flags flags, keybinding_mode mode)
+internal Momo_Colors_ColorCtx
+Momo_Colors_GetColorCtxFromCursor(Momo_Colors_FlagType flags, keybinding_mode mode)
 {
-    Color_Ctx ctx = {0};
+    Momo_Colors_ColorCtx ctx = {0};
     ctx.flags = flags;
     ctx.mode = mode;
     return ctx;
 }
 
 static ARGB_Color
-argb_from_id(Color_Table table, Managed_ID id, int subindex)
+Momo_Colors_ARGBFromID(Color_Table table, Managed_ID id, int subindex)
 {
     ARGB_Color result = 0;
     FColor color = fcolor_id(id);
@@ -82,16 +82,16 @@ argb_from_id(Color_Table table, Managed_ID id, int subindex)
 }
 
 static ARGB_Color
-argb_from_id(Color_Table table, Managed_ID id)
+Momo_Colors_ARGBFromID(Color_Table table, Managed_ID id)
 {
-    return argb_from_id(table, id, 0);
+    return Momo_Colors_ARGBFromID(table, id, 0);
 }
 
 internal ARGB_Color
-momo_get_color(Application_Links *app, Color_Ctx ctx)
+Momo_Colors_GetColor(Application_Links *app, Momo_Colors_ColorCtx ctx)
 {
     Color_Table table = active_color_table;
-    ARGB_Color default_color = argb_from_id(table, defcolor_text_default);
+    ARGB_Color default_color = Momo_Colors_ARGBFromID(table, defcolor_text_default);
     ARGB_Color color = default_color;
     f32 t = 1;
     
@@ -116,7 +116,7 @@ momo_get_color(Application_Links *app, Color_Ctx ctx)
                         case MOMO_INDEX_NOTE_KIND_TYPE:
                         {
                             FillFromFlag(SYNTAX_FLAGS_TYPES);
-                            color = argb_from_id(table,
+                            color = Momo_Colors_ARGBFromID(table,
                                                   note->flags & MOMO_INDEX_NOTE_FLAG_SUM_TYPE
                                                   ? fleury_color_index_sum_type
                                                   : fleury_color_index_product_type);
@@ -125,42 +125,42 @@ momo_get_color(Application_Links *app, Color_Ctx ctx)
                         case MOMO_INDEX_NOTE_KIND_MACRO:
                         {
                             FillFromFlag(SYNTAX_FLAGS_MACROS);
-                            color = argb_from_id(table, fleury_color_index_macro);
+                            color = Momo_Colors_ARGBFromID(table, fleury_color_index_macro);
                         }break;
                         
                         case MOMO_INDEX_NOTE_KIND_FUNCTION:
                         {
                             FillFromFlag(SYNTAX_FLAGS_FUNCTIONS);
-                            color = argb_from_id(table, fleury_color_index_function);
+                            color = Momo_Colors_ARGBFromID(table, fleury_color_index_function);
                         }break;
                         
                         case MOMO_INDEX_NOTE_KIND_CONSTANT:
                         {
                             FillFromFlag(SYNTAX_FLAGS_CONSTANTS);
-                            color = argb_from_id(table, fleury_color_index_constant);
+                            color = Momo_Colors_ARGBFromID(table, fleury_color_index_constant);
                         }break;
                         
                         case MOMO_INDEX_NOTE_KIND_DECL:
                         {
                             FillFromFlag(SYNTAX_FLAGS_CONSTANTS);
-                            color = argb_from_id(table, fleury_color_index_decl);
+                            color = Momo_Colors_ARGBFromID(table, fleury_color_index_decl);
                         }break;
                         
                         default: color = 0xffff00ff; break;
                     }
                     
-                    if(!momo_is_argb_valid(color)) { color = default_color; }
+                    if(!Momo_Colors_IsArgbValid(color)) { color = default_color; }
                 }
                 
             }break;
             
-            case TokenBaseKind_Preprocessor:     { FillFromFlag(SYNTAX_FLAGS_PREPROCESSOR); color = argb_from_id(table, defcolor_preproc); } break;
-            case TokenBaseKind_Keyword:          { FillFromFlag(SYNTAX_FLAGS_KEYWORDS); color = argb_from_id(table, defcolor_keyword); } break;
-            case TokenBaseKind_Comment:          { color = argb_from_id(table, defcolor_comment); } break;
-            case TokenBaseKind_LiteralString:    { FillFromFlag(SYNTAX_FLAGS_LITERALS); color = argb_from_id(table, defcolor_str_constant); } break;
-            case TokenBaseKind_LiteralInteger:   { FillFromFlag(SYNTAX_FLAGS_LITERALS); color = argb_from_id(table, defcolor_int_constant); } break;
-            case TokenBaseKind_LiteralFloat:     { FillFromFlag(SYNTAX_FLAGS_LITERALS); color = argb_from_id(table, defcolor_float_constant); } break;
-            case TokenBaseKind_Operator:         { FillFromFlag(SYNTAX_FLAGS_OPERATORS); color = argb_from_id(table, fleury_color_operators); if(!momo_is_argb_valid(color)) { color = default_color; } } break;
+            case TokenBaseKind_Preprocessor:     { FillFromFlag(SYNTAX_FLAGS_PREPROCESSOR); color = Momo_Colors_ARGBFromID(table, defcolor_preproc); } break;
+            case TokenBaseKind_Keyword:          { FillFromFlag(SYNTAX_FLAGS_KEYWORDS); color = Momo_Colors_ARGBFromID(table, defcolor_keyword); } break;
+            case TokenBaseKind_Comment:          { color = Momo_Colors_ARGBFromID(table, defcolor_comment); } break;
+            case TokenBaseKind_LiteralString:    { FillFromFlag(SYNTAX_FLAGS_LITERALS); color = Momo_Colors_ARGBFromID(table, defcolor_str_constant); } break;
+            case TokenBaseKind_LiteralInteger:   { FillFromFlag(SYNTAX_FLAGS_LITERALS); color = Momo_Colors_ARGBFromID(table, defcolor_int_constant); } break;
+            case TokenBaseKind_LiteralFloat:     { FillFromFlag(SYNTAX_FLAGS_LITERALS); color = Momo_Colors_ARGBFromID(table, defcolor_float_constant); } break;
+            case TokenBaseKind_Operator:         { FillFromFlag(SYNTAX_FLAGS_OPERATORS); color = Momo_Colors_ARGBFromID(table, fleury_color_operators); if(!Momo_Colors_IsArgbValid(color)) { color = default_color; } } break;
             
             case TokenBaseKind_ScopeOpen:
             case TokenBaseKind_ScopeClose:
@@ -168,8 +168,8 @@ momo_get_color(Application_Links *app, Color_Ctx ctx)
             case TokenBaseKind_ParentheticalClose:
             case TokenBaseKind_StatementClose:
             {
-                color = argb_from_id(table, fleury_color_syntax_crap);
-                if(!momo_is_argb_valid(color)) { color = default_color; }
+                color = Momo_Colors_ARGBFromID(table, fleury_color_syntax_crap);
+                if(!Momo_Colors_IsArgbValid(color)) { color = default_color; }
                 break;
             }
             
@@ -180,7 +180,7 @@ momo_get_color(Application_Links *app, Color_Ctx ctx)
                     case TokenCppKind_LiteralTrue:
                     case TokenCppKind_LiteralFalse:
                     {
-                        color = argb_from_id(table, defcolor_bool_constant);
+                        color = Momo_Colors_ARGBFromID(table, defcolor_bool_constant);
                         FillFromFlag(SYNTAX_FLAGS_LITERALS); 
                         break;
                     }
@@ -190,13 +190,13 @@ momo_get_color(Application_Links *app, Color_Ctx ctx)
                     case TokenCppKind_LiteralCharacterUTF16:
                     case TokenCppKind_LiteralCharacterUTF32:
                     {
-                        color = argb_from_id(table, defcolor_char_constant);
+                        color = Momo_Colors_ARGBFromID(table, defcolor_char_constant);
                         FillFromFlag(SYNTAX_FLAGS_LITERALS); 
                         break;
                     }
                     case TokenCppKind_PPIncludeFile:
                     {
-                        color = argb_from_id(table, defcolor_include);
+                        color = Momo_Colors_ARGBFromID(table, defcolor_include);
                         FillFromFlag(SYNTAX_FLAGS_LITERALS); 
                         break;
                     }
@@ -209,13 +209,13 @@ momo_get_color(Application_Links *app, Color_Ctx ctx)
     //~ NOTE(rjf): Cursor Color
     else
     {
-        if(ctx.flags & COLOR_FLAGS_MACRO)
+        if(ctx.flags & Momo_Colors_FlagType_Macro)
         {
-            color = argb_from_id(table, fleury_color_cursor_macro);
+            color = Momo_Colors_ARGBFromID(table, fleury_color_cursor_macro);
         }
         else
         {
-            color = argb_from_id(table, defcolor_cursor, ctx.mode);
+            color = Momo_Colors_ARGBFromID(table, defcolor_cursor, ctx.mode);
         }
     }
     
@@ -223,14 +223,14 @@ momo_get_color(Application_Links *app, Color_Ctx ctx)
 }
 
 static void
-momo_syntax_highlight(Application_Links *app, Text_Layout_ID text_layout_id, Token_Array *array)
+Momo_Colors_SyntaxHighlight(Application_Links *app, Text_Layout_ID text_layout_id, Token_Array *array)
 {
     Color_Table table = active_color_table;
     Buffer_ID buffer = text_layout_get_buffer(app, text_layout_id);
     Range_i64 visible_range = text_layout_get_visible_range(app, text_layout_id);
     i64 first_index = token_index_from_pos(array, visible_range.first);
     Token_Iterator_Array it = token_iterator_index(0, array, first_index);
-    ARGB_Color comment_tag_color = argb_from_id(table, fleury_color_index_comment_tag, 0);
+    ARGB_Color comment_tag_color = Momo_Colors_ARGBFromID(table, fleury_color_index_comment_tag, 0);
     
     for(;;)
     {
@@ -239,11 +239,11 @@ momo_syntax_highlight(Application_Links *app, Text_Layout_ID text_layout_id, Tok
         {
             break;
         }
-        ARGB_Color argb = momo_get_color(app, momo_get_color_ctx_from_token(*token, buffer));
+        ARGB_Color argb = Momo_Colors_GetColor(app, Momo_Colors_GetColorCtxFromToken(*token, buffer));
         paint_text_color(app, text_layout_id, Ii64_size(token->pos, token->size), argb);
         
         // NOTE(rjf): Substrings from comments
-        if(momo_is_argb_valid(comment_tag_color))
+        if(Momo_Colors_IsArgbValid(comment_tag_color))
         {
             if(token->kind == TokenBaseKind_Comment)
             {

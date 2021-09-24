@@ -394,6 +394,7 @@
 //#include "4coder_fleury_plots_demo.cpp"
 
 
+#include "4coder_momo_common.h"
 
 #include "4coder_momo_lang.h"
 #include "4coder_momo_index.h"
@@ -403,6 +404,8 @@
 #include "4coder_momo_cursor.h"
 #include "4coder_momo_error_annotations.h"
 #include "4coder_momo_lister.h"
+#include "4coder_momo_auto_indent.h"
+
 #include "4coder_momo_commands.h"
 
 #include "4coder_momo_lang.cpp"
@@ -413,9 +416,9 @@
 #include "4coder_momo_cursor.cpp"
 #include "4coder_momo_error_annotations.cpp"
 #include "4coder_momo_lister.cpp"
+#include "4coder_momo_auto_indent.cpp"
+
 #include "4coder_momo_commands.cpp"
-
-
 #include "4coder_momo_hooks.cpp"
 
 
@@ -441,6 +444,7 @@ void custom_layer_init(Application_Links *app)
         set_custom_hook(app, HookID_WholeScreenRenderCaller, default_whole_screen_render_caller);
         set_custom_hook(app, HookID_DeltaRule,               momo_delta_rule);
         set_custom_hook(app, HookID_BufferEditRange,         momo_buffer_edit_range);
+        set_custom_hook(app, HookID_SaveFile,                momo_save_file);
         set_custom_hook_memory_size(app, HookID_DeltaRule, delta_ctx_size(sizeof(Vec2_f32)));
     }
     

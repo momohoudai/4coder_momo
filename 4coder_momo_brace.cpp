@@ -1,6 +1,6 @@
 
 function void
-momo_brace_render_highlight(Application_Links *app, Buffer_ID buffer, Text_Layout_ID text_layout_id,
+Momo_Brace_RenderHightlight(Application_Links *app, Buffer_ID buffer, Text_Layout_ID text_layout_id,
                          i64 pos, ARGB_Color *colors, i32 color_count)
 {
     if(!def_get_config_b32(vars_save_string_lit("f4_disable_brace_highlight")))
@@ -38,7 +38,7 @@ momo_brace_render_highlight(Application_Links *app, Buffer_ID buffer, Text_Layou
 //~ NOTE(rjf): Closing-brace Annotation
 
 function void
-momo_brace_render_close_brace_annotation(Application_Links *app, Buffer_ID buffer, Text_Layout_ID text_layout_id,
+Momo_Brace_RenderCloseBraceAnnotation(Application_Links *app, Buffer_ID buffer, Text_Layout_ID text_layout_id,
                                     i64 pos)
 {
     if(!def_get_config_b32(vars_save_string_lit("f4_disable_close_brace_annotation")))
@@ -151,7 +151,7 @@ momo_brace_render_close_brace_annotation(Application_Links *app, Buffer_ID buffe
             {
                 ARGB_Color color = finalize_color(defcolor_comment, 0);
                 Color_Array colors = finalize_color_array(fleury_color_brace_annotation);
-                if (colors.count >= 1 && momo_is_argb_valid(colors.vals[0])) {
+                if (colors.count >= 1 && Momo_Colors_IsArgbValid(colors.vals[0])) {
                     color = colors.vals[(ranges.count - i - 1) % colors.count];
                 }
                 
@@ -188,7 +188,7 @@ momo_brace_render_close_brace_annotation(Application_Links *app, Buffer_ID buffe
 //~ NOTE(rjf): Brace lines
 
 static void
-momo_brace_render_lines(Application_Links *app, Buffer_ID buffer, View_ID view,
+Momo_Brace_RenderLines(Application_Links *app, Buffer_ID buffer, View_ID view,
                      Text_Layout_ID text_layout_id, i64 pos)
 {
     if(!def_get_config_b32(vars_save_string_lit("f4_disable_brace_lines")))
@@ -291,7 +291,7 @@ momo_brace_render_lines(Application_Links *app, Buffer_ID buffer, View_ID view,
             line_rect.y1 = y_end;
             
             Color_Array colors = finalize_color_array(fleury_color_brace_line);
-            if (colors.count >= 1 && momo_is_argb_valid(colors.vals[0])) {
+            if (colors.count >= 1 && Momo_Colors_IsArgbValid(colors.vals[0])) {
                 draw_rectangle(app, line_rect, 0.5f, 
                                colors.vals[(ranges.count - i - 1) % colors.count]);
             }

@@ -956,5 +956,249 @@ Momo_Lister_GetChoiceFromUser(Application_Links *app, char *query, Momo_Lister_C
     return(Momo_Lister_GetChoiceFromUser(app, SCu8(query), list));
 }
 
-// BOTTOM
+function void
+Momo_Lister_PushDirectoryFiles(Application_Links *app, Momo_Lister *lister){
+    Scratch_Block scratch(app, lister->arena);
+    
+    Temp_Memory temp = begin_temp(lister->arena);
+    String_Const_u8 hot = push_hot_directory(app, lister->arena);
+    if (!character_is_slash(string_get_character(hot, hot.size - 1))){
+        hot = push_u8_stringf(lister->arena, "%.*s/", string_expand(hot));
+    }
+    Momo_Lister_SetTextField(lister, hot);
+    Momo_Lister_SetKey(lister, string_front_of_path(hot));
+    
+    File_List file_list = system_get_file_list(scratch, hot);
+    end_temp(temp);
+    
+    File_Info **one_past_last = file_list.infos + file_list.count;
+    
+    Momo_Lister_BeginNewItemSet(app, lister);
+    
+    hot = push_hot_directory(app, lister->arena);
+    push_align(lister->arena, 8);
+    if (hot.str != 0){
+        String_Const_u8 empty_string = string_u8_litexpr("");
+        Momo_Lister_Prealloced_String empty_string_prealloced = Momo_Lister_PreAlloced(empty_string);
+        for (File_Info **info = file_list.infos;
+             info < one_past_last;
+             info += 1){
+            if (!HasFlag((**info).attributes.flags, FileAttribute_IsDirectory)) continue;
+            String_Const_u8 file_name = push_u8_stringf(lister->arena, "%.*s/",
+                                                        string_expand((**info).file_name));
+            Momo_Lister_AddItem(lister, Momo_Lister_PreAlloced(file_name), empty_string_prealloced, file_name.str, 0);
+        }
+        
+        for (File_Info **info = file_list.infos;
+             info < one_past_last;
+             info += 1){
+            if (HasFlag((**info).attributes.flags, FileAttribute_IsDirectory)) continue;
+            String_Const_u8 file_name = push_string_copy(lister->arena, (**info).file_name);
+            char *is_loaded = "";
+            char *status_flag = "";
+            
+            Buffer_ID buffer = {};
+            {
+                Temp_Memory path_temp = begin_temp(lister->arena);
+                List_String_Const_u8 list = {};
+                string_list_push(lister->arena, &list, hot);
+                string_list_push_overlap(lister->arena, &list, '/', (**info).file_name);
+                String_Const_u8 full_file_path = string_list_flatten(lister->arena, list);
+                buffer = get_buffer_by_file_name(app, full_file_path, Access_Always);
+                end_temp(path_temp);
+            }
+            
+            if (buffer != 0){
+                is_loaded = "LOADED";
+                Dirty_State dirty = buffer_get_dirty_state(app, buffer);
+                switch (dirty){
+                    case DirtyState_UnsavedChanges:  status_flag = " *"; break;
+                    case DirtyState_UnloadedChanges: status_flag = " !"; break;
+                    case DirtyState_UnsavedChangesAndUnloadedChanges: status_flag = " *!"; break;
+                }
+            }
+            String_Const_u8 status = push_u8_stringf(lister->arena, "%s%s", is_loaded, status_flag);
+            Momo_Lister_AddItem(lister, Momo_Lister_PreAlloced(file_name), Momo_Lister_PreAlloced(status), file_name.str, 0);
+        }
+    }
+}
 
+
+internal void
+Momo_Lister_PushNote(Application_Links *app, Arena *arena, Momo_Lister *lister, Momo_Index_Note *note)
+{
+    if(note && note->file)
+    {
+        Momo_Index_File *file = note->file;
+        Buffer_ID buffer = file->buffer;
+        
+        Tiny_Jump *jump = push_array(arena, Tiny_Jump, 1);
+        jump->buffer = buffer;
+        jump->pos = note->range.first;
+        
+        String_Const_u8 buffer_name = push_buffer_unique_name(app, arena, buffer);
+        String_Const_u8 name = {};
+        if (note->parent != 0) 
+            name = push_stringf(arena, "[%.*s] %.*s::%.*s", string_expand(buffer_name), string_expand(note->parent->string), string_expand(note->string));
+        else
+            name = push_stringf(arena, "[%.*s] %.*s", string_expand(buffer_name), string_expand(note->string));
+        String_Const_u8 sort = S8Lit("");
+        switch(note->kind)
+        {
+            case MOMO_INDEX_NOTE_KIND_TYPE:
+            {
+                sort = push_stringf(arena, "type [%s] [%s]",
+                                    note->flags & MOMO_INDEX_NOTE_FLAG_PROTOTYPE ? "prototype" : "def",
+                                    note->flags & MOMO_INDEX_NOTE_FLAG_SUM_TYPE ? "sum" : "product");
+            }break;
+            
+            case MOMO_INDEX_NOTE_KIND_FUNCTION:
+            {
+                sort = push_stringf(arena, "func [%s]", 
+                                    note->flags & MOMO_INDEX_NOTE_FLAG_PROTOTYPE ? "prototype" : "def");
+               
+            }break;
+            
+            case MOMO_INDEX_NOTE_KIND_MACRO:
+            {
+                sort = S8Lit("macro");
+            }break;
+            
+            case MOMO_INDEX_NOTE_KIND_CONSTANT:
+            {
+                sort = S8Lit("constant");
+            }break;
+            
+            case MOMO_INDEX_NOTE_KIND_COMMENT_TAG:
+            {
+                sort = S8Lit("comment tag");
+            }break;
+            
+            case MOMO_INDEX_NOTE_KIND_COMMENT_TODO:
+            {
+                sort = S8Lit("TODO");
+            }break;
+            
+            default: break;
+        }
+        
+        Momo_Lister_AddItem(lister, name, sort, jump, 0);
+    }
+}
+
+
+template<typename Pred>
+function void 
+Momo_Lister_PushNoteWithChildren(Application_Links* app, Arena* arena, Momo_Lister* lister, Momo_Index_Note* parent, Pred pred) {
+    if (!parent) {
+        return;
+    }
+    if (pred(parent)) {
+        Momo_Lister_PushNote(app, arena, lister, parent);
+    }    
+    for(Momo_Index_Note *child = parent->first_child; child; child = child->next_sibling) {
+        Momo_Lister_PushNoteWithChildren(app, arena, lister, child, pred);
+    }
+}
+
+///~ Lister creation
+function File_Name_Result
+Momo_Lister_CreateToGetFilenameFromUser(Application_Links *app, Arena *arena, String_Const_u8 query, View_ID view){
+  
+    Momo_Lister_Handlers handlers = Momo_Lister_GetDefaultHandlers();
+    handlers.refresh = Momo_Lister_PushDirectoryFiles;
+    handlers.write_character = lister__write_character__file_path;
+    handlers.backspace = lister__backspace_text_field__file_path;
+
+    Momo_Lister_Result l_result = Momo_Lister_RunWithRefreshHandler(app, arena, query, handlers);
+    
+    File_Name_Result result = {};
+    result.canceled = l_result.canceled;
+    if (!l_result.canceled){
+        result.clicked = l_result.activated_by_click;
+        if (l_result.user_data != 0){
+            String_Const_u8 name = SCu8((u8*)l_result.user_data);
+            result.file_name_activated = name;
+            result.is_folder = character_is_slash(string_get_character(name, name.size - 1));
+        }
+        result.file_name_in_text_field = string_front_of_path(l_result.text_field);
+        
+        String_Const_u8 path = {};
+        if (l_result.user_data == 0 && result.file_name_in_text_field.size == 0 && l_result.text_field.size > 0){
+            result.file_name_in_text_field = string_front_folder_of_path(l_result.text_field);
+            path = string_remove_front_folder_of_path(l_result.text_field);
+        }
+        else{
+            path = string_remove_front_of_path(l_result.text_field);
+        }
+        if (character_is_slash(string_get_character(path, path.size - 1))){
+            path = string_chop(path, 1);
+        }
+        result.path_in_text_field = path;
+    }
+    
+    return(result);
+}
+
+function File_Name_Result
+Momo_Lister_CreateToGetFilenameFromUser(Application_Links *app, Arena *arena, char *query, View_ID view){
+    return(Momo_Lister_CreateToGetFilenameFromUser(app, arena, SCu8(query), view));
+}
+
+// NOTE(Momo): Pred must be of type: b32(Momo_Index_Note*)
+template<typename Pred>
+function void
+Momo_Lister_CreateWithProjectNotes(Application_Links* app, String_Const_u8 init_str, b32 same_panel, Pred pred){
+    char *query = "Index (Project):";
+    
+    Scratch_Block scratch(app);
+    Momo_Lister_Block lister(app, scratch);
+    Momo_Lister_SetQuery(lister, query);
+    Momo_Lister_SetKey(lister, init_str);
+    Momo_Lister_SetTextField(lister, init_str);
+    Momo_Lister_SetDefaultHandlers(lister);
+    
+
+    Momo_Index_Lock();
+    {
+        for (Buffer_ID buffer = get_buffer_next(app, 0, Access_Always);
+             buffer != 0; buffer = get_buffer_next(app, buffer, Access_Always))
+        {
+            Momo_Index_File *file = Momo_Index_LookupFile(app, buffer);
+            if(file != 0)
+            {
+                for(Momo_Index_Note *note = file->first_note; note; note = note->next_sibling)
+                {
+                    Momo_Lister_PushNoteWithChildren(app, scratch, lister, note, pred);                   
+                }
+            }
+        }
+    }
+    Momo_Index_Unlock();
+    
+    Momo_Lister_Result l_result = Momo_Lister_Run(app, lister);
+    Tiny_Jump result = {};
+    if (!l_result.canceled && l_result.user_data != 0){
+        block_copy_struct(&result, (Tiny_Jump*)l_result.user_data);
+    }
+    
+    if (result.buffer != 0)
+    {
+        View_ID view = get_this_ctx_view(app, Access_Always);
+        if(!same_panel)
+        {
+            view = get_next_view_looped_primary_panels(app, view, Access_Always);
+        }
+        point_stack_push_view_cursor(app, view);
+        Momo_JumpToLocation(app, view, result.buffer, result.pos);
+    }
+}
+
+function void
+Momo_Lister_CreateWithProjectNotes(Application_Links* app, String_Const_u8 init_str, b32 same_panel)
+{
+    Momo_Lister_CreateWithProjectNotes(app, init_str, same_panel,   
+        [](Momo_Index_Note*) -> b32 { 
+            return true; 
+    });
+}

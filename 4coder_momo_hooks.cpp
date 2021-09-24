@@ -5,6 +5,34 @@ enum Momo_Range_Highlight_Kind
     MOMO_RANGE_HIGHLIGHT_KIND_MINOR_UNDERLINE,
 };
 
+BUFFER_HOOK_SIG(momo_save_file){
+    // buffer_id
+    ProfileScope(app, "momo_save_file");
+    
+    b32 auto_indent = def_get_config_b32(vars_save_string_lit("automatically_indent_text_on_save"));
+    b32 is_virtual = def_get_config_b32(vars_save_string_lit("enable_virtual_whitespace"));
+    if (auto_indent && is_virtual){
+        Momo_Indent_IndentBuffer(app, buffer_id, buffer_range(app, buffer_id));
+    }
+    
+    Managed_Scope scope = buffer_get_managed_scope(app, buffer_id);
+    Line_Ending_Kind *eol = scope_attachment(app, scope, buffer_eol_setting,
+                                             Line_Ending_Kind);
+    switch (*eol){
+        case LineEndingKind_LF:
+        {
+            rewrite_lines_to_lf(app, buffer_id);
+        }break;
+        case LineEndingKind_CRLF:
+        {
+            rewrite_lines_to_crlf(app, buffer_id);
+        }break;
+    }
+    
+    // no meaning for return
+    return(0);
+}
+
 function void
 momo_do_full_lex_async_sub(Async_Context *actx, Buffer_ID buffer_id)
 {
@@ -119,7 +147,7 @@ momo_render_buffer(Application_Links *app, View_ID view_id, Face_ID face_id,
                    Rect_f32 rect, Frame_Info frame_info)
 {
     Scratch_Block scratch(app);
-    ProfileScope(app, "[Fleury] Render Buffer");
+    ProfileScope(app, "[Momo] Render Buffer");
     
     View_ID active_view = get_active_view(app, Access_Always);
     b32 is_active_view = (active_view == view_id);
@@ -129,7 +157,7 @@ momo_render_buffer(Application_Links *app, View_ID view_id, Face_ID face_id,
     Token_Array token_array = get_token_array_from_buffer(app, buffer);
     if(token_array.tokens != 0)
     {
-        momo_syntax_highlight(app, text_layout_id, &token_array);
+        Momo_Colors_SyntaxHighlight(app, text_layout_id, &token_array);
         
         // NOTE(allen): Scan for TODOs and NOTEs
         b32 use_comment_keywords = def_get_config_b32(vars_save_string_lit("use_comment_keywords"));
@@ -164,9 +192,9 @@ momo_render_buffer(Application_Links *app, View_ID view_id, Face_ID face_id,
     // NOTE(rjf): Brace highlight
     {
         Color_Array colors = finalize_color_array(fleury_color_brace_highlight);
-        if(colors.count >= 1 && momo_is_argb_valid(colors.vals[0]))
+        if(colors.count >= 1 && Momo_Colors_IsArgbValid(colors.vals[0]))
         {
-            momo_brace_render_highlight(app, buffer, text_layout_id, cursor_pos,
+            Momo_Brace_RenderHightlight(app, buffer, text_layout_id, cursor_pos,
                                         colors.vals, colors.count);
         }
     }
@@ -218,7 +246,7 @@ momo_render_buffer(Application_Links *app, View_ID view_id, Face_ID face_id,
     // NOTE(jack): Token Occurance Highlight
     if (!def_get_config_b32(vars_save_string_lit("f4_disable_cursor_token_occurance"))) 
     {
-        ProfileScope(app, "[Fleury] Token Occurance Highlight");
+        ProfileScope(app, "[Momo] Token Occurance Highlight");
         
         // NOTE(jack): Get the active cursor's token string
         Buffer_ID active_cursor_buffer = view_get_buffer(app, active_view, Access_Always);
@@ -277,7 +305,7 @@ momo_render_buffer(Application_Links *app, View_ID view_id, Face_ID face_id,
     // NOTE(jack): if "f4_disable_cursor_token_occurance" is set, just highlight the cusror 
     else
     {
-        ProfileScope(app, "[Fleury] Token Highlight");
+        ProfileScope(app, "[Momo] Token Highlight");
         
         Token_Iterator_Array it = token_iterator_pos(0, &token_array, cursor_pos);
         Token *token = token_it_read(&it);
@@ -331,8 +359,8 @@ momo_render_buffer(Application_Links *app, View_ID view_id, Face_ID face_id,
     }
 
     // NOTE(Momo): render brace ending annotation and brace lines
-    momo_brace_render_close_brace_annotation(app, buffer, text_layout_id, cursor_pos);
-    momo_brace_render_lines(app, buffer, view_id, text_layout_id, cursor_pos);
+    Momo_Brace_RenderCloseBraceAnnotation(app, buffer, text_layout_id, cursor_pos);
+    Momo_Brace_RenderLines(app, buffer, view_id, text_layout_id, cursor_pos);
     
     // NOTE(allen): put the actual text on the actual screen
     draw_text_layout_default(app, text_layout_id);
@@ -411,7 +439,7 @@ momo_render_buffer(Application_Links *app, View_ID view_id, Face_ID face_id,
     {
         Rect_f32 view_rect = view_get_screen_rect(app, view_id);
         ARGB_Color color = fcolor_resolve(fcolor_id(fleury_color_inactive_pane_overlay));
-        if(momo_is_argb_valid(color))
+        if(Momo_Colors_IsArgbValid(color))
         {
             draw_rectangle(app, view_rect, 0.f, color);
         }
@@ -456,7 +484,7 @@ momo_draw_file_bar(Application_Links *app, View_ID view_id, Buffer_ID buffer, Fa
             bar.y1,
         };
         ARGB_Color progress_bar_color = fcolor_resolve(fcolor_id(fleury_color_file_progress_bar));
-        if(momo_is_argb_valid(progress_bar_color))
+        if(Momo_Colors_IsArgbValid(progress_bar_color))
         {
             draw_rectangle(app, progress_bar_rect, 0, progress_bar_color);
         }
@@ -627,7 +655,7 @@ momo_render(Application_Links *app, Frame_Info frame_info, View_ID view_id)
         else if(is_active_view == 0)
         {
             ARGB_Color inactive_bg_color = fcolor_resolve(fcolor_id(fleury_color_inactive_pane_background));
-            if(momo_is_argb_valid(inactive_bg_color))
+            if(Momo_Colors_IsArgbValid(inactive_bg_color))
             {
                 color = inactive_bg_color;
             }
@@ -642,7 +670,7 @@ momo_render(Application_Links *app, Frame_Info frame_info, View_ID view_id)
         if(def_get_config_b32(vars_save_string_lit("f4_margin_use_mode_color")) &&
            is_active_view)
         {
-            color = momo_get_color(app, momo_get_color_ctx_from_cursor(0, GlobalKeybindingMode));
+            color = Momo_Colors_GetColor(app, Momo_Colors_GetColorCtxFromCursor(0, GlobalKeybindingMode));
         }
         draw_margin(app, view_rect, region, color);
     }
@@ -1059,7 +1087,7 @@ momo_tick(Application_Links *app, Frame_Info frame_info)
     linalloc_clear(&global_frame_arena);
     global_tooltip_count = 0;
     
-    momo_tick_colors(app, frame_info);
+    Momo_Colors_Tick(app, frame_info);
     Momo_Index_Tick(app);
     //F4_CLC_Tick(frame_info);
     //F4_UpdateFlashes(app, frame_info);

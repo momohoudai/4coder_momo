@@ -137,13 +137,13 @@ momo_cursor_render_emacs_style(Application_Links *app, View_ID view_id, b32 is_a
     
     b32 has_highlight_range = draw_highlight_range(app, view_id, buffer, text_layout_id, roundness);
     
-    Color_Flags flags = 0;
-    flags |= !!global_keyboard_macro_is_recording * COLOR_FLAGS_MACRO;
-    ARGB_Color cursor_color = momo_get_color(app, momo_get_color_ctx_from_cursor(flags, GlobalKeybindingMode));
+    Momo_Colors_FlagType flags = 0;
+    flags |= !!global_keyboard_macro_is_recording * Momo_Colors_FlagType_Macro;
+    ARGB_Color cursor_color = Momo_Colors_GetColor(app, Momo_Colors_GetColorCtxFromCursor(flags, GlobalKeybindingMode));
     ARGB_Color mark_color = cursor_color;
-    ARGB_Color inactive_cursor_color = argb_from_id(active_color_table, fleury_color_cursor_inactive, 0);
+    ARGB_Color inactive_cursor_color = Momo_Colors_ARGBFromID(active_color_table, fleury_color_cursor_inactive, 0);
     
-    if(!momo_is_argb_valid(inactive_cursor_color))
+    if(!Momo_Colors_IsArgbValid(inactive_cursor_color))
     {
         inactive_cursor_color = cursor_color;
     }
@@ -312,7 +312,7 @@ momo_cursor_render_notepad_style(Application_Links *app, View_ID view_id, b32 is
         
         // NOTE(rjf): Draw cursor
         {
-            ARGB_Color cursor_color = momo_get_color(app, momo_get_color_ctx_from_cursor(0, GlobalKeybindingMode));
+            ARGB_Color cursor_color = Momo_Colors_GetColor(app, Momo_Colors_GetColorCtxFromCursor(0, GlobalKeybindingMode));
             ARGB_Color ghost_color = fcolor_resolve(fcolor_change_alpha(fcolor_argb(cursor_color), 0.5f));
             Rect_f32 rect = text_layout_character_on_screen(app, text_layout_id, cursor_pos);
             rect.x1 = rect.x0 + outline_thickness;

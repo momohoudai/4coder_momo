@@ -43,377 +43,242 @@ lexeme_table_lookup(u64 *hash_array, String_Const_u8 *key_array,
 }
 
 #endif
-u64 cs_main_keys_hash_array[96] = {
-0x47473ba1b6e4a581,0x0000000000000000,0xd2c90defa38ffde3,0x47473ba1b6e4abe3,
-0x34d1c9e2c82a7983,0xf609cb50d829a625,0x0000000000000000,0x0000000000000000,
-0x47473ba1b6e4a589,0x34d1c9e2d5cb0549,0xba8ab9295a332609,0x0000000000000000,
-0x0000000000000000,0x47473ba1b6e4a5ed,0x89f250b3f44755cd,0x34d1c9e2ca3107ed,
-0x0000000000000000,0x0000000000000000,0xb2addbcb1c87a093,0x0000000000000000,
-0xd2ce4db3307405f5,0xba8ab9295a3c1d75,0xf609cb28abd8e7d5,0x0000000000000000,
-0x0000000000000000,0x0000000000000000,0x886d826a77810a3b,0x886d826520506f1b,
-0x886d82652e25ebbb,0x34d1c9e2c829eb1d,0xba8ab9295a3319bd,0x0000000000000000,
-0x0000000000000000,0x0000000000000000,0xd2c930a91c1bf303,0xaa49cad1b36d46a3,
-0x0000000000000000,0xd2c9309e36238c25,0x0000000000000000,0x0000000000000000,
-0x886d826a7730c449,0x886d82652cfd7869,0x34d1c9e2ca30570b,0x34d1c9e2cbc687eb,
-0x0000000000000000,0x47473ba1b6e4abad,0x886d8265205b5a6d,0x0000000000000000,
-0x0000000000000000,0x0000000000000000,0x89f253f03d89b5b3,0x34d1c9e2c833fc93,
-0x0000000000000000,0xf720e13c5b8c8375,0x0000000000000000,0x0000000000000000,
-0x0000000000000000,0x89f253f756a6ec39,0x0000000000000000,0x89f250b3f470d01b,
-0x34d1c9e2cbc65e5b,0x34d1c9e2ca1312fd,0x89f250be2c02007d,0x886d8265200960bd,
-0x0000000000000000,0xba8ab9295a33fae1,0x0000000000000000,0xf720e223e49c9dc3,
-0x34d1c9e2d5ca28a3,0x0000000000000000,0xd2ce4df546f4d467,0x0000000000000000,
-0x0000000000000000,0xba8ab9295a3352e9,0x34d1c9e2c82685ab,0x886d826a77fcb9eb,
-0x0000000000000000,0x0000000000000000,0x0000000000000000,0x34d1c9e2cbc0f82f,
-0x0000000000000000,0x0000000000000000,0x89f250b3f4ae3533,0x0000000000000000,
-0x0000000000000000,0x886d8269d9ef3a75,0x0000000000000000,0x0000000000000000,
-0x0000000000000000,0x0000000000000000,0x886d826a77dcbe9b,0x34d1c9e2ca246cfb,
-0x0000000000000000,0x0000000000000000,0x886d82652221137f,0x89f250b3f45c06ff,
+u64 go_main_keys_hash_array[47] = {
+0x0000000000000000,0x0000000000000000,0x29564790b5fe507d,0x0000000000000000,
+0x1a822741f12c37e7,0x0000000000000000,0x822a81b9d37fcbb1,0x0000000000000000,
+0x0000000000000000,0x0000000000000000,0x958bbbcb97565f7d,0x0000000000000000,
+0x0000000000000000,0x1799621c48b7db03,0xa9c5578535980687,0x9d76302b801b1d23,
+0x0000000000000000,0x1a822741f1d9dd53,0x0000000000000000,0x958bbbcb9755de17,
+0x29564790b2cf0edb,0xcf335042260b05b5,0xb7e19494bbe41c29,0x0000000000000000,
+0x1a822741f1f493ab,0x1a822741f1228aef,0xb7e195691ec14773,0x0000000000000000,
+0x0000000000000000,0x1a822741f1e2dcbd,0x0000000000000000,0x0000000000000000,
+0xb7e1956d0f9b04f3,0x0000000000000000,0xb7e1956ecfa572f3,0x822a81b9d37fcb41,
+0x0000000000000000,0xb7e1956d63004b3f,0x958bbbcb9755b8b5,0x0000000000000000,
+0x1a822741f1db5ba9,0x0000000000000000,0x29564790bad2786b,0x29564790cec21cdd,
+0x29564790e85ad3ab,0x1a822741f1e731e3,0xcf3351077b12cc03,
 };
-u8 cs_main_keys_key_array_0[] = {0x69,0x66,};
-u8 cs_main_keys_key_array_2[] = {0x76,0x69,0x72,0x74,0x75,0x61,0x6c,};
-u8 cs_main_keys_key_array_3[] = {0x64,0x6f,};
-u8 cs_main_keys_key_array_4[] = {0x62,0x61,0x73,0x65,};
-u8 cs_main_keys_key_array_5[] = {0x6f,0x76,0x65,0x72,0x72,0x69,0x64,0x65,};
-u8 cs_main_keys_key_array_8[] = {0x69,0x6e,};
-u8 cs_main_keys_key_array_9[] = {0x75,0x69,0x6e,0x74,};
-u8 cs_main_keys_key_array_10[] = {0x69,0x6e,0x74,};
-u8 cs_main_keys_key_array_13[] = {0x69,0x73,};
-u8 cs_main_keys_key_array_14[] = {0x73,0x74,0x61,0x74,0x69,0x63,};
-u8 cs_main_keys_key_array_15[] = {0x74,0x68,0x69,0x73,};
-u8 cs_main_keys_key_array_18[] = {0x70,0x72,0x6f,0x74,0x65,0x63,0x74,0x65,0x64,};
-u8 cs_main_keys_key_array_20[] = {0x64,0x65,0x66,0x61,0x75,0x6c,0x74,};
-u8 cs_main_keys_key_array_21[] = {0x66,0x6f,0x72,};
-u8 cs_main_keys_key_array_22[] = {0x6f,0x70,0x65,0x72,0x61,0x74,0x6f,0x72,};
-u8 cs_main_keys_key_array_26[] = {0x66,0x6c,0x6f,0x61,0x74,};
-u8 cs_main_keys_key_array_27[] = {0x63,0x6f,0x6e,0x73,0x74,};
-u8 cs_main_keys_key_array_28[] = {0x75,0x73,0x69,0x6e,0x67,};
-u8 cs_main_keys_key_array_29[] = {0x63,0x68,0x61,0x72,};
-u8 cs_main_keys_key_array_30[] = {0x76,0x61,0x72,};
-u8 cs_main_keys_key_array_34[] = {0x70,0x61,0x72,0x74,0x69,0x61,0x6c,};
-u8 cs_main_keys_key_array_35[] = {0x6e,0x61,0x6d,0x65,0x73,0x70,0x61,0x63,0x65,};
-u8 cs_main_keys_key_array_37[] = {0x70,0x72,0x69,0x76,0x61,0x74,0x65,};
-u8 cs_main_keys_key_array_40[] = {0x65,0x76,0x65,0x6e,0x74,};
-u8 cs_main_keys_key_array_41[] = {0x73,0x68,0x6f,0x72,0x74,};
-u8 cs_main_keys_key_array_42[] = {0x76,0x6f,0x69,0x64,};
-u8 cs_main_keys_key_array_43[] = {0x65,0x6c,0x73,0x65,};
-u8 cs_main_keys_key_array_45[] = {0x61,0x73,};
-u8 cs_main_keys_key_array_46[] = {0x63,0x6c,0x61,0x73,0x73,};
-u8 cs_main_keys_key_array_50[] = {0x72,0x65,0x74,0x75,0x72,0x6e,};
-u8 cs_main_keys_key_array_51[] = {0x63,0x61,0x73,0x65,};
-u8 cs_main_keys_key_array_53[] = {0x64,0x65,0x6c,0x65,0x67,0x61,0x74,0x65,};
-u8 cs_main_keys_key_array_57[] = {0x64,0x6f,0x75,0x62,0x6c,0x65,};
-u8 cs_main_keys_key_array_59[] = {0x73,0x74,0x72,0x69,0x6e,0x67,};
-u8 cs_main_keys_key_array_60[] = {0x65,0x6e,0x75,0x6d,};
-u8 cs_main_keys_key_array_61[] = {0x6e,0x75,0x6c,0x6c,};
-u8 cs_main_keys_key_array_62[] = {0x70,0x75,0x62,0x6c,0x69,0x63,};
-u8 cs_main_keys_key_array_63[] = {0x62,0x72,0x65,0x61,0x6b,};
-u8 cs_main_keys_key_array_65[] = {0x6e,0x65,0x77,};
-u8 cs_main_keys_key_array_67[] = {0x63,0x6f,0x6e,0x74,0x69,0x6e,0x75,0x65,};
-u8 cs_main_keys_key_array_68[] = {0x74,0x72,0x75,0x65,};
-u8 cs_main_keys_key_array_70[] = {0x66,0x6f,0x72,0x65,0x61,0x63,0x68,};
-u8 cs_main_keys_key_array_73[] = {0x74,0x72,0x79,};
-u8 cs_main_keys_key_array_74[] = {0x62,0x6f,0x6f,0x6c,};
-u8 cs_main_keys_key_array_75[] = {0x66,0x61,0x6c,0x73,0x65,};
-u8 cs_main_keys_key_array_79[] = {0x67,0x6f,0x74,0x6f,};
-u8 cs_main_keys_key_array_82[] = {0x73,0x74,0x72,0x75,0x63,0x74,};
-u8 cs_main_keys_key_array_85[] = {0x77,0x68,0x69,0x6c,0x65,};
-u8 cs_main_keys_key_array_90[] = {0x66,0x69,0x6e,0x61,0x6c,};
-u8 cs_main_keys_key_array_91[] = {0x6c,0x6f,0x6e,0x67,};
-u8 cs_main_keys_key_array_94[] = {0x63,0x61,0x74,0x63,0x68,};
-u8 cs_main_keys_key_array_95[] = {0x73,0x77,0x69,0x74,0x63,0x68,};
-String_Const_u8 cs_main_keys_key_array[96] = {
-{cs_main_keys_key_array_0, 2},
-{0, 0},
-{cs_main_keys_key_array_2, 7},
-{cs_main_keys_key_array_3, 2},
-{cs_main_keys_key_array_4, 4},
-{cs_main_keys_key_array_5, 8},
+u8 go_main_keys_key_array_2[] = {0x62,0x72,0x65,0x61,0x6b,};
+u8 go_main_keys_key_array_4[] = {0x66,0x75,0x6e,0x63,};
+u8 go_main_keys_key_array_6[] = {0x67,0x6f,};
+u8 go_main_keys_key_array_10[] = {0x76,0x61,0x72,};
+u8 go_main_keys_key_array_13[] = {0x63,0x6f,0x6e,0x74,0x69,0x6e,0x75,0x65,};
+u8 go_main_keys_key_array_14[] = {0x66,0x61,0x6c,0x6c,0x74,0x68,0x72,0x6f,0x75,0x67,0x68,};
+u8 go_main_keys_key_array_15[] = {0x69,0x6e,0x74,0x65,0x72,0x66,0x61,0x63,0x65,};
+u8 go_main_keys_key_array_17[] = {0x63,0x61,0x73,0x65,};
+u8 go_main_keys_key_array_19[] = {0x6d,0x61,0x70,};
+u8 go_main_keys_key_array_20[] = {0x63,0x6f,0x6e,0x73,0x74,};
+u8 go_main_keys_key_array_21[] = {0x64,0x65,0x66,0x61,0x75,0x6c,0x74,};
+u8 go_main_keys_key_array_22[] = {0x69,0x6d,0x70,0x6f,0x72,0x74,};
+u8 go_main_keys_key_array_24[] = {0x65,0x6c,0x73,0x65,};
+u8 go_main_keys_key_array_25[] = {0x67,0x6f,0x74,0x6f,};
+u8 go_main_keys_key_array_26[] = {0x72,0x65,0x74,0x75,0x72,0x6e,};
+u8 go_main_keys_key_array_29[] = {0x74,0x79,0x70,0x65,};
+u8 go_main_keys_key_array_32[] = {0x73,0x74,0x72,0x75,0x63,0x74,};
+u8 go_main_keys_key_array_34[] = {0x73,0x65,0x6c,0x65,0x63,0x74,};
+u8 go_main_keys_key_array_35[] = {0x69,0x66,};
+u8 go_main_keys_key_array_37[] = {0x73,0x77,0x69,0x74,0x63,0x68,};
+u8 go_main_keys_key_array_38[] = {0x66,0x6f,0x72,};
+u8 go_main_keys_key_array_40[] = {0x63,0x68,0x61,0x6e,};
+u8 go_main_keys_key_array_42[] = {0x72,0x61,0x6e,0x67,0x65,};
+u8 go_main_keys_key_array_43[] = {0x64,0x65,0x66,0x65,0x72,};
+u8 go_main_keys_key_array_44[] = {0x66,0x61,0x6c,0x73,0x65,};
+u8 go_main_keys_key_array_45[] = {0x74,0x72,0x75,0x65,};
+u8 go_main_keys_key_array_46[] = {0x70,0x61,0x63,0x6b,0x61,0x67,0x65,};
+String_Const_u8 go_main_keys_key_array[47] = {
 {0, 0},
 {0, 0},
-{cs_main_keys_key_array_8, 2},
-{cs_main_keys_key_array_9, 4},
-{cs_main_keys_key_array_10, 3},
+{go_main_keys_key_array_2, 5},
 {0, 0},
+{go_main_keys_key_array_4, 4},
 {0, 0},
-{cs_main_keys_key_array_13, 2},
-{cs_main_keys_key_array_14, 6},
-{cs_main_keys_key_array_15, 4},
-{0, 0},
-{0, 0},
-{cs_main_keys_key_array_18, 9},
-{0, 0},
-{cs_main_keys_key_array_20, 7},
-{cs_main_keys_key_array_21, 3},
-{cs_main_keys_key_array_22, 8},
+{go_main_keys_key_array_6, 2},
 {0, 0},
 {0, 0},
 {0, 0},
-{cs_main_keys_key_array_26, 5},
-{cs_main_keys_key_array_27, 5},
-{cs_main_keys_key_array_28, 5},
-{cs_main_keys_key_array_29, 4},
-{cs_main_keys_key_array_30, 3},
+{go_main_keys_key_array_10, 3},
 {0, 0},
 {0, 0},
+{go_main_keys_key_array_13, 8},
+{go_main_keys_key_array_14, 11},
+{go_main_keys_key_array_15, 9},
 {0, 0},
-{cs_main_keys_key_array_34, 7},
-{cs_main_keys_key_array_35, 9},
+{go_main_keys_key_array_17, 4},
 {0, 0},
-{cs_main_keys_key_array_37, 7},
+{go_main_keys_key_array_19, 3},
+{go_main_keys_key_array_20, 5},
+{go_main_keys_key_array_21, 7},
+{go_main_keys_key_array_22, 6},
 {0, 0},
-{0, 0},
-{cs_main_keys_key_array_40, 5},
-{cs_main_keys_key_array_41, 5},
-{cs_main_keys_key_array_42, 4},
-{cs_main_keys_key_array_43, 4},
-{0, 0},
-{cs_main_keys_key_array_45, 2},
-{cs_main_keys_key_array_46, 5},
-{0, 0},
-{0, 0},
-{0, 0},
-{cs_main_keys_key_array_50, 6},
-{cs_main_keys_key_array_51, 4},
-{0, 0},
-{cs_main_keys_key_array_53, 8},
+{go_main_keys_key_array_24, 4},
+{go_main_keys_key_array_25, 4},
+{go_main_keys_key_array_26, 6},
 {0, 0},
 {0, 0},
-{0, 0},
-{cs_main_keys_key_array_57, 6},
-{0, 0},
-{cs_main_keys_key_array_59, 6},
-{cs_main_keys_key_array_60, 4},
-{cs_main_keys_key_array_61, 4},
-{cs_main_keys_key_array_62, 6},
-{cs_main_keys_key_array_63, 5},
-{0, 0},
-{cs_main_keys_key_array_65, 3},
-{0, 0},
-{cs_main_keys_key_array_67, 8},
-{cs_main_keys_key_array_68, 4},
-{0, 0},
-{cs_main_keys_key_array_70, 7},
+{go_main_keys_key_array_29, 4},
 {0, 0},
 {0, 0},
-{cs_main_keys_key_array_73, 3},
-{cs_main_keys_key_array_74, 4},
-{cs_main_keys_key_array_75, 5},
+{go_main_keys_key_array_32, 6},
 {0, 0},
+{go_main_keys_key_array_34, 6},
+{go_main_keys_key_array_35, 2},
 {0, 0},
+{go_main_keys_key_array_37, 6},
+{go_main_keys_key_array_38, 3},
 {0, 0},
-{cs_main_keys_key_array_79, 4},
+{go_main_keys_key_array_40, 4},
 {0, 0},
-{0, 0},
-{cs_main_keys_key_array_82, 6},
-{0, 0},
-{0, 0},
-{cs_main_keys_key_array_85, 5},
-{0, 0},
-{0, 0},
-{0, 0},
-{0, 0},
-{cs_main_keys_key_array_90, 5},
-{cs_main_keys_key_array_91, 4},
-{0, 0},
-{0, 0},
-{cs_main_keys_key_array_94, 5},
-{cs_main_keys_key_array_95, 6},
+{go_main_keys_key_array_42, 5},
+{go_main_keys_key_array_43, 5},
+{go_main_keys_key_array_44, 5},
+{go_main_keys_key_array_45, 4},
+{go_main_keys_key_array_46, 7},
 };
-Lexeme_Table_Value cs_main_keys_value_array[96] = {
-{4, TokenCsKind_If},
-{0, 0},
-{4, TokenCsKind_Virtual},
-{4, TokenCsKind_Do},
-{4, TokenCsKind_Base},
-{4, TokenCsKind_Override},
+Lexeme_Table_Value go_main_keys_value_array[47] = {
 {0, 0},
 {0, 0},
-{4, TokenCsKind_In},
-{4, TokenCsKind_Uint},
-{4, TokenCsKind_Int},
+{4, TokenGoKind_Break},
 {0, 0},
+{4, TokenGoKind_Func},
 {0, 0},
-{4, TokenCsKind_Is},
-{4, TokenCsKind_Static},
-{4, TokenCsKind_This},
-{0, 0},
-{0, 0},
-{4, TokenCsKind_Protected},
-{0, 0},
-{4, TokenCsKind_Default},
-{4, TokenCsKind_For},
-{4, TokenCsKind_Operator},
+{4, TokenGoKind_Go},
 {0, 0},
 {0, 0},
 {0, 0},
-{4, TokenCsKind_Float},
-{4, TokenCsKind_Const},
-{4, TokenCsKind_Using},
-{4, TokenCsKind_Char},
-{4, TokenCsKind_Var},
+{4, TokenGoKind_Var},
 {0, 0},
 {0, 0},
+{4, TokenGoKind_Continue},
+{4, TokenGoKind_Fallthrough},
+{4, TokenGoKind_Interface},
 {0, 0},
-{4, TokenCsKind_Partial},
-{4, TokenCsKind_Namespace},
+{4, TokenGoKind_Case},
 {0, 0},
-{4, TokenCsKind_Private},
+{4, TokenGoKind_Map},
+{4, TokenGoKind_Const},
+{4, TokenGoKind_Default},
+{4, TokenGoKind_Import},
 {0, 0},
-{0, 0},
-{4, TokenCsKind_Event},
-{4, TokenCsKind_Short},
-{4, TokenCsKind_Void},
-{4, TokenCsKind_Else},
-{0, 0},
-{4, TokenCsKind_As},
-{4, TokenCsKind_Class},
-{0, 0},
-{0, 0},
-{0, 0},
-{4, TokenCsKind_Return},
-{4, TokenCsKind_Case},
-{0, 0},
-{4, TokenCsKind_Delegate},
+{4, TokenGoKind_Else},
+{4, TokenGoKind_Goto},
+{4, TokenGoKind_Return},
 {0, 0},
 {0, 0},
-{0, 0},
-{4, TokenCsKind_Double},
-{0, 0},
-{4, TokenCsKind_String},
-{4, TokenCsKind_Enum},
-{4, TokenCsKind_Null},
-{4, TokenCsKind_Public},
-{4, TokenCsKind_Break},
-{0, 0},
-{4, TokenCsKind_New},
-{0, 0},
-{4, TokenCsKind_Continue},
-{8, TokenCsKind_LiteralTrue},
-{0, 0},
-{4, TokenCsKind_Foreach},
+{4, TokenGoKind_Type},
 {0, 0},
 {0, 0},
-{4, TokenCsKind_Try},
-{4, TokenCsKind_Bool},
-{8, TokenCsKind_LiteralFalse},
+{4, TokenGoKind_Struct},
 {0, 0},
+{4, TokenGoKind_Select},
+{4, TokenGoKind_If},
 {0, 0},
+{4, TokenGoKind_Switch},
+{4, TokenGoKind_For},
 {0, 0},
-{4, TokenCsKind_Goto},
+{4, TokenGoKind_Chan},
 {0, 0},
-{0, 0},
-{4, TokenCsKind_Struct},
-{0, 0},
-{0, 0},
-{4, TokenCsKind_While},
-{0, 0},
-{0, 0},
-{0, 0},
-{0, 0},
-{4, TokenCsKind_Final},
-{4, TokenCsKind_Long},
-{0, 0},
-{0, 0},
-{4, TokenCsKind_Catch},
-{4, TokenCsKind_Switch},
+{4, TokenGoKind_Range},
+{4, TokenGoKind_Defer},
+{8, TokenGoKind_LiteralFalse},
+{8, TokenGoKind_LiteralTrue},
+{4, TokenGoKind_Package},
 };
-i32 cs_main_keys_slot_count = 96;
-u64 cs_main_keys_seed = 0x9062c443c6255d54;
-u64 cs_pp_directives_hash_array[25] = {
-0x0000000000000000,0x9434a5323b512735,0xe70b59eb1981c835,0xe70b59eb266c4bb1,
-0xe70b59eb19847aef,0x0000000000000000,0x0000000000000000,0x6db0fa85ea3e61fb,
-0x0000000000000000,0xd01f0203ec4e761d,0x6db0fa92a22dcce5,0x6db0fa925ceb5f0d,
-0x0000000000000000,0xe70b59eb26f40b7d,0x0000000000000000,0x0000000000000000,
-0xff575083419d4bf1,0x0000000000000000,0x9434a5323b09160d,0x0000000000000000,
-0xe70b59eb30498835,0x9434a5323b511d1f,0xff5756cff3d2e7fd,0x0000000000000000,
-0x6db0fa92a7367475,
+i32 go_main_keys_slot_count = 47;
+u64 go_main_keys_seed = 0x17d5549e85b68d94;
+u64 go_pp_directives_hash_array[25] = {
+0x98e54be0fc4832e1,0x0000000000000000,0xac4056996d9031e7,0xac4056997a464d5f,
+0x0000000000000000,0x98e54be18e62509b,0xc2ee0de3306a63eb,0x0000000000000000,
+0x98e54be31299396b,0x98e54be18ac7a65f,0x0000000000000000,0xecd44f0f75e33477,
+0x0000000000000000,0x0000000000000000,0x0000000000000000,0x264ce3ded44a5b4b,
+0x264ce3cbf407ab47,0x0000000000000000,0xc2ee0de330a51977,0xac4056996c3d9c9f,
+0xc2ee0de330a51495,0x0000000000000000,0x0000000000000000,0xac4056996725365f,
+0xac4056997a59fb25,
 };
-u8 cs_pp_directives_key_array_1[] = {0x65,0x6c,0x69,0x66,};
-u8 cs_pp_directives_key_array_2[] = {0x75,0x6e,0x64,0x65,0x66,};
-u8 cs_pp_directives_key_array_3[] = {0x65,0x72,0x72,0x6f,0x72,};
-u8 cs_pp_directives_key_array_4[] = {0x75,0x73,0x69,0x6e,0x67,};
-u8 cs_pp_directives_key_array_7[] = {0x70,0x72,0x61,0x67,0x6d,0x61,};
-u8 cs_pp_directives_key_array_9[] = {0x69,0x66,};
-u8 cs_pp_directives_key_array_10[] = {0x69,0x66,0x6e,0x64,0x65,0x66,};
-u8 cs_pp_directives_key_array_11[] = {0x64,0x65,0x66,0x69,0x6e,0x65,};
-u8 cs_pp_directives_key_array_13[] = {0x65,0x6e,0x64,0x69,0x66,};
-u8 cs_pp_directives_key_array_16[] = {0x69,0x6e,0x63,0x6c,0x75,0x64,0x65,};
-u8 cs_pp_directives_key_array_18[] = {0x6c,0x69,0x6e,0x65,};
-u8 cs_pp_directives_key_array_20[] = {0x69,0x66,0x64,0x65,0x66,};
-u8 cs_pp_directives_key_array_21[] = {0x65,0x6c,0x73,0x65,};
-u8 cs_pp_directives_key_array_22[] = {0x76,0x65,0x72,0x73,0x69,0x6f,0x6e,};
-u8 cs_pp_directives_key_array_24[] = {0x69,0x6d,0x70,0x6f,0x72,0x74,};
-String_Const_u8 cs_pp_directives_key_array[25] = {
+u8 go_pp_directives_key_array_0[] = {0x70,0x72,0x61,0x67,0x6d,0x61,};
+u8 go_pp_directives_key_array_2[] = {0x65,0x6e,0x64,0x69,0x66,};
+u8 go_pp_directives_key_array_3[] = {0x75,0x6e,0x64,0x65,0x66,};
+u8 go_pp_directives_key_array_5[] = {0x69,0x6d,0x70,0x6f,0x72,0x74,};
+u8 go_pp_directives_key_array_6[] = {0x6c,0x69,0x6e,0x65,};
+u8 go_pp_directives_key_array_8[] = {0x64,0x65,0x66,0x69,0x6e,0x65,};
+u8 go_pp_directives_key_array_9[] = {0x69,0x66,0x6e,0x64,0x65,0x66,};
+u8 go_pp_directives_key_array_11[] = {0x69,0x66,};
+u8 go_pp_directives_key_array_15[] = {0x69,0x6e,0x63,0x6c,0x75,0x64,0x65,};
+u8 go_pp_directives_key_array_16[] = {0x76,0x65,0x72,0x73,0x69,0x6f,0x6e,};
+u8 go_pp_directives_key_array_18[] = {0x65,0x6c,0x69,0x66,};
+u8 go_pp_directives_key_array_19[] = {0x65,0x72,0x72,0x6f,0x72,};
+u8 go_pp_directives_key_array_20[] = {0x65,0x6c,0x73,0x65,};
+u8 go_pp_directives_key_array_23[] = {0x69,0x66,0x64,0x65,0x66,};
+u8 go_pp_directives_key_array_24[] = {0x75,0x73,0x69,0x6e,0x67,};
+String_Const_u8 go_pp_directives_key_array[25] = {
+{go_pp_directives_key_array_0, 6},
 {0, 0},
-{cs_pp_directives_key_array_1, 4},
-{cs_pp_directives_key_array_2, 5},
-{cs_pp_directives_key_array_3, 5},
-{cs_pp_directives_key_array_4, 5},
+{go_pp_directives_key_array_2, 5},
+{go_pp_directives_key_array_3, 5},
 {0, 0},
+{go_pp_directives_key_array_5, 6},
+{go_pp_directives_key_array_6, 4},
 {0, 0},
-{cs_pp_directives_key_array_7, 6},
+{go_pp_directives_key_array_8, 6},
+{go_pp_directives_key_array_9, 6},
 {0, 0},
-{cs_pp_directives_key_array_9, 2},
-{cs_pp_directives_key_array_10, 6},
-{cs_pp_directives_key_array_11, 6},
-{0, 0},
-{cs_pp_directives_key_array_13, 5},
+{go_pp_directives_key_array_11, 2},
 {0, 0},
 {0, 0},
-{cs_pp_directives_key_array_16, 7},
 {0, 0},
-{cs_pp_directives_key_array_18, 4},
+{go_pp_directives_key_array_15, 7},
+{go_pp_directives_key_array_16, 7},
 {0, 0},
-{cs_pp_directives_key_array_20, 5},
-{cs_pp_directives_key_array_21, 4},
-{cs_pp_directives_key_array_22, 7},
+{go_pp_directives_key_array_18, 4},
+{go_pp_directives_key_array_19, 5},
+{go_pp_directives_key_array_20, 4},
 {0, 0},
-{cs_pp_directives_key_array_24, 6},
+{0, 0},
+{go_pp_directives_key_array_23, 5},
+{go_pp_directives_key_array_24, 5},
 };
-Lexeme_Table_Value cs_pp_directives_value_array[25] = {
+Lexeme_Table_Value go_pp_directives_value_array[25] = {
+{5, TokenGoKind_PPPragma},
 {0, 0},
-{5, TokenCsKind_PPElIf},
-{5, TokenCsKind_PPUndef},
-{5, TokenCsKind_PPError},
-{5, TokenCsKind_PPUsing},
+{5, TokenGoKind_PPEndIf},
+{5, TokenGoKind_PPUndef},
 {0, 0},
+{5, TokenGoKind_PPImport},
+{5, TokenGoKind_PPLine},
 {0, 0},
-{5, TokenCsKind_PPPragma},
+{5, TokenGoKind_PPDefine},
+{5, TokenGoKind_PPIfNDef},
 {0, 0},
-{5, TokenCsKind_PPIf},
-{5, TokenCsKind_PPIfNDef},
-{5, TokenCsKind_PPDefine},
-{0, 0},
-{5, TokenCsKind_PPEndIf},
+{5, TokenGoKind_PPIf},
 {0, 0},
 {0, 0},
-{5, TokenCsKind_PPInclude},
 {0, 0},
-{5, TokenCsKind_PPLine},
+{5, TokenGoKind_PPInclude},
+{5, TokenGoKind_PPVersion},
 {0, 0},
-{5, TokenCsKind_PPIfDef},
-{5, TokenCsKind_PPElse},
-{5, TokenCsKind_PPVersion},
+{5, TokenGoKind_PPElIf},
+{5, TokenGoKind_PPError},
+{5, TokenGoKind_PPElse},
 {0, 0},
-{5, TokenCsKind_PPImport},
+{0, 0},
+{5, TokenGoKind_PPIfDef},
+{5, TokenGoKind_PPUsing},
 };
-i32 cs_pp_directives_slot_count = 25;
-u64 cs_pp_directives_seed = 0x4b1dea45719083a0;
-u64 cs_pp_keys_hash_array[2] = {
-0x2ae39e5c8bbda725,0x0000000000000000,
+i32 go_pp_directives_slot_count = 25;
+u64 go_pp_directives_seed = 0x81d1281e27c4ede6;
+u64 go_pp_keys_hash_array[2] = {
+0x0000000000000000,0xa32c4c171f396e75,
 };
-u8 cs_pp_keys_key_array_0[] = {0x64,0x65,0x66,0x69,0x6e,0x65,0x64,};
-String_Const_u8 cs_pp_keys_key_array[2] = {
-{cs_pp_keys_key_array_0, 7},
+u8 go_pp_keys_key_array_1[] = {0x64,0x65,0x66,0x69,0x6e,0x65,0x64,};
+String_Const_u8 go_pp_keys_key_array[2] = {
 {0, 0},
+{go_pp_keys_key_array_1, 7},
 };
-Lexeme_Table_Value cs_pp_keys_value_array[2] = {
-{4, TokenCsKind_PPDefined},
+Lexeme_Table_Value go_pp_keys_value_array[2] = {
 {0, 0},
+{4, TokenGoKind_PPDefined},
 };
-i32 cs_pp_keys_slot_count = 2;
-u64 cs_pp_keys_seed = 0xcf6c70d02725bc1a;
-struct Lex_State_Cs{
+i32 go_pp_keys_slot_count = 2;
+u64 go_pp_keys_seed = 0x5b7ae05c31bcaad5;
+struct Lex_State_Go{
 u32 flags_ZF0;
 u32 flags_KF0;
 u16 flags_KB0;
@@ -425,7 +290,7 @@ u8 *ptr;
 u8 *opl_ptr;
 };
 internal void
-lex_full_input_cs_init(Lex_State_Cs *state_ptr, String_Const_u8 input){
+lex_full_input_go_init(Lex_State_Go *state_ptr, String_Const_u8 input){
 state_ptr->flags_ZF0 = 0;
 state_ptr->flags_KF0 = 0;
 state_ptr->flags_KB0 = 0;
@@ -437,10 +302,10 @@ state_ptr->ptr = input.str;
 state_ptr->opl_ptr = input.str + input.size;
 }
 internal b32
-lex_full_input_cs_breaks(Arena *arena, Token_List *list, Lex_State_Cs *state_ptr, u64 max){
+lex_full_input_go_breaks(Arena *arena, Token_List *list, Lex_State_Go *state_ptr, u64 max){
 b32 result = false;
 u64 emit_counter = 0;
-Lex_State_Cs state;
+Lex_State_Go state;
 block_copy_struct(&state, state_ptr);
 {
 state_label_1: // root
@@ -452,7 +317,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_EOF;
+token.sub_kind = TokenGoKind_EOF;
 token.kind = 0;
 }while(0);
 token_list_push(arena, list, &token);
@@ -478,7 +343,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LexError;
+token.sub_kind = TokenGoKind_LexError;
 token.kind = 2;
 }while(0);
 token_list_push(arena, list, &token);
@@ -561,7 +426,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_ParenOp;
+token.sub_kind = TokenGoKind_ParenOp;
 token.kind = 13;
 }while(0);
 token_list_push(arena, list, &token);
@@ -583,7 +448,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_ParenCl;
+token.sub_kind = TokenGoKind_ParenCl;
 token.kind = 14;
 }while(0);
 token_list_push(arena, list, &token);
@@ -615,7 +480,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Comma;
+token.sub_kind = TokenGoKind_Comma;
 token.kind = 15;
 }while(0);
 token_list_push(arena, list, &token);
@@ -668,7 +533,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Semicolon;
+token.sub_kind = TokenGoKind_Semicolon;
 token.kind = 15;
 }while(0);
 token_list_push(arena, list, &token);
@@ -709,7 +574,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Ternary;
+token.sub_kind = TokenGoKind_Ternary;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -748,7 +613,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_BrackOp;
+token.sub_kind = TokenGoKind_BrackOp;
 token.kind = 13;
 }while(0);
 token_list_push(arena, list, &token);
@@ -775,7 +640,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_BrackCl;
+token.sub_kind = TokenGoKind_BrackCl;
 token.kind = 14;
 }while(0);
 token_list_push(arena, list, &token);
@@ -797,7 +662,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Xor;
+token.sub_kind = TokenGoKind_Xor;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -825,7 +690,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_BraceOp;
+token.sub_kind = TokenGoKind_BraceOp;
 token.kind = 11;
 }while(0);
 token_list_push(arena, list, &token);
@@ -852,7 +717,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_BraceCl;
+token.sub_kind = TokenGoKind_BraceCl;
 token.kind = 12;
 }while(0);
 token_list_push(arena, list, &token);
@@ -874,7 +739,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Tilde;
+token.sub_kind = TokenGoKind_Tilde;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -900,20 +765,20 @@ token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
 if (HasFlag(state.flags_KB0, 0x1)){
-Lexeme_Table_Lookup lookup = lexeme_table_lookup(cs_pp_keys_hash_array, cs_pp_keys_key_array, cs_pp_keys_value_array, cs_pp_keys_slot_count, cs_pp_keys_seed, state.emit_ptr, token.size);
+Lexeme_Table_Lookup lookup = lexeme_table_lookup(go_pp_keys_hash_array, go_pp_keys_key_array, go_pp_keys_value_array, go_pp_keys_slot_count, go_pp_keys_seed, state.emit_ptr, token.size);
 if (lookup.found_match){
 token.kind = lookup.base_kind;
 token.sub_kind = lookup.sub_kind;
 break;
 }
 }
-Lexeme_Table_Lookup lookup = lexeme_table_lookup(cs_main_keys_hash_array, cs_main_keys_key_array, cs_main_keys_value_array, cs_main_keys_slot_count, cs_main_keys_seed, state.emit_ptr, token.size);
+Lexeme_Table_Lookup lookup = lexeme_table_lookup(go_main_keys_hash_array, go_main_keys_key_array, go_main_keys_value_array, go_main_keys_slot_count, go_main_keys_seed, state.emit_ptr, token.size);
 if (lookup.found_match){
 token.kind = lookup.base_kind;
 token.sub_kind = lookup.sub_kind;
 break;
 }
-token.sub_kind = TokenCsKind_Identifier;
+token.sub_kind = TokenGoKind_Identifier;
 token.kind = 6;
 }while(0);
 token_list_push(arena, list, &token);
@@ -943,20 +808,20 @@ token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
 if (HasFlag(state.flags_KB0, 0x1)){
-Lexeme_Table_Lookup lookup = lexeme_table_lookup(cs_pp_keys_hash_array, cs_pp_keys_key_array, cs_pp_keys_value_array, cs_pp_keys_slot_count, cs_pp_keys_seed, state.emit_ptr, token.size);
+Lexeme_Table_Lookup lookup = lexeme_table_lookup(go_pp_keys_hash_array, go_pp_keys_key_array, go_pp_keys_value_array, go_pp_keys_slot_count, go_pp_keys_seed, state.emit_ptr, token.size);
 if (lookup.found_match){
 token.kind = lookup.base_kind;
 token.sub_kind = lookup.sub_kind;
 break;
 }
 }
-Lexeme_Table_Lookup lookup = lexeme_table_lookup(cs_main_keys_hash_array, cs_main_keys_key_array, cs_main_keys_value_array, cs_main_keys_slot_count, cs_main_keys_seed, state.emit_ptr, token.size);
+Lexeme_Table_Lookup lookup = lexeme_table_lookup(go_main_keys_hash_array, go_main_keys_key_array, go_main_keys_value_array, go_main_keys_slot_count, go_main_keys_seed, state.emit_ptr, token.size);
 if (lookup.found_match){
 token.kind = lookup.base_kind;
 token.sub_kind = lookup.sub_kind;
 break;
 }
-token.sub_kind = TokenCsKind_Identifier;
+token.sub_kind = TokenGoKind_Identifier;
 token.kind = 6;
 }while(0);
 token_list_push(arena, list, &token);
@@ -986,7 +851,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Whitespace;
+token.sub_kind = TokenGoKind_Whitespace;
 token.kind = 1;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1006,7 +871,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Whitespace;
+token.sub_kind = TokenGoKind_Whitespace;
 token.kind = 1;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1044,7 +909,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_PPErrorMessage;
+token.sub_kind = TokenGoKind_PPErrorMessage;
 token.kind = 10;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1069,7 +934,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_PPErrorMessage;
+token.sub_kind = TokenGoKind_PPErrorMessage;
 token.kind = 10;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1094,7 +959,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Backslash;
+token.sub_kind = TokenGoKind_Backslash;
 token.kind = 1;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1114,7 +979,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Backslash;
+token.sub_kind = TokenGoKind_Backslash;
 token.kind = 1;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1136,7 +1001,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Backslash;
+token.sub_kind = TokenGoKind_Backslash;
 token.kind = 1;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1166,7 +1031,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Dot;
+token.sub_kind = TokenGoKind_Dot;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1186,7 +1051,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Dot;
+token.sub_kind = TokenGoKind_Dot;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1222,7 +1087,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Div;
+token.sub_kind = TokenGoKind_Div;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1242,7 +1107,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Div;
+token.sub_kind = TokenGoKind_Div;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1274,7 +1139,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_DivEq;
+token.sub_kind = TokenGoKind_DivEq;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1299,7 +1164,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LiteralInteger;
+token.sub_kind = TokenGoKind_LiteralInteger;
 token.kind = 8;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1319,7 +1184,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LiteralInteger;
+token.sub_kind = TokenGoKind_LiteralInteger;
 token.kind = 8;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1375,7 +1240,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LiteralInteger;
+token.sub_kind = TokenGoKind_LiteralInteger;
 token.kind = 8;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1395,7 +1260,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LiteralInteger;
+token.sub_kind = TokenGoKind_LiteralInteger;
 token.kind = 8;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1458,7 +1323,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LiteralFloat64;
+token.sub_kind = TokenGoKind_LiteralFloat64;
 token.kind = 9;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1478,7 +1343,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LiteralFloat64;
+token.sub_kind = TokenGoKind_LiteralFloat64;
 token.kind = 9;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1511,7 +1376,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LiteralFloat32;
+token.sub_kind = TokenGoKind_LiteralFloat32;
 token.kind = 9;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1533,7 +1398,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LiteralFloat64;
+token.sub_kind = TokenGoKind_LiteralFloat64;
 token.kind = 9;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1558,7 +1423,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LiteralFloat64;
+token.sub_kind = TokenGoKind_LiteralFloat64;
 token.kind = 9;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1578,7 +1443,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LiteralFloat64;
+token.sub_kind = TokenGoKind_LiteralFloat64;
 token.kind = 9;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1611,7 +1476,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LiteralFloat32;
+token.sub_kind = TokenGoKind_LiteralFloat32;
 token.kind = 9;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1633,7 +1498,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LiteralFloat64;
+token.sub_kind = TokenGoKind_LiteralFloat64;
 token.kind = 9;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1658,7 +1523,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LiteralFloat64;
+token.sub_kind = TokenGoKind_LiteralFloat64;
 token.kind = 9;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1678,7 +1543,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LiteralFloat64;
+token.sub_kind = TokenGoKind_LiteralFloat64;
 token.kind = 9;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1706,7 +1571,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LiteralFloat32;
+token.sub_kind = TokenGoKind_LiteralFloat32;
 token.kind = 9;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1728,7 +1593,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LiteralFloat64;
+token.sub_kind = TokenGoKind_LiteralFloat64;
 token.kind = 9;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1753,7 +1618,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LiteralFloat64;
+token.sub_kind = TokenGoKind_LiteralFloat64;
 token.kind = 9;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1773,7 +1638,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LiteralFloat64;
+token.sub_kind = TokenGoKind_LiteralFloat64;
 token.kind = 9;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1801,7 +1666,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LiteralFloat32;
+token.sub_kind = TokenGoKind_LiteralFloat32;
 token.kind = 9;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1823,7 +1688,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LiteralFloat64;
+token.sub_kind = TokenGoKind_LiteralFloat64;
 token.kind = 9;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1848,7 +1713,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LexError;
+token.sub_kind = TokenGoKind_LexError;
 token.kind = 2;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1868,7 +1733,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LexError;
+token.sub_kind = TokenGoKind_LexError;
 token.kind = 2;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1901,7 +1766,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LiteralIntegerHex;
+token.sub_kind = TokenGoKind_LiteralIntegerHex;
 token.kind = 8;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1921,7 +1786,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LiteralIntegerHex;
+token.sub_kind = TokenGoKind_LiteralIntegerHex;
 token.kind = 8;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1969,7 +1834,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LiteralIntegerOct;
+token.sub_kind = TokenGoKind_LiteralIntegerOct;
 token.kind = 8;
 }while(0);
 token_list_push(arena, list, &token);
@@ -1989,7 +1854,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LiteralIntegerOct;
+token.sub_kind = TokenGoKind_LiteralIntegerOct;
 token.kind = 8;
 }while(0);
 token_list_push(arena, list, &token);
@@ -2037,16 +1902,16 @@ token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
 if (HasFlag(state.flags_ZF0, 0x1)){
-token.sub_kind = TokenCsKind_LiteralIntegerHexU;
+token.sub_kind = TokenGoKind_LiteralIntegerHexU;
 token.kind = 8;
 break;
 }
 if (HasFlag(state.flags_ZF0, 0x2)){
-token.sub_kind = TokenCsKind_LiteralIntegerOctU;
+token.sub_kind = TokenGoKind_LiteralIntegerOctU;
 token.kind = 8;
 break;
 }
-token.sub_kind = TokenCsKind_LiteralIntegerU;
+token.sub_kind = TokenGoKind_LiteralIntegerU;
 token.kind = 8;
 }while(0);
 token_list_push(arena, list, &token);
@@ -2067,16 +1932,16 @@ token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
 if (HasFlag(state.flags_ZF0, 0x1)){
-token.sub_kind = TokenCsKind_LiteralIntegerHexU;
+token.sub_kind = TokenGoKind_LiteralIntegerHexU;
 token.kind = 8;
 break;
 }
 if (HasFlag(state.flags_ZF0, 0x2)){
-token.sub_kind = TokenCsKind_LiteralIntegerOctU;
+token.sub_kind = TokenGoKind_LiteralIntegerOctU;
 token.kind = 8;
 break;
 }
-token.sub_kind = TokenCsKind_LiteralIntegerU;
+token.sub_kind = TokenGoKind_LiteralIntegerU;
 token.kind = 8;
 }while(0);
 token_list_push(arena, list, &token);
@@ -2112,16 +1977,16 @@ token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
 if (HasFlag(state.flags_ZF0, 0x1)){
-token.sub_kind = TokenCsKind_LiteralIntegerHexL;
+token.sub_kind = TokenGoKind_LiteralIntegerHexL;
 token.kind = 8;
 break;
 }
 if (HasFlag(state.flags_ZF0, 0x2)){
-token.sub_kind = TokenCsKind_LiteralIntegerOctL;
+token.sub_kind = TokenGoKind_LiteralIntegerOctL;
 token.kind = 8;
 break;
 }
-token.sub_kind = TokenCsKind_LiteralIntegerL;
+token.sub_kind = TokenGoKind_LiteralIntegerL;
 token.kind = 8;
 }while(0);
 token_list_push(arena, list, &token);
@@ -2142,16 +2007,16 @@ token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
 if (HasFlag(state.flags_ZF0, 0x1)){
-token.sub_kind = TokenCsKind_LiteralIntegerHexL;
+token.sub_kind = TokenGoKind_LiteralIntegerHexL;
 token.kind = 8;
 break;
 }
 if (HasFlag(state.flags_ZF0, 0x2)){
-token.sub_kind = TokenCsKind_LiteralIntegerOctL;
+token.sub_kind = TokenGoKind_LiteralIntegerOctL;
 token.kind = 8;
 break;
 }
-token.sub_kind = TokenCsKind_LiteralIntegerL;
+token.sub_kind = TokenGoKind_LiteralIntegerL;
 token.kind = 8;
 }while(0);
 token_list_push(arena, list, &token);
@@ -2179,16 +2044,16 @@ token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
 if (HasFlag(state.flags_ZF0, 0x1)){
-token.sub_kind = TokenCsKind_LiteralIntegerHexUL;
+token.sub_kind = TokenGoKind_LiteralIntegerHexUL;
 token.kind = 8;
 break;
 }
 if (HasFlag(state.flags_ZF0, 0x2)){
-token.sub_kind = TokenCsKind_LiteralIntegerOctUL;
+token.sub_kind = TokenGoKind_LiteralIntegerOctUL;
 token.kind = 8;
 break;
 }
-token.sub_kind = TokenCsKind_LiteralIntegerUL;
+token.sub_kind = TokenGoKind_LiteralIntegerUL;
 token.kind = 8;
 }while(0);
 token_list_push(arena, list, &token);
@@ -2214,16 +2079,16 @@ token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
 if (HasFlag(state.flags_ZF0, 0x1)){
-token.sub_kind = TokenCsKind_LiteralIntegerHexUL;
+token.sub_kind = TokenGoKind_LiteralIntegerHexUL;
 token.kind = 8;
 break;
 }
 if (HasFlag(state.flags_ZF0, 0x2)){
-token.sub_kind = TokenCsKind_LiteralIntegerOctUL;
+token.sub_kind = TokenGoKind_LiteralIntegerOctUL;
 token.kind = 8;
 break;
 }
-token.sub_kind = TokenCsKind_LiteralIntegerUL;
+token.sub_kind = TokenGoKind_LiteralIntegerUL;
 token.kind = 8;
 }while(0);
 token_list_push(arena, list, &token);
@@ -2244,16 +2109,16 @@ token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
 if (HasFlag(state.flags_ZF0, 0x1)){
-token.sub_kind = TokenCsKind_LiteralIntegerHexUL;
+token.sub_kind = TokenGoKind_LiteralIntegerHexUL;
 token.kind = 8;
 break;
 }
 if (HasFlag(state.flags_ZF0, 0x2)){
-token.sub_kind = TokenCsKind_LiteralIntegerOctUL;
+token.sub_kind = TokenGoKind_LiteralIntegerOctUL;
 token.kind = 8;
 break;
 }
-token.sub_kind = TokenCsKind_LiteralIntegerUL;
+token.sub_kind = TokenGoKind_LiteralIntegerUL;
 token.kind = 8;
 }while(0);
 token_list_push(arena, list, &token);
@@ -2276,16 +2141,16 @@ token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
 if (HasFlag(state.flags_ZF0, 0x1)){
-token.sub_kind = TokenCsKind_LiteralIntegerHexULL;
+token.sub_kind = TokenGoKind_LiteralIntegerHexULL;
 token.kind = 8;
 break;
 }
 if (HasFlag(state.flags_ZF0, 0x2)){
-token.sub_kind = TokenCsKind_LiteralIntegerOctULL;
+token.sub_kind = TokenGoKind_LiteralIntegerOctULL;
 token.kind = 8;
 break;
 }
-token.sub_kind = TokenCsKind_LiteralIntegerULL;
+token.sub_kind = TokenGoKind_LiteralIntegerULL;
 token.kind = 8;
 }while(0);
 token_list_push(arena, list, &token);
@@ -2311,16 +2176,16 @@ token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
 if (HasFlag(state.flags_ZF0, 0x1)){
-token.sub_kind = TokenCsKind_LiteralIntegerHexL;
+token.sub_kind = TokenGoKind_LiteralIntegerHexL;
 token.kind = 8;
 break;
 }
 if (HasFlag(state.flags_ZF0, 0x2)){
-token.sub_kind = TokenCsKind_LiteralIntegerOctL;
+token.sub_kind = TokenGoKind_LiteralIntegerOctL;
 token.kind = 8;
 break;
 }
-token.sub_kind = TokenCsKind_LiteralIntegerL;
+token.sub_kind = TokenGoKind_LiteralIntegerL;
 token.kind = 8;
 }while(0);
 token_list_push(arena, list, &token);
@@ -2341,16 +2206,16 @@ token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
 if (HasFlag(state.flags_ZF0, 0x1)){
-token.sub_kind = TokenCsKind_LiteralIntegerHexL;
+token.sub_kind = TokenGoKind_LiteralIntegerHexL;
 token.kind = 8;
 break;
 }
 if (HasFlag(state.flags_ZF0, 0x2)){
-token.sub_kind = TokenCsKind_LiteralIntegerOctL;
+token.sub_kind = TokenGoKind_LiteralIntegerOctL;
 token.kind = 8;
 break;
 }
-token.sub_kind = TokenCsKind_LiteralIntegerL;
+token.sub_kind = TokenGoKind_LiteralIntegerL;
 token.kind = 8;
 }while(0);
 token_list_push(arena, list, &token);
@@ -2373,16 +2238,16 @@ token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
 if (HasFlag(state.flags_ZF0, 0x1)){
-token.sub_kind = TokenCsKind_LiteralIntegerHexUL;
+token.sub_kind = TokenGoKind_LiteralIntegerHexUL;
 token.kind = 8;
 break;
 }
 if (HasFlag(state.flags_ZF0, 0x2)){
-token.sub_kind = TokenCsKind_LiteralIntegerOctUL;
+token.sub_kind = TokenGoKind_LiteralIntegerOctUL;
 token.kind = 8;
 break;
 }
-token.sub_kind = TokenCsKind_LiteralIntegerUL;
+token.sub_kind = TokenGoKind_LiteralIntegerUL;
 token.kind = 8;
 }while(0);
 token_list_push(arena, list, &token);
@@ -2413,16 +2278,16 @@ token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
 if (HasFlag(state.flags_ZF0, 0x1)){
-token.sub_kind = TokenCsKind_LiteralIntegerHexUL;
+token.sub_kind = TokenGoKind_LiteralIntegerHexUL;
 token.kind = 8;
 break;
 }
 if (HasFlag(state.flags_ZF0, 0x2)){
-token.sub_kind = TokenCsKind_LiteralIntegerOctUL;
+token.sub_kind = TokenGoKind_LiteralIntegerOctUL;
 token.kind = 8;
 break;
 }
-token.sub_kind = TokenCsKind_LiteralIntegerUL;
+token.sub_kind = TokenGoKind_LiteralIntegerUL;
 token.kind = 8;
 }while(0);
 token_list_push(arena, list, &token);
@@ -2443,16 +2308,16 @@ token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
 if (HasFlag(state.flags_ZF0, 0x1)){
-token.sub_kind = TokenCsKind_LiteralIntegerHexUL;
+token.sub_kind = TokenGoKind_LiteralIntegerHexUL;
 token.kind = 8;
 break;
 }
 if (HasFlag(state.flags_ZF0, 0x2)){
-token.sub_kind = TokenCsKind_LiteralIntegerOctUL;
+token.sub_kind = TokenGoKind_LiteralIntegerOctUL;
 token.kind = 8;
 break;
 }
-token.sub_kind = TokenCsKind_LiteralIntegerUL;
+token.sub_kind = TokenGoKind_LiteralIntegerUL;
 token.kind = 8;
 }while(0);
 token_list_push(arena, list, &token);
@@ -2475,16 +2340,16 @@ token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
 if (HasFlag(state.flags_ZF0, 0x1)){
-token.sub_kind = TokenCsKind_LiteralIntegerHexULL;
+token.sub_kind = TokenGoKind_LiteralIntegerHexULL;
 token.kind = 8;
 break;
 }
 if (HasFlag(state.flags_ZF0, 0x2)){
-token.sub_kind = TokenCsKind_LiteralIntegerOctULL;
+token.sub_kind = TokenGoKind_LiteralIntegerOctULL;
 token.kind = 8;
 break;
 }
-token.sub_kind = TokenCsKind_LiteralIntegerULL;
+token.sub_kind = TokenGoKind_LiteralIntegerULL;
 token.kind = 8;
 }while(0);
 token_list_push(arena, list, &token);
@@ -2510,16 +2375,16 @@ token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
 if (HasFlag(state.flags_ZF0, 0x1)){
-token.sub_kind = TokenCsKind_LiteralIntegerHexLL;
+token.sub_kind = TokenGoKind_LiteralIntegerHexLL;
 token.kind = 8;
 break;
 }
 if (HasFlag(state.flags_ZF0, 0x2)){
-token.sub_kind = TokenCsKind_LiteralIntegerOctLL;
+token.sub_kind = TokenGoKind_LiteralIntegerOctLL;
 token.kind = 8;
 break;
 }
-token.sub_kind = TokenCsKind_LiteralIntegerLL;
+token.sub_kind = TokenGoKind_LiteralIntegerLL;
 token.kind = 8;
 }while(0);
 token_list_push(arena, list, &token);
@@ -2540,16 +2405,16 @@ token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
 if (HasFlag(state.flags_ZF0, 0x1)){
-token.sub_kind = TokenCsKind_LiteralIntegerHexLL;
+token.sub_kind = TokenGoKind_LiteralIntegerHexLL;
 token.kind = 8;
 break;
 }
 if (HasFlag(state.flags_ZF0, 0x2)){
-token.sub_kind = TokenCsKind_LiteralIntegerOctLL;
+token.sub_kind = TokenGoKind_LiteralIntegerOctLL;
 token.kind = 8;
 break;
 }
-token.sub_kind = TokenCsKind_LiteralIntegerLL;
+token.sub_kind = TokenGoKind_LiteralIntegerLL;
 token.kind = 8;
 }while(0);
 token_list_push(arena, list, &token);
@@ -2572,16 +2437,16 @@ token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
 if (HasFlag(state.flags_ZF0, 0x1)){
-token.sub_kind = TokenCsKind_LiteralIntegerHexULL;
+token.sub_kind = TokenGoKind_LiteralIntegerHexULL;
 token.kind = 8;
 break;
 }
 if (HasFlag(state.flags_ZF0, 0x2)){
-token.sub_kind = TokenCsKind_LiteralIntegerOctULL;
+token.sub_kind = TokenGoKind_LiteralIntegerOctULL;
 token.kind = 8;
 break;
 }
-token.sub_kind = TokenCsKind_LiteralIntegerULL;
+token.sub_kind = TokenGoKind_LiteralIntegerULL;
 token.kind = 8;
 }while(0);
 token_list_push(arena, list, &token);
@@ -2606,7 +2471,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LexError;
+token.sub_kind = TokenGoKind_LexError;
 token.kind = 2;
 }while(0);
 token_list_push(arena, list, &token);
@@ -2626,7 +2491,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LexError;
+token.sub_kind = TokenGoKind_LexError;
 token.kind = 2;
 }while(0);
 token_list_push(arena, list, &token);
@@ -2672,21 +2537,21 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-Lexeme_Table_Lookup lookup = lexeme_table_lookup(cs_pp_directives_hash_array, cs_pp_directives_key_array, cs_pp_directives_value_array, cs_pp_directives_slot_count, cs_pp_directives_seed, state.delim_first, (state.delim_one_past_last - state.delim_first));
+Lexeme_Table_Lookup lookup = lexeme_table_lookup(go_pp_directives_hash_array, go_pp_directives_key_array, go_pp_directives_value_array, go_pp_directives_slot_count, go_pp_directives_seed, state.delim_first, (state.delim_one_past_last - state.delim_first));
 if (lookup.found_match){
 token.kind = lookup.base_kind;
 token.sub_kind = lookup.sub_kind;
 break;
 }
-token.sub_kind = TokenCsKind_PPUnknown;
+token.sub_kind = TokenGoKind_PPUnknown;
 token.kind = 2;
 }while(0);
 switch (token.sub_kind){
-case TokenCsKind_PPInclude:
+case TokenGoKind_PPInclude:
 {
 state.flags_KF0 |= 0x1;
 }break;
-case TokenCsKind_PPError:
+case TokenGoKind_PPError:
 {
 state.flags_KF0 |= 0x2;
 }break;
@@ -2709,21 +2574,21 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-Lexeme_Table_Lookup lookup = lexeme_table_lookup(cs_pp_directives_hash_array, cs_pp_directives_key_array, cs_pp_directives_value_array, cs_pp_directives_slot_count, cs_pp_directives_seed, state.delim_first, (state.delim_one_past_last - state.delim_first));
+Lexeme_Table_Lookup lookup = lexeme_table_lookup(go_pp_directives_hash_array, go_pp_directives_key_array, go_pp_directives_value_array, go_pp_directives_slot_count, go_pp_directives_seed, state.delim_first, (state.delim_one_past_last - state.delim_first));
 if (lookup.found_match){
 token.kind = lookup.base_kind;
 token.sub_kind = lookup.sub_kind;
 break;
 }
-token.sub_kind = TokenCsKind_PPUnknown;
+token.sub_kind = TokenGoKind_PPUnknown;
 token.kind = 2;
 }while(0);
 switch (token.sub_kind){
-case TokenCsKind_PPInclude:
+case TokenGoKind_PPInclude:
 {
 state.flags_KF0 |= 0x1;
 }break;
-case TokenCsKind_PPError:
+case TokenGoKind_PPError:
 {
 state.flags_KF0 |= 0x2;
 }break;
@@ -2763,7 +2628,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LexError;
+token.sub_kind = TokenGoKind_LexError;
 token.kind = 2;
 }while(0);
 token_list_push(arena, list, &token);
@@ -2783,7 +2648,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LexError;
+token.sub_kind = TokenGoKind_LexError;
 token.kind = 2;
 }while(0);
 token_list_push(arena, list, &token);
@@ -2819,7 +2684,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_PPIncludeFile;
+token.sub_kind = TokenGoKind_PPIncludeFile;
 token.kind = 10;
 }while(0);
 token_list_push(arena, list, &token);
@@ -2844,7 +2709,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LexError;
+token.sub_kind = TokenGoKind_LexError;
 token.kind = 2;
 }while(0);
 token_list_push(arena, list, &token);
@@ -2864,7 +2729,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LexError;
+token.sub_kind = TokenGoKind_LexError;
 token.kind = 2;
 }while(0);
 token_list_push(arena, list, &token);
@@ -2900,7 +2765,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_PPIncludeFile;
+token.sub_kind = TokenGoKind_PPIncludeFile;
 token.kind = 10;
 }while(0);
 token_list_push(arena, list, &token);
@@ -3047,7 +2912,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LexError;
+token.sub_kind = TokenGoKind_LexError;
 token.kind = 2;
 }while(0);
 token_list_push(arena, list, &token);
@@ -3072,7 +2937,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LexError;
+token.sub_kind = TokenGoKind_LexError;
 token.kind = 2;
 }while(0);
 token_list_push(arena, list, &token);
@@ -3096,26 +2961,26 @@ token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
 if (HasFlag(state.flags_ZF0, 0x4)){
-token.sub_kind = TokenCsKind_LiteralStringWide;
+token.sub_kind = TokenGoKind_LiteralStringWide;
 token.kind = 10;
 break;
 }
 if (HasFlag(state.flags_ZF0, 0x8)){
-token.sub_kind = TokenCsKind_LiteralStringUTF8;
+token.sub_kind = TokenGoKind_LiteralStringUTF8;
 token.kind = 10;
 break;
 }
 if (HasFlag(state.flags_ZF0, 0x10)){
-token.sub_kind = TokenCsKind_LiteralStringUTF16;
+token.sub_kind = TokenGoKind_LiteralStringUTF16;
 token.kind = 10;
 break;
 }
 if (HasFlag(state.flags_ZF0, 0x20)){
-token.sub_kind = TokenCsKind_LiteralStringUTF32;
+token.sub_kind = TokenGoKind_LiteralStringUTF32;
 token.kind = 10;
 break;
 }
-token.sub_kind = TokenCsKind_LiteralString;
+token.sub_kind = TokenGoKind_LiteralString;
 token.kind = 10;
 }while(0);
 token_list_push(arena, list, &token);
@@ -3142,26 +3007,26 @@ token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
 if (HasFlag(state.flags_ZF0, 0x4)){
-token.sub_kind = TokenCsKind_LiteralCharacterWide;
+token.sub_kind = TokenGoKind_LiteralCharacterWide;
 token.kind = 10;
 break;
 }
 if (HasFlag(state.flags_ZF0, 0x8)){
-token.sub_kind = TokenCsKind_LiteralCharacterUTF8;
+token.sub_kind = TokenGoKind_LiteralCharacterUTF8;
 token.kind = 10;
 break;
 }
 if (HasFlag(state.flags_ZF0, 0x10)){
-token.sub_kind = TokenCsKind_LiteralCharacterUTF16;
+token.sub_kind = TokenGoKind_LiteralCharacterUTF16;
 token.kind = 10;
 break;
 }
 if (HasFlag(state.flags_ZF0, 0x20)){
-token.sub_kind = TokenCsKind_LiteralCharacterUTF32;
+token.sub_kind = TokenGoKind_LiteralCharacterUTF32;
 token.kind = 10;
 break;
 }
-token.sub_kind = TokenCsKind_LiteralCharacter;
+token.sub_kind = TokenGoKind_LiteralCharacter;
 token.kind = 10;
 }while(0);
 token_list_push(arena, list, &token);
@@ -3194,7 +3059,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LexError;
+token.sub_kind = TokenGoKind_LexError;
 token.kind = 2;
 }while(0);
 token_list_push(arena, list, &token);
@@ -3208,7 +3073,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_EOF;
+token.sub_kind = TokenGoKind_EOF;
 token.kind = 0;
 }while(0);
 token_list_push(arena, list, &token);
@@ -3497,7 +3362,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LexError;
+token.sub_kind = TokenGoKind_LexError;
 token.kind = 2;
 }while(0);
 token_list_push(arena, list, &token);
@@ -3511,7 +3376,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_EOF;
+token.sub_kind = TokenGoKind_EOF;
 token.kind = 0;
 }while(0);
 token_list_push(arena, list, &token);
@@ -3538,7 +3403,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LexError;
+token.sub_kind = TokenGoKind_LexError;
 token.kind = 2;
 }while(0);
 token_list_push(arena, list, &token);
@@ -3569,7 +3434,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LexError;
+token.sub_kind = TokenGoKind_LexError;
 token.kind = 2;
 }while(0);
 token_list_push(arena, list, &token);
@@ -3583,7 +3448,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_EOF;
+token.sub_kind = TokenGoKind_EOF;
 token.kind = 0;
 }while(0);
 token_list_push(arena, list, &token);
@@ -3650,26 +3515,26 @@ token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
 if (HasFlag(state.flags_ZF0, 0x4)){
-token.sub_kind = TokenCsKind_LiteralStringWideRaw;
+token.sub_kind = TokenGoKind_LiteralStringWideRaw;
 token.kind = 10;
 break;
 }
 if (HasFlag(state.flags_ZF0, 0x8)){
-token.sub_kind = TokenCsKind_LiteralStringUTF8Raw;
+token.sub_kind = TokenGoKind_LiteralStringUTF8Raw;
 token.kind = 10;
 break;
 }
 if (HasFlag(state.flags_ZF0, 0x10)){
-token.sub_kind = TokenCsKind_LiteralStringUTF16Raw;
+token.sub_kind = TokenGoKind_LiteralStringUTF16Raw;
 token.kind = 10;
 break;
 }
 if (HasFlag(state.flags_ZF0, 0x20)){
-token.sub_kind = TokenCsKind_LiteralStringUTF32Raw;
+token.sub_kind = TokenGoKind_LiteralStringUTF32Raw;
 token.kind = 10;
 break;
 }
-token.sub_kind = TokenCsKind_LiteralStringRaw;
+token.sub_kind = TokenGoKind_LiteralStringRaw;
 token.kind = 10;
 }while(0);
 token_list_push(arena, list, &token);
@@ -3694,7 +3559,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_BlockComment;
+token.sub_kind = TokenGoKind_BlockComment;
 token.kind = 3;
 }while(0);
 token_list_push(arena, list, &token);
@@ -3708,7 +3573,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_EOF;
+token.sub_kind = TokenGoKind_EOF;
 token.kind = 0;
 }while(0);
 token_list_push(arena, list, &token);
@@ -3750,7 +3615,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_BlockComment;
+token.sub_kind = TokenGoKind_BlockComment;
 token.kind = 3;
 }while(0);
 token_list_push(arena, list, &token);
@@ -3764,7 +3629,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_EOF;
+token.sub_kind = TokenGoKind_EOF;
 token.kind = 0;
 }while(0);
 token_list_push(arena, list, &token);
@@ -3796,7 +3661,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_BlockComment;
+token.sub_kind = TokenGoKind_BlockComment;
 token.kind = 3;
 }while(0);
 token_list_push(arena, list, &token);
@@ -3821,7 +3686,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LineComment;
+token.sub_kind = TokenGoKind_LineComment;
 token.kind = 3;
 }while(0);
 token_list_push(arena, list, &token);
@@ -3846,7 +3711,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LineComment;
+token.sub_kind = TokenGoKind_LineComment;
 token.kind = 3;
 }while(0);
 token_list_push(arena, list, &token);
@@ -3897,7 +3762,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Colon;
+token.sub_kind = TokenGoKind_Colon;
 token.kind = 15;
 }while(0);
 token_list_push(arena, list, &token);
@@ -3917,7 +3782,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Colon;
+token.sub_kind = TokenGoKind_Colon;
 token.kind = 15;
 }while(0);
 token_list_push(arena, list, &token);
@@ -3939,7 +3804,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_ColonColon;
+token.sub_kind = TokenGoKind_ColonColon;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -3964,7 +3829,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Plus;
+token.sub_kind = TokenGoKind_Plus;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -3984,7 +3849,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Plus;
+token.sub_kind = TokenGoKind_Plus;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4006,7 +3871,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_PlusPlus;
+token.sub_kind = TokenGoKind_PlusPlus;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4028,7 +3893,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_PlusEq;
+token.sub_kind = TokenGoKind_PlusEq;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4053,7 +3918,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Minus;
+token.sub_kind = TokenGoKind_Minus;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4073,7 +3938,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Minus;
+token.sub_kind = TokenGoKind_Minus;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4095,7 +3960,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_MinusMinus;
+token.sub_kind = TokenGoKind_MinusMinus;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4117,7 +3982,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_MinusEq;
+token.sub_kind = TokenGoKind_MinusEq;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4142,7 +4007,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Less;
+token.sub_kind = TokenGoKind_Less;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4162,7 +4027,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Less;
+token.sub_kind = TokenGoKind_Less;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4189,7 +4054,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LessEq;
+token.sub_kind = TokenGoKind_LessEq;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4214,7 +4079,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Grtr;
+token.sub_kind = TokenGoKind_Grtr;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4234,7 +4099,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Grtr;
+token.sub_kind = TokenGoKind_Grtr;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4256,7 +4121,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_GrtrEq;
+token.sub_kind = TokenGoKind_GrtrEq;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4286,7 +4151,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Eq;
+token.sub_kind = TokenGoKind_Eq;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4306,7 +4171,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Eq;
+token.sub_kind = TokenGoKind_Eq;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4328,7 +4193,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_EqEq;
+token.sub_kind = TokenGoKind_EqEq;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4353,7 +4218,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Not;
+token.sub_kind = TokenGoKind_Not;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4373,7 +4238,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Not;
+token.sub_kind = TokenGoKind_Not;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4395,7 +4260,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_NotEq;
+token.sub_kind = TokenGoKind_NotEq;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4420,7 +4285,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_And;
+token.sub_kind = TokenGoKind_And;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4440,7 +4305,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_And;
+token.sub_kind = TokenGoKind_And;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4462,7 +4327,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_AndAnd;
+token.sub_kind = TokenGoKind_AndAnd;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4487,7 +4352,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Or;
+token.sub_kind = TokenGoKind_Or;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4507,7 +4372,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Or;
+token.sub_kind = TokenGoKind_Or;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4529,7 +4394,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_OrOr;
+token.sub_kind = TokenGoKind_OrOr;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4554,7 +4419,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Star;
+token.sub_kind = TokenGoKind_Star;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4574,7 +4439,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Star;
+token.sub_kind = TokenGoKind_Star;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4596,7 +4461,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_StarEq;
+token.sub_kind = TokenGoKind_StarEq;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4621,7 +4486,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Mod;
+token.sub_kind = TokenGoKind_Mod;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4641,7 +4506,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_Mod;
+token.sub_kind = TokenGoKind_Mod;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4663,7 +4528,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_ModEq;
+token.sub_kind = TokenGoKind_ModEq;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4688,7 +4553,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LeftLeft;
+token.sub_kind = TokenGoKind_LeftLeft;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4708,7 +4573,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LeftLeft;
+token.sub_kind = TokenGoKind_LeftLeft;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4730,7 +4595,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LeftLeftEq;
+token.sub_kind = TokenGoKind_LeftLeftEq;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4755,7 +4620,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_RightRight;
+token.sub_kind = TokenGoKind_RightRight;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4775,7 +4640,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_RightRight;
+token.sub_kind = TokenGoKind_RightRight;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4797,7 +4662,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_RightRightEq;
+token.sub_kind = TokenGoKind_RightRightEq;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4822,7 +4687,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_PPStringify;
+token.sub_kind = TokenGoKind_PPStringify;
 token.kind = 15;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4842,7 +4707,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_PPStringify;
+token.sub_kind = TokenGoKind_PPStringify;
 token.kind = 15;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4864,7 +4729,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_PPConcat;
+token.sub_kind = TokenGoKind_PPConcat;
 token.kind = 15;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4889,7 +4754,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LexError;
+token.sub_kind = TokenGoKind_LexError;
 token.kind = 2;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4909,7 +4774,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_LexError;
+token.sub_kind = TokenGoKind_LexError;
 token.kind = 2;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4931,7 +4796,7 @@ token.pos = (i64)(state.emit_ptr - state.base);
 token.size = (i64)(state.ptr - state.emit_ptr);
 token.flags = state.flags_KB0;
 do{
-token.sub_kind = TokenCsKind_DotDotDot;
+token.sub_kind = TokenGoKind_DotDotDot;
 token.kind = 7;
 }while(0);
 token_list_push(arena, list, &token);
@@ -4951,10 +4816,10 @@ block_copy_struct(state_ptr, &state);
 return(result);
 }
 internal Token_List
-lex_full_input_cs(Arena *arena, String_Const_u8 input){
-Lex_State_Cs state = {};
-lex_full_input_cs_init(&state, input);
+lex_full_input_go(Arena *arena, String_Const_u8 input){
+Lex_State_Go state = {};
+lex_full_input_go_init(&state, input);
 Token_List list = {};
-lex_full_input_cs_breaks(arena, &list, &state, max_u64);
+lex_full_input_go_breaks(arena, &list, &state, max_u64);
 return(list);
 }

@@ -779,6 +779,28 @@ Momo_Index_Tick(Application_Links *app)
         buffer_clear_layout_cache(app, buffer_id);
     }
 }
-
+internal void
+Momo_Index_GoToDefinitionInNote(Application_Links *app, Momo_Index_Note *note, b32 same_panel) { 
+    if(note != 0 && note->file != 0) {
+        View_ID view = get_active_view(app, Access_Always);
+        Rect_f32 region = view_get_buffer_region(app, view);
+        f32 view_height = rect_height(region);
+        Buffer_ID buffer = note->file->buffer;
+        if(!same_panel)
+        {
+            view = get_next_view_looped_primary_panels(app, view, Access_Always);
+        }
+        point_stack_push_view_cursor(app, view);
+        view_set_buffer(app, view, buffer, 0);
+        i64 line_number = get_line_number_from_pos(app, buffer, note->range.min);
+        Buffer_Scroll scroll = view_get_buffer_scroll(app, view);
+        scroll.position.line_number = line_number;
+        scroll.target.line_number = line_number;
+        scroll.position.pixel_shift.y = scroll.target.pixel_shift.y = -view_height*0.5f;
+        view_set_buffer_scroll(app, view, scroll, SetBufferScroll_SnapCursorIntoView);
+        view_set_cursor(app, view, seek_pos(note->range.min));
+        view_set_mark(app, view, seek_pos(note->range.min));
+    }
+}
 
 #endif 

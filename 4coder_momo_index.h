@@ -112,7 +112,7 @@ internal void Momo_Index_SkipSoftTokens(Momo_Index_ParseCtx *ctx, b32 preproc);
 internal void Momo_Index_SkipOpTokens(Momo_Index_ParseCtx *ctx);
 internal String_Const_u8 Momo_Index_StringFromToken(Momo_Index_ParseCtx* ctx, Token* token);
 internal void Momo_Index_Tick(Application_Links *app);
-
+internal void Momo_Index_GoToDefinitionInNote(Application_Links *app, Momo_Index_Note *note, b32 same_panel);
 // Format:
 // %t -> token,         requires char * specifying token string
 // %k -> token kind,    requires Token_Base_Kind and Token ** for output token

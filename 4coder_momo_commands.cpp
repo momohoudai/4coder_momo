@@ -3,134 +3,17 @@
 
 
 
-static b32 global_insert_mode = false;
-static b32 global_query_lock = false;
 
-#define QueryLock \
-if (global_query_lock) { \
-    momo_leave_event_unhandled(app); \
-    return; \
-} \
-global_query_lock = true; \
-Defer { global_query_lock = false; }; 
 
-function void
-momo_push_lister_with_directory_files(Application_Links *app, Momo_Lister *lister){
-    Scratch_Block scratch(app, lister->arena);
-    
-    Temp_Memory temp = begin_temp(lister->arena);
-    String_Const_u8 hot = push_hot_directory(app, lister->arena);
-    if (!character_is_slash(string_get_character(hot, hot.size - 1))){
-        hot = push_u8_stringf(lister->arena, "%.*s/", string_expand(hot));
-    }
-    Momo_Lister_SetTextField(lister, hot);
-    Momo_Lister_SetKey(lister, string_front_of_path(hot));
-    
-    File_List file_list = system_get_file_list(scratch, hot);
-    end_temp(temp);
-    
-    File_Info **one_past_last = file_list.infos + file_list.count;
-    
-    Momo_Lister_BeginNewItemSet(app, lister);
-    
-    hot = push_hot_directory(app, lister->arena);
-    push_align(lister->arena, 8);
-    if (hot.str != 0){
-        String_Const_u8 empty_string = string_u8_litexpr("");
-        Momo_Lister_Prealloced_String empty_string_prealloced = Momo_Lister_PreAlloced(empty_string);
-        for (File_Info **info = file_list.infos;
-             info < one_past_last;
-             info += 1){
-            if (!HasFlag((**info).attributes.flags, FileAttribute_IsDirectory)) continue;
-            String_Const_u8 file_name = push_u8_stringf(lister->arena, "%.*s/",
-                                                        string_expand((**info).file_name));
-            Momo_Lister_AddItem(lister, Momo_Lister_PreAlloced(file_name), empty_string_prealloced, file_name.str, 0);
-        }
-        
-        for (File_Info **info = file_list.infos;
-             info < one_past_last;
-             info += 1){
-            if (HasFlag((**info).attributes.flags, FileAttribute_IsDirectory)) continue;
-            String_Const_u8 file_name = push_string_copy(lister->arena, (**info).file_name);
-            char *is_loaded = "";
-            char *status_flag = "";
-            
-            Buffer_ID buffer = {};
-            {
-                Temp_Memory path_temp = begin_temp(lister->arena);
-                List_String_Const_u8 list = {};
-                string_list_push(lister->arena, &list, hot);
-                string_list_push_overlap(lister->arena, &list, '/', (**info).file_name);
-                String_Const_u8 full_file_path = string_list_flatten(lister->arena, list);
-                buffer = get_buffer_by_file_name(app, full_file_path, Access_Always);
-                end_temp(path_temp);
-            }
-            
-            if (buffer != 0){
-                is_loaded = "LOADED";
-                Dirty_State dirty = buffer_get_dirty_state(app, buffer);
-                switch (dirty){
-                    case DirtyState_UnsavedChanges:  status_flag = " *"; break;
-                    case DirtyState_UnloadedChanges: status_flag = " !"; break;
-                    case DirtyState_UnsavedChangesAndUnloadedChanges: status_flag = " *!"; break;
-                }
-            }
-            String_Const_u8 status = push_u8_stringf(lister->arena, "%s%s", is_loaded, status_flag);
-            Momo_Lister_AddItem(lister, Momo_Lister_PreAlloced(file_name), Momo_Lister_PreAlloced(status), file_name.str, 0);
-        }
-    }
-}
 
-function File_Name_Result
-momo_get_file_name_from_user(Application_Links *app, Arena *arena, String_Const_u8 query, View_ID view){
-  
-    Momo_Lister_Handlers handlers = Momo_Lister_GetDefaultHandlers();
-    handlers.refresh = momo_push_lister_with_directory_files;
-    handlers.write_character = lister__write_character__file_path;
-    handlers.backspace = lister__backspace_text_field__file_path;
-
-    Momo_Lister_Result l_result = Momo_Lister_RunWithRefreshHandler(app, arena, query, handlers);
-    
-    File_Name_Result result = {};
-    result.canceled = l_result.canceled;
-    if (!l_result.canceled){
-        result.clicked = l_result.activated_by_click;
-        if (l_result.user_data != 0){
-            String_Const_u8 name = SCu8((u8*)l_result.user_data);
-            result.file_name_activated = name;
-            result.is_folder = character_is_slash(string_get_character(name, name.size - 1));
-        }
-        result.file_name_in_text_field = string_front_of_path(l_result.text_field);
-        
-        String_Const_u8 path = {};
-        if (l_result.user_data == 0 && result.file_name_in_text_field.size == 0 && l_result.text_field.size > 0){
-            result.file_name_in_text_field = string_front_folder_of_path(l_result.text_field);
-            path = string_remove_front_folder_of_path(l_result.text_field);
-        }
-        else{
-            path = string_remove_front_of_path(l_result.text_field);
-        }
-        if (character_is_slash(string_get_character(path, path.size - 1))){
-            path = string_chop(path, 1);
-        }
-        result.path_in_text_field = path;
-    }
-    
-    return(result);
-}
-
-function File_Name_Result
-momo_get_file_name_from_user(Application_Links *app, Arena *arena, char *query, View_ID view){
-    return(momo_get_file_name_from_user(app, arena, SCu8(query), view));
-}
-
+//~ Commands
 CUSTOM_COMMAND_SIG(momo_interactive_open_or_new)
 CUSTOM_DOC("Interactively open a file out of the file system.") 
 {
     for (;;){
         Scratch_Block scratch(app);
         View_ID view = get_this_ctx_view(app, Access_Always);
-        File_Name_Result result = momo_get_file_name_from_user(app, scratch, "Open:", view);
+        File_Name_Result result = Momo_Lister_CreateToGetFilenameFromUser(app, scratch, "Open:", view);
         if (result.canceled) break;
         
         String_Const_u8 file_name = result.file_name_activated;
@@ -173,489 +56,51 @@ CUSTOM_DOC("Interactively open a file out of the file system.")
     }
 }
 
-internal void
-momo_go_to_definition(Application_Links *app, Momo_Index_Note *note, b32 same_panel) { 
-    if(note != 0 && note->file != 0) {
-        View_ID view = get_active_view(app, Access_Always);
-        Rect_f32 region = view_get_buffer_region(app, view);
-        f32 view_height = rect_height(region);
-        Buffer_ID buffer = note->file->buffer;
-        if(!same_panel)
-        {
-            view = get_next_view_looped_primary_panels(app, view, Access_Always);
-        }
-        point_stack_push_view_cursor(app, view);
-        view_set_buffer(app, view, buffer, 0);
-        i64 line_number = get_line_number_from_pos(app, buffer, note->range.min);
-        Buffer_Scroll scroll = view_get_buffer_scroll(app, view);
-        scroll.position.line_number = line_number;
-        scroll.target.line_number = line_number;
-        scroll.position.pixel_shift.y = scroll.target.pixel_shift.y = -view_height*0.5f;
-        view_set_buffer_scroll(app, view, scroll, SetBufferScroll_SnapCursorIntoView);
-        view_set_cursor(app, view, seek_pos(note->range.min));
-        view_set_mark(app, view, seek_pos(note->range.min));
-    }
-}
 
-
-function void
-momo_write_text_and_auto_indent_internal(Application_Links* app, String_Const_u8 insert) {
-    ProfileScope(app, "write and auto indent");
-    if (insert.str != 0 && insert.size > 0) {
-        b32 do_auto_indent = false;
-        for (u64 i = 0; !do_auto_indent && i < insert.size; i += 1) {
-            switch (insert.str[i]) {
-            case ';': case ':':
-            case '{': case '}':
-            case '(': case ')':
-            case '[': case ']':
-            case '#':
-            case '\n': case '\t':
-            {
-                do_auto_indent = true;
-            }break;
-            }
-        }
-        if (do_auto_indent) {
-            View_ID view = get_active_view(app, Access_ReadWriteVisible);
-            Buffer_ID buffer = view_get_buffer(app, view, Access_ReadWriteVisible);
-            Range_i64 pos = {};
-            pos.min = view_get_cursor_pos(app, view);
-            write_text(app, insert);
-            pos.max = view_get_cursor_pos(app, view);
-            auto_indent_buffer(app, buffer, pos, 0);
-            move_past_lead_whitespace(app, view, buffer);
-        }
-        else {
-            write_text(app, insert);
-        }
-    }
-}
-
-function i64
-momo_boundary_word(Application_Links* app, Buffer_ID buffer, Side side, Scan_Direction direction, i64 pos) {
-    i64 result = 0;
-    if (direction == Scan_Forward) {
-        result = Min(buffer_seek_character_class_change_0_1(app, buffer, &character_predicate_alpha_numeric_underscore_utf8, direction, pos),
-            buffer_seek_character_class_change_1_0(app, buffer, &character_predicate_alpha_numeric_underscore_utf8, direction, pos));
-        result = Min(result, buffer_seek_character_class_change_1_0(app, buffer, &character_predicate_whitespace, direction, pos));
-    }
-    else {
-        result = Max(buffer_seek_character_class_change_0_1(app, buffer, &character_predicate_alpha_numeric_underscore_utf8, direction, pos),
-            buffer_seek_character_class_change_1_0(app, buffer, &character_predicate_alpha_numeric_underscore_utf8, direction, pos));
-        result = Max(result, buffer_seek_character_class_change_1_0(app, buffer, &character_predicate_whitespace, direction, pos));
-    }
-
-    return result;
-}
-
-function void
-momo_seek_string_forward(Application_Links* app, Buffer_ID buffer, i64 fallback_pos, i64 pos, i64 end, String_Const_u8 needle, i64* result) {
-    if (end == 0) {
-        end = (i32)buffer_get_size(app, buffer);
-    }
-    String_Match match = {};
-    match.range.first = pos;
-    for (;;) {
-        match = buffer_seek_string(app, buffer, needle, Scan_Forward, (i32)match.range.first);
-        if (HasFlag(match.flags, StringMatch_CaseSensitive) ||
-            match.buffer != buffer || match.range.first >= end) break;
-    }
-    if (match.range.first < end && match.buffer == buffer) {
-        *result = match.range.first;
-    }
-    else {
-        // Instead of returning end of buffer size, return pos
-        //*result = buffer_get_size(app, buffer);
-        *result = fallback_pos;
-    }
-}
-
-function void
-momo_seek_string_backward(Application_Links* app, Buffer_ID buffer, i64 fallback_pos, i64 pos, i64 min, String_Const_u8 needle, i64* result) {
-    String_Match match = {};
-    match.range.first = pos;
-    for (;;) {
-        match = buffer_seek_string(app, buffer, needle, Scan_Backward, (i32)match.range.first);
-        if (HasFlag(match.flags, StringMatch_CaseSensitive) ||
-            match.buffer != buffer || match.range.first < min) break;
-    }
-    if (match.range.first >= min && match.buffer == buffer) {
-        *result = match.range.first;
-    }
-    else {
-        *result = fallback_pos;
-    }
-}
-
-
-function void
-momo_number_mode(Application_Links* app, String_Const_u8 init_str) {
-    QueryLock;
-
-    View_ID view = get_active_view(app, Access_ReadVisible);
-    Buffer_ID buffer = view_get_buffer(app, view, Access_ReadVisible);
-
-    if (buffer != 0) {
-        Query_Bar_Group group(app);
-        Query_Bar find = {};
-        u8 number_buffer[1024];
-        find.prompt = string_u8_litexpr("Number: ");
-        find.string = SCu8(number_buffer, (u64)0);
-        find.string_capacity = sizeof(number_buffer);
-        if (!start_query_bar(app, &find, 0)) {
-            return;
-        }
-
-
-
-        // If the current input is a number, we can just append.
-        if (init_str.size > 0)
-        {
-            Scratch_Block scratch(app);
-            User_Input in = get_current_input(app);
-            init_str = string_replace(scratch, init_str,
-                                        string_u8_litexpr("\n"),
-                                        string_u8_litexpr(""));
-            init_str = string_replace(scratch, init_str,
-                                        string_u8_litexpr("\t"),
-                                        string_u8_litexpr(""));
-            if (string_is_integer(init_str, 10)){
-                String_u8 string = Su8(find.string.str, find.string.size, find.string_capacity);
-                string_append(&string, init_str);
-                find.string.size = string.string.size;
-            }
-            
-
-        }
-
-
-        for (;;) {
-            User_Input in = get_next_input(app, EventPropertyGroup_Any, 
-                                EventProperty_Escape|EventProperty_MouseButton);
-            if (in.abort) {
-                break;
-            }
-
-            // for all other cases, attempt to insert
-            Scratch_Block scratch(app);
-            b32 good_insert = false;
-            String_Const_u8 insert_string = to_writable(&in);
-            if (insert_string.str != 0 && insert_string.size > 0){
-                insert_string = string_replace(scratch, insert_string,
-                                            string_u8_litexpr("\n"),
-                                            string_u8_litexpr(""));
-                insert_string = string_replace(scratch, insert_string,
-                                                        string_u8_litexpr("\t"),
-                                                        string_u8_litexpr(""));
-                if (string_is_integer(insert_string, 10)){
-                    good_insert = true;
-                }
-            }
-
-            // Shift-G will go to line
-            if (match_key_code(&in, KeyCode_G)) {
-                Input_Modifier_Set* mods = &in.event.key.modifiers;
-                if (has_modifier(mods, KeyCode_Shift)) {
-                    i32 line_number = (i32)string_to_integer(find.string, 10);
-                    View_ID view = get_active_view(app, Access_ReadVisible);
-                    view_set_cursor_and_preferred_x(app, view, seek_line_col(line_number, 0));
-                    break;
-                }
-                
-            }
-
-            if (in.event.kind == InputEventKind_KeyStroke &&
-                (in.event.key.code == KeyCode_Return || in.event.key.code == KeyCode_Tab))
-            {
-                break;
-            }
-            else if (in.event.kind == InputEventKind_KeyStroke &&
-                    in.event.key.code == KeyCode_Backspace){
-                find.string = backspace_utf8(find.string);
-            }
-            else if (good_insert){
-                String_u8 string = Su8(find.string.str, find.string.size, find.string_capacity);
-                string_append(&string, insert_string);
-                find.string.size = string.string.size;
-            }
-            else{
-                leave_current_input_unhandled(app);
-            }
-        }
-    }
-}
-
-internal void
-momo_jump_to_location(Application_Links *app, View_ID view, Buffer_ID buffer, i64 pos)
+CUSTOM_COMMAND_SIG(momo_auto_indent_whole_file)
+CUSTOM_DOC("Audo-indents the entire current buffer.")
 {
-    // NOTE(rjf): This function was ripped from 4coder's jump_to_location. It was copied
-    // and modified so that jumping to a location didn't cause a selection in notepad-like
-    // mode.
-    
-    view_set_active(app, view);
-    Buffer_Seek seek = seek_pos(pos);
-    set_view_to_location(app, view, buffer, seek);
-    
-    if (auto_center_after_jumps)
-    {
-        center_view(app);
-    }
-    view_set_cursor(app, view, seek);
-    view_set_mark(app, view, seek);
+    View_ID view = get_active_view(app, Access_ReadWriteVisible);
+    Buffer_ID buffer = view_get_buffer(app, view, Access_ReadWriteVisible);
+    i64 buffer_size = buffer_get_size(app, buffer);
+    Momo_Indent_IndentBuffer(app, buffer, Ii64(0, buffer_size));
 }
 
-
-
-internal void
-momo_push_lister_with_note(Application_Links *app, Arena *arena, Momo_Lister *lister, Momo_Index_Note *note)
+CUSTOM_COMMAND_SIG(momo_auto_indent_line_at_cursor)
+CUSTOM_DOC("Auto-indents the line on which the cursor sits.")
 {
-    if(note && note->file)
-    {
-        Momo_Index_File *file = note->file;
-        Buffer_ID buffer = file->buffer;
-        
-        Tiny_Jump *jump = push_array(arena, Tiny_Jump, 1);
-        jump->buffer = buffer;
-        jump->pos = note->range.first;
-        
-        String_Const_u8 buffer_name = push_buffer_unique_name(app, arena, buffer);
-        String_Const_u8 name = {};
-        if (note->parent != 0) 
-            name = push_stringf(arena, "[%.*s] %.*s::%.*s", string_expand(buffer_name), string_expand(note->parent->string), string_expand(note->string));
-        else
-            name = push_stringf(arena, "[%.*s] %.*s", string_expand(buffer_name), string_expand(note->string));
-        String_Const_u8 sort = S8Lit("");
-        switch(note->kind)
-        {
-            case MOMO_INDEX_NOTE_KIND_TYPE:
-            {
-                sort = push_stringf(arena, "type [%s] [%s]",
-                                    note->flags & MOMO_INDEX_NOTE_FLAG_PROTOTYPE ? "prototype" : "def",
-                                    note->flags & MOMO_INDEX_NOTE_FLAG_SUM_TYPE ? "sum" : "product");
-            }break;
-            
-            case MOMO_INDEX_NOTE_KIND_FUNCTION:
-            {
-                sort = push_stringf(arena, "func [%s]", 
-                                    note->flags & MOMO_INDEX_NOTE_FLAG_PROTOTYPE ? "prototype" : "def");
-               
-            }break;
-            
-            case MOMO_INDEX_NOTE_KIND_MACRO:
-            {
-                sort = S8Lit("macro");
-            }break;
-            
-            case MOMO_INDEX_NOTE_KIND_CONSTANT:
-            {
-                sort = S8Lit("constant");
-            }break;
-            
-            case MOMO_INDEX_NOTE_KIND_COMMENT_TAG:
-            {
-                sort = S8Lit("comment tag");
-            }break;
-            
-            case MOMO_INDEX_NOTE_KIND_COMMENT_TODO:
-            {
-                sort = S8Lit("TODO");
-            }break;
-            
-            default: break;
-        }
-        
-        Momo_Lister_AddItem(lister, name, sort, jump, 0);
-    }
+    View_ID view = get_active_view(app, Access_ReadWriteVisible);
+    Buffer_ID buffer = view_get_buffer(app, view, Access_ReadWriteVisible);
+    i64 pos = view_get_cursor_pos(app, view);
+    Momo_Indent_IndentBuffer(app, buffer, Ii64(pos));
+    move_past_lead_whitespace(app, view, buffer);
+}
+
+CUSTOM_COMMAND_SIG(momo_auto_indent_range)
+CUSTOM_DOC("Auto-indents the range between the cursor and the mark.")
+{
+    View_ID view = get_active_view(app, Access_ReadWriteVisible);
+    Buffer_ID buffer = view_get_buffer(app, view, Access_ReadWriteVisible);
+    Range_i64 range = get_view_range(app, view);
+    Momo_Indent_IndentBuffer(app, buffer, range);
+    move_past_lead_whitespace(app, view, buffer);
 }
 
 
-template<typename Pred>
-function void 
-momo_push_lister_with_note_including_children(Application_Links* app, Arena* arena, Momo_Lister* lister, Momo_Index_Note* parent, Pred pred) {
-    if (!parent) {
+
+CUSTOM_COMMAND_SIG(momo_write_text_and_auto_indent)
+CUSTOM_DOC("Inserts text and auto-indents the line on which the cursor sits if any of the text contains 'layout punctuation' such as ;:{}()[]# and new lines.")
+{
+    if (!global_insert_mode) {
         return;
     }
-    if (pred(parent)) {
-        momo_push_lister_with_note(app, arena, lister, parent);
-    }    
-    for(Momo_Index_Note *child = parent->first_child; child; child = child->next_sibling) {
-        momo_push_lister_with_note_including_children(app, arena, lister, child, pred);
-    }
-}
-
-// NOTE(Momo): Pred must be of type: b32(Momo_Index_Note*)
-template<typename Pred>
-function void
-momo_list_project_notes_custom(Application_Links* app, String_Const_u8 init_str, b32 same_panel, Pred pred){
-    char *query = "Index (Project):";
-    
-    Scratch_Block scratch(app);
-    Momo_Lister_Block lister(app, scratch);
-    Momo_Lister_SetQuery(lister, query);
-    Momo_Lister_SetKey(lister, init_str);
-    Momo_Lister_SetTextField(lister, init_str);
-    Momo_Lister_SetDefaultHandlers(lister);
-    
-
-    Momo_Index_Lock();
-    {
-        for (Buffer_ID buffer = get_buffer_next(app, 0, Access_Always);
-             buffer != 0; buffer = get_buffer_next(app, buffer, Access_Always))
-        {
-            Momo_Index_File *file = Momo_Index_LookupFile(app, buffer);
-            if(file != 0)
-            {
-                for(Momo_Index_Note *note = file->first_note; note; note = note->next_sibling)
-                {
-                    momo_push_lister_with_note_including_children(app, scratch, lister, note, pred);                   
-                }
-            }
-        }
-    }
-    Momo_Index_Unlock();
-    
-    Momo_Lister_Result l_result = Momo_Lister_Run(app, lister);
-    Tiny_Jump result = {};
-    if (!l_result.canceled && l_result.user_data != 0){
-        block_copy_struct(&result, (Tiny_Jump*)l_result.user_data);
-    }
-    
-    if (result.buffer != 0)
-    {
-        View_ID view = get_this_ctx_view(app, Access_Always);
-        if(!same_panel)
-        {
-            view = get_next_view_looped_primary_panels(app, view, Access_Always);
-        }
-        point_stack_push_view_cursor(app, view);
-        momo_jump_to_location(app, view, result.buffer, result.pos);
-    }
-}
-
-function void
-momo_list_project_notes(Application_Links* app, String_Const_u8 init_str, b32 same_panel)
-{
-    momo_list_project_notes_custom(app, init_str, same_panel,   
-        [](Momo_Index_Note*) -> b32 { 
-            return true; 
-    });
+    ProfileScope(app, "write and auto indent");
+    User_Input in = get_current_input(app);
+    String_Const_u8 insert = to_writable(&in);
+    Momo_Indent_WriteTextAndIndent(app, insert);
 }
 
 
-function i64
-momo_boundary_token_and_whitespace(Application_Links *app, Buffer_ID buffer, 
-                               Side side, Scan_Direction direction, i64 pos)
-{
-    i64 result = boundary_non_whitespace(app, buffer, side, direction, pos);
-    Token_Array tokens = get_token_array_from_buffer(app, buffer);
-    if (tokens.tokens != 0){
-        switch (direction){
-            case Scan_Forward:
-            {
-                i64 buffer_size = buffer_get_size(app, buffer);
-                result = buffer_size;
-                if(tokens.count > 0)
-                {
-                    Token_Iterator_Array it = token_iterator_pos(0, &tokens, pos);
-                    Token *token = token_it_read(&it);
-                    
-                    if(token == 0)
-                    {
-                        break;
-                    }
-                    
-                    // NOTE(rjf): Comments/Strings
-                    if(token->kind == TokenBaseKind_Comment ||
-                       token->kind == TokenBaseKind_LiteralString)
-                    {
-                        result = boundary_non_whitespace(app, buffer, side, direction, pos);
-                        break;
-                    }
-                    
-                    // NOTE(rjf): All other cases.
-                    else
-                    {
-                        if (token->kind == TokenBaseKind_Whitespace)
-                        {
-                            // token_it_inc_non_whitespace(&it);
-                            // token = token_it_read(&it);
-                        }
-                        
-                        if (side == Side_Max){
-                            result = token->pos + token->size;
-                            
-                            token_it_inc_all(&it);
-                            Token *ws = token_it_read(&it);
-                            if(ws != 0 && ws->kind == TokenBaseKind_Whitespace &&
-                               get_line_number_from_pos(app, buffer, ws->pos + ws->size) ==
-                               get_line_number_from_pos(app, buffer, token->pos))
-                            {
-                                result = ws->pos + ws->size;
-                            }
-                        }
-                        else{
-                            if (token->pos <= pos){
-                                token_it_inc_non_whitespace(&it);
-                                token = token_it_read(&it);
-                            }
-                            if (token != 0){
-                                result = token->pos;
-                            }
-                        }
-                    }
-                    
-                }
-            }break;
-            
-            case Scan_Backward:
-            {
-                result = 0;
-                if (tokens.count > 0){
-                    Token_Iterator_Array it = token_iterator_pos(0, &tokens, pos);
-                    Token *token = token_it_read(&it);
-                    
-                    Token_Iterator_Array it2 = it;
-                    token_it_dec_non_whitespace(&it2);
-                    Token *token2 = token_it_read(&it2);
-                    
-                    // NOTE(rjf): Comments/Strings
-                    if(token->kind == TokenBaseKind_Comment ||
-                       token->kind == TokenBaseKind_LiteralString ||
-                       (token2 && 
-                        token2->kind == TokenBaseKind_Comment ||
-                        token2->kind == TokenBaseKind_LiteralString))
-                    {
-                        result = boundary_non_whitespace(app, buffer, side, direction, pos);
-                        break;
-                    }
-                    
-                    if (token->kind == TokenBaseKind_Whitespace){
-                        token_it_dec_non_whitespace(&it);
-                        token = token_it_read(&it);
-                    }
-                    if (token != 0){
-                        if (side == Side_Min){
-                            if (token->pos >= pos){
-                                token_it_dec_non_whitespace(&it);
-                                token = token_it_read(&it);
-                            }
-                            result = token->pos;
-                        }
-                        else{
-                            if (token->pos + token->size >= pos){
-                                token_it_dec_non_whitespace(&it);
-                                token = token_it_read(&it);
-                            }
-                            result = token->pos + token->size;
-                        }
-                    }
-                }
-            }break;
-        }
-    }
-    return(result);
-}
 
 
 CUSTOM_COMMAND_SIG(momo_toggle_compilation_expand)
@@ -706,7 +151,7 @@ CUSTOM_DOC("List all definitions in the index and jump to the one selected by th
             {
                 for(Momo_Index_Note *note = file->first_note; note; note = note->next_sibling)
                 {
-                    momo_push_lister_with_note(app, scratch, lister, note);
+                    Momo_Lister_PushNote(app, scratch, lister, note);
                 }
             }
         }
@@ -723,13 +168,13 @@ CUSTOM_DOC("List all definitions in the index and jump to the one selected by th
     {
         View_ID view = get_this_ctx_view(app, Access_Always);
         point_stack_push_view_cursor(app, view);
-        momo_jump_to_location(app, view, result.buffer, result.pos);
+        Momo_JumpToLocation(app, view, result.buffer, result.pos);
     }
 }
 
 
 function Custom_Command_Function*
-momo_get_command_from_user(Application_Links *app, String_Const_u8 query, i32 *command_ids, i32 command_id_count, Command_Lister_Status_Rule *status_rule){
+Momo_GetCommandFromUser(Application_Links *app, String_Const_u8 query, i32 *command_ids, i32 command_id_count, Command_Lister_Status_Rule *status_rule){
     if (command_ids == 0){
         command_id_count = command_one_past_last_id;
     }
@@ -785,19 +230,19 @@ momo_get_command_from_user(Application_Links *app, String_Const_u8 query, i32 *c
 }
 
 function Custom_Command_Function*
-momo_get_command_from_user(Application_Links *app, String_Const_u8 query, Command_Lister_Status_Rule *status_rule){
-    return(momo_get_command_from_user(app, query, 0, 0, status_rule));
+Momo_GetCommandFromUser(Application_Links *app, String_Const_u8 query, Command_Lister_Status_Rule *status_rule){
+    return(Momo_GetCommandFromUser(app, query, 0, 0, status_rule));
 }
 
 function Custom_Command_Function*
-momo_get_command_from_user(Application_Links *app, char *query,
+Momo_GetCommandFromUser(Application_Links *app, char *query,
                       i32 *command_ids, i32 command_id_count, Command_Lister_Status_Rule *status_rule){
-    return(momo_get_command_from_user(app, SCu8(query), command_ids, command_id_count, status_rule));
+    return(Momo_GetCommandFromUser(app, SCu8(query), command_ids, command_id_count, status_rule));
 }
 
 function Custom_Command_Function*
-momo_get_command_from_user(Application_Links *app, char *query, Command_Lister_Status_Rule *status_rule){
-    return(momo_get_command_from_user(app, SCu8(query), 0, 0, status_rule));
+Momo_GetCommandFromUser(Application_Links *app, char *query, Command_Lister_Status_Rule *status_rule){
+    return(Momo_GetCommandFromUser(app, SCu8(query), 0, 0, status_rule));
 }
 
 CUSTOM_UI_COMMAND_SIG(momo_command_lister)
@@ -815,7 +260,7 @@ CUSTOM_DOC("Opens an interactive list of all registered commands.")
         else{
             rule = command_lister_status_descriptions();
         }
-        Custom_Command_Function *func = momo_get_command_from_user(app, "Command:", &rule);
+        Custom_Command_Function *func = Momo_GetCommandFromUser(app, "Command:", &rule);
         if (func != 0){
             view_enqueue_command_function(app, view, func);
         }
@@ -892,21 +337,26 @@ CUSTOM_DOC("Inserts whatever text was used to trigger this command.")
     }
 }
 
-CUSTOM_COMMAND_SIG(momo_write_text_and_auto_indent)
-CUSTOM_DOC("Inserts text and auto-indents the line on which the cursor sits if any of the text contains 'layout punctuation' such as ;:{}()[]# and new lines.")
-{
-    if (global_insert_mode) {
-        write_text_and_auto_indent(app);
-    }
-}
 
 CUSTOM_COMMAND_SIG(momo_append_line_and_enter_insert)
 CUSTOM_DOC("Inserts text and auto-indents the line on which the cursor sits if any of the text contains 'layout punctuation' such as ;:{}()[]# and new lines.")
 {
     seek_end_of_textual_line(app);
-    momo_write_text_and_auto_indent_internal(app, string_u8_litexpr("\n"));
+    //Momo_Indent_WriteTextAndIndent(app, string_u8_litexpr("\n"));
+
+    View_ID view = get_active_view(app, Access_ReadWriteVisible);
+    Buffer_ID buffer = view_get_buffer(app, view, Access_ReadWriteVisible);
+    Range_i64 pos = {};
+    pos.min = view_get_cursor_pos(app, view);
+    write_text(app, string_u8_litexpr("\n"));
+    pos.max = view_get_cursor_pos(app, view);
+    Momo_Indent_IndentBuffer(app, buffer, pos, 0);
+    move_past_lead_whitespace(app, view, buffer);
+
     momo_switch_to_insert_mode(app);
 }
+
+
 
 CUSTOM_COMMAND_SIG(momo_cut_line)
 CUSTOM_DOC("Cut the text in the range from the cursor to the mark onto the clipboard.")
@@ -969,23 +419,23 @@ CUSTOM_DOC("Vsplit panel but don't go")
 
 // NOTE(Momo): Yeah this is pretty dumb, but hey
 CUSTOM_COMMAND_SIG(momo_number_mode_1) 
-CUSTOM_DOC("Number Mode 1") { momo_number_mode(app, string_u8_litexpr("1")); }
+CUSTOM_DOC("Number Mode 1") { Momo_EnterNumberMode(app, string_u8_litexpr("1")); }
 CUSTOM_COMMAND_SIG(momo_number_mode_2) 
-CUSTOM_DOC("Number Mode 2") { momo_number_mode(app, string_u8_litexpr("2")); }
+CUSTOM_DOC("Number Mode 2") { Momo_EnterNumberMode(app, string_u8_litexpr("2")); }
 CUSTOM_COMMAND_SIG(momo_number_mode_3) 
-CUSTOM_DOC("Number Mode 3") { momo_number_mode(app, string_u8_litexpr("3")); }
+CUSTOM_DOC("Number Mode 3") { Momo_EnterNumberMode(app, string_u8_litexpr("3")); }
 CUSTOM_COMMAND_SIG(momo_number_mode_4) 
-CUSTOM_DOC("Number Mode 4") { momo_number_mode(app, string_u8_litexpr("4")); }
+CUSTOM_DOC("Number Mode 4") { Momo_EnterNumberMode(app, string_u8_litexpr("4")); }
 CUSTOM_COMMAND_SIG(momo_number_mode_5) 
-CUSTOM_DOC("Number Mode 5") { momo_number_mode(app, string_u8_litexpr("5")); }
+CUSTOM_DOC("Number Mode 5") { Momo_EnterNumberMode(app, string_u8_litexpr("5")); }
 CUSTOM_COMMAND_SIG(momo_number_mode_6) 
-CUSTOM_DOC("Number Mode 6") { momo_number_mode(app, string_u8_litexpr("6")); }
+CUSTOM_DOC("Number Mode 6") { Momo_EnterNumberMode(app, string_u8_litexpr("6")); }
 CUSTOM_COMMAND_SIG(momo_number_mode_7) 
-CUSTOM_DOC("Number Mode 7") { momo_number_mode(app, string_u8_litexpr("7")); }
+CUSTOM_DOC("Number Mode 7") { Momo_EnterNumberMode(app, string_u8_litexpr("7")); }
 CUSTOM_COMMAND_SIG(momo_number_mode_8) 
-CUSTOM_DOC("Number Mode 8") { momo_number_mode(app, string_u8_litexpr("8")); }
+CUSTOM_DOC("Number Mode 8") { Momo_EnterNumberMode(app, string_u8_litexpr("8")); }
 CUSTOM_COMMAND_SIG(momo_number_mode_9) 
-CUSTOM_DOC("Number Mode 9") { momo_number_mode(app, string_u8_litexpr("9")); }
+CUSTOM_DOC("Number Mode 9") { Momo_EnterNumberMode(app, string_u8_litexpr("9")); }
 
 
 
@@ -998,14 +448,14 @@ CUSTOM_DOC("List all definitions in the index and enter the token under the curs
     if (note != 0) {
         if (note->next == 0) {
             // if there is only one exact match, just gooo
-            momo_go_to_definition(app, note, 1);
+            Momo_Index_GoToDefinitionInNote(app, note, 1);
         }
         else {
             // case for multiple notes
             auto pred = [string](Momo_Index_Note* note) -> b32 {
                 return string_match(note->string, string);
             };
-            momo_list_project_notes_custom(app, string, 1, pred);    
+            Momo_Lister_CreateWithProjectNotes(app, string, 1, pred);    
         }
     }
 }
@@ -1019,14 +469,14 @@ CUSTOM_DOC("List all definitions in the index and enter the token under the curs
     if (note != 0) {
         if (note->next == 0) {
             // if there is only one exact match, just gooo
-            momo_go_to_definition(app, note, 0);
+            Momo_Index_GoToDefinitionInNote(app, note, 0);
         }
         else {
             // case for multiple notes
             auto pred = [string](Momo_Index_Note* note) -> b32 {
                 return string_match(note->string, string);
             };
-            momo_list_project_notes_custom(app, string, 0, pred);    
+            Momo_Lister_CreateWithProjectNotes(app, string, 0, pred);    
         }
     }
         
@@ -1039,14 +489,14 @@ CUSTOM_UI_COMMAND_SIG(momo_search_for_definition_project_wide)
 CUSTOM_DOC("List all definitions in the index and jump to the one selected by the user.")
 {
     String_Const_u8 str = {};
-    momo_list_project_notes(app, str, 1);
+    Momo_Lister_CreateWithProjectNotes(app, str, 1);
 }
 
 CUSTOM_COMMAND_SIG(snipe_forward_whitespace_and_token_boundary)
 CUSTOM_DOC("Delete a single, whole token on or to the right of the cursor and post it to the clipboard.")
 {
     Scratch_Block scratch(app);
-    current_view_snipe_delete(app, Scan_Forward, push_boundary_list(scratch, momo_boundary_token_and_whitespace));
+    current_view_snipe_delete(app, Scan_Forward, push_boundary_list(scratch, Momo_BoundaryTokenAndWhiteSpace));
 
 }
 
@@ -1212,8 +662,8 @@ CUSTOM_DOC("Removes #if 0/#endif")
             i64 endif_pos;
             i64 if0_pos;
          
-            momo_seek_string_forward(app, buffer, -1, search_from, 0, if0_str, &if0_pos);
-            momo_seek_string_forward(app, buffer, -1, search_from, 0, endif_str, &endif_pos);
+            Momo_SeekStringForward(app, buffer, -1, search_from, 0, if0_str, &if0_pos);
+            Momo_SeekStringForward(app, buffer, -1, search_from, 0, endif_str, &endif_pos);
 
             if (if0_pos != -1) {
                 if (if0_pos < endif_pos) {
@@ -1255,8 +705,8 @@ CUSTOM_DOC("Removes #if 0/#endif")
             // find the next #endif or #if0
             i64 endif_pos;
             i64 if0_pos;
-            momo_seek_string_backward(app, buffer, -1, search_from, 0, if0_str, &if0_pos);
-            momo_seek_string_backward(app, buffer, -1, search_from, 0, endif_str, &endif_pos);
+            Momo_SeekStringBackward(app, buffer, -1, search_from, 0, if0_str, &if0_pos);
+            Momo_SeekStringBackward(app, buffer, -1, search_from, 0, endif_str, &endif_pos);
            
             if (endif_pos != -1) {
                 if (if0_pos < endif_pos) {
@@ -1403,10 +853,10 @@ CUSTOM_DOC("Queries the user a string, and can do reverse and forward search wit
                     if (match_key_code(&in, KeyCode_N)) {
                         Input_Modifier_Set* mods = &in.event.key.modifiers;
                         if (has_modifier(mods, KeyCode_Shift)) {
-                            momo_seek_string_backward(app, buffer, match.start, match.start - 1, 0, find.string, &new_pos);
+                            Momo_SeekStringBackward(app, buffer, match.start, match.start - 1, 0, find.string, &new_pos);
                         }
                         else {
-                            momo_seek_string_forward(app, buffer, match.start, match.end, 0, find.string, &new_pos);
+                            Momo_SeekStringForward(app, buffer, match.start, match.end, 0, find.string, &new_pos);
                         }
                     }
 
@@ -1466,14 +916,14 @@ CUSTOM_COMMAND_SIG(momo_backspace_token_boundary)
 CUSTOM_DOC("Deletes left to a token boundary.")
 {
     Scratch_Block scratch(app);
-    current_view_boundary_delete(app, Scan_Backward, push_boundary_list(scratch, momo_boundary_token_and_whitespace));
+    current_view_boundary_delete(app, Scan_Backward, push_boundary_list(scratch, Momo_BoundaryTokenAndWhiteSpace));
 }
 
 CUSTOM_COMMAND_SIG(momo_delete_token_boundary)
 CUSTOM_DOC("Deletes right to a token boundary.")
 {
     Scratch_Block scratch(app);
-    current_view_boundary_delete(app, Scan_Forward, push_boundary_list(scratch, momo_boundary_token_and_whitespace));
+    current_view_boundary_delete(app, Scan_Forward, push_boundary_list(scratch, Momo_BoundaryTokenAndWhiteSpace));
 }
 
 CUSTOM_COMMAND_SIG(momo_backspace_alpha_numeric_or_camel_boundary)

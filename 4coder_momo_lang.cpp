@@ -139,9 +139,12 @@ Momo_Language_LexFullInput_NoBreaks(Application_Links *app, Momo_Language *langu
 // NOTE(rjf): Include language files here.
 #include "generated/4coder_momo_lexer_cs.h"
 #include "generated/4coder_momo_lexer_cs.cpp"
+#include "generated/4coder_momo_lexer_go.h"
+#include "generated/4coder_momo_lexer_go.cpp"
+
 #include "4coder_momo_lang_cpp.cpp"
 #include "4coder_momo_lang_cs.cpp"
-
+#include "4coder_momo_lang_go.cpp"
 
 // NOTE(rjf): @Momo_Language_RegisterAll Register languages.
 function void
@@ -178,6 +181,17 @@ Momo_Language_RegisterAll(void)
     
     }
     
+    // NOTE(Momo): go
+    {
+        Momo_Language_Register(S8Lit("go"),
+                            Momo_Go_Index_File,
+                            lex_full_input_go_init,
+                            lex_full_input_go_breaks,
+                            Momo_Go_PosContext,
+                            Momo_Go_Highlight,
+                            Lex_State_Go);
+    
+    }
 #if 0
     // NOTE(rjf): Jai
     {

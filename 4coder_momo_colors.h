@@ -24,9 +24,9 @@ CUSTOM_ID(colors, fleury_color_lego_grab);
 CUSTOM_ID(colors, fleury_color_lego_splat);
 CUSTOM_ID(colors, fleury_color_error_annotation);
 
-static ARGB_Color argb_from_id(Color_Table table, Managed_ID id, int subindex);
-static ARGB_Color argb_from_id(Color_Table table, Managed_ID id);
-typedef u32 Syntax_Flags;
+static ARGB_Color Momo_Colors_ARGBFromID(Color_Table table, Managed_ID id, int subindex);
+static ARGB_Color Momo_Colors_ARGBFromID(Color_Table table, Managed_ID id);
+typedef u32 Momo_Colors_SyntaxFlagType;
 enum
 {
     SYNTAX_FLAGS_FUNCTIONS    = (1<<0),
@@ -41,14 +41,14 @@ enum
 };
 #define Momo_SyntaxFlag_All 0xffffffff
 
-struct Syntax_Options
+struct Momo_Colors_SyntaxOptions
 {
     String8 name;
-    Syntax_Flags flags;
+    Momo_Colors_SyntaxFlagType flags;
 };
 
 global f32 momo_syntax_flag_transitions[32] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,};
-global Syntax_Options momo_syntax_opts[] =
+global Momo_Colors_SyntaxOptions momo_syntax_opts[] =
 {
     { S8Lit("All"),            Momo_SyntaxFlag_All },
     { S8Lit("None"),           0 },
