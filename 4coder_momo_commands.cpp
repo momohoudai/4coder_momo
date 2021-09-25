@@ -57,7 +57,7 @@ CUSTOM_DOC("Interactively open a file out of the file system.")
 }
 
 
-CUSTOM_COMMAND_SIG(momo_auto_indent_whole_file)
+CUSTOM_COMMAND_SIG(momo_indent_whole_file)
 CUSTOM_DOC("Audo-indents the entire current buffer.")
 {
     View_ID view = get_active_view(app, Access_ReadWriteVisible);
@@ -66,7 +66,7 @@ CUSTOM_DOC("Audo-indents the entire current buffer.")
     Momo_Indent_IndentBuffer(app, buffer, Ii64(0, buffer_size));
 }
 
-CUSTOM_COMMAND_SIG(momo_auto_indent_line_at_cursor)
+CUSTOM_COMMAND_SIG(momo_indent_line_at_cursor)
 CUSTOM_DOC("Auto-indents the line on which the cursor sits.")
 {
     View_ID view = get_active_view(app, Access_ReadWriteVisible);
@@ -76,7 +76,7 @@ CUSTOM_DOC("Auto-indents the line on which the cursor sits.")
     move_past_lead_whitespace(app, view, buffer);
 }
 
-CUSTOM_COMMAND_SIG(momo_auto_indent_range)
+CUSTOM_COMMAND_SIG(momo_indent_range)
 CUSTOM_DOC("Auto-indents the range between the cursor and the mark.")
 {
     View_ID view = get_active_view(app, Access_ReadWriteVisible);
@@ -88,7 +88,7 @@ CUSTOM_DOC("Auto-indents the range between the cursor and the mark.")
 
 
 
-CUSTOM_COMMAND_SIG(momo_write_text_and_auto_indent)
+CUSTOM_COMMAND_SIG(momo_write_text_and_indent)
 CUSTOM_DOC("Inserts text and auto-indents the line on which the cursor sits if any of the text contains 'layout punctuation' such as ;:{}()[]# and new lines.")
 {
     if (!global_insert_mode) {
@@ -944,6 +944,21 @@ CUSTOM_DOC("Deletes right to an alphanumeric or camel boundary.")
                                                                        boundary_alpha_numeric_camel));
 }
 
+CUSTOM_COMMAND_SIG(momo_insert_tab)
+CUSTOM_DOC("Inserts tab at cursor")
+{
+    write_text(app, string_u8_litexpr("\t"));
+}
+
+CUSTOM_COMMAND_SIG(momo_indent_lines_right)
+CUSTOM_DOC("Shift lines to the left by indent width")
+{
+    View_ID view = get_active_view(app, Access_ReadWriteVisible);
+    Buffer_ID buffer = view_get_buffer(app, view, Access_ReadWriteVisible);
+    Range_i64 range = get_view_range(app, view);
+    Momo_Indent_IndentLinesRight(app, buffer, range, 0);
+
+}
 
 
 #endif

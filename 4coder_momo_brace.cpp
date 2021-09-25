@@ -248,7 +248,9 @@ Momo_Brace_RenderLines(Application_Links *app, Buffer_ID buffer, View_ID view,
         float x_position = 0.f;
         
         u64 vw_indent = def_get_config_u64(app, vars_save_string_lit("virtual_whitespace_regular_indent"));
-        
+        i32 tab_width = (i32)def_get_config_u64(app, vars_save_string_lit("default_tab_width"));
+        tab_width = clamp_bot(1, tab_width);
+
         for (i32 i = ranges.count - 1; i >= 0; i -= 1)
         {
             Range_i64 range = ranges.ranges[i];
@@ -263,13 +265,22 @@ Momo_Brace_RenderLines(Application_Links *app, Buffer_ID buffer, View_ID view,
             else
             {
                 String_Const_u8 line = push_buffer_line(app, scratch, buffer, get_line_number_from_pos(app, buffer, range.end));
+                u64 advance = 0;
                 for(u64 char_idx = 0; char_idx < line.size; char_idx += 1)
                 {
+                   
                     if(!character_is_whitespace(line.str[char_idx]))
                     {
-                        x_position = metrics.space_advance * char_idx;
+                        x_position = metrics.space_advance * advance;
                         break;
                     }
+                    else if (line.str[char_idx] == '\t') {
+                        advance += 4;
+                    } 
+                    else {
+                        advance += 1;
+                    }
+
                 }
             }
             

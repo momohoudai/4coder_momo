@@ -105,7 +105,7 @@ momo_set_essential_bindings(Mapping *mapping)
     
     SelectMap(code_map_id);
     ParentMap(file_map_id);
-    BindTextInput(momo_write_text_and_auto_indent);
+    BindTextInput(momo_write_text_and_indent);
     
     SelectMap(global_command_map_id);
 	ParentMap(global_map_id);
