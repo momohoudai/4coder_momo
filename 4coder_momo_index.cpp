@@ -244,6 +244,19 @@ Momo_Index_LookupNote(String_Const_u8 string, Momo_Index_Note *parent)
     return result;
 }
 
+internal Momo_Index_Note*
+Momo_Index_FindFirstNonPrototypeNote(Momo_Index_Note* note) { 
+    while(note != 0) {        
+        if (!(note->flags & MOMO_INDEX_NOTE_FLAG_PROTOTYPE)) {
+           return note; 
+        }
+        note = note->next;
+
+    }
+    return note;
+
+}
+
 #if 0
 internal Momo_Index_Note *
 Momo_Index_LookupNote(String_Const_u8 string)

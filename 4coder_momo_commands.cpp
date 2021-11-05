@@ -438,26 +438,14 @@ CUSTOM_COMMAND_SIG(momo_number_mode_9)
 CUSTOM_DOC("Number Mode 9") { Momo_EnterNumberMode(app, string_u8_litexpr("9")); }
 
 
-
 CUSTOM_UI_COMMAND_SIG(momo_search_for_definition_under_cursor_project_wide)
 CUSTOM_DOC("List all definitions in the index and enter the token under the cursor")
 {
     Scratch_Block scratch(app);
     String_Const_u8 string = push_token_or_word_under_active_cursor(app, scratch);
     Momo_Index_Note* note = Momo_Index_LookupNote(string);
-    if (note != 0) {
-        if (note->next == 0) {
-            // if there is only one exact match, just gooo
-            Momo_Index_GoToDefinitionInNote(app, note, 1);
-        }
-        else {
-            // case for multiple notes
-            auto pred = [string](Momo_Index_Note* note) -> b32 {
-                return string_match(note->string, string);
-            };
-            Momo_Lister_CreateWithProjectNotes(app, string, 1, pred);    
-        }
-    }
+    note = Momo_Index_FindFirstNonPrototypeNote(note);
+    Momo_Index_GoToDefinitionInNote(app, note, 1);  
 }
 
 CUSTOM_UI_COMMAND_SIG(momo_search_for_definition_under_cursor_project_wide_other_panel)
@@ -466,30 +454,24 @@ CUSTOM_DOC("List all definitions in the index and enter the token under the curs
     Scratch_Block scratch(app);
     String_Const_u8 string = push_token_or_word_under_active_cursor(app, scratch);
     Momo_Index_Note* note = Momo_Index_LookupNote(string);
-    if (note != 0) {
-        if (note->next == 0) {
-            // if there is only one exact match, just gooo
-            Momo_Index_GoToDefinitionInNote(app, note, 0);
-        }
-        else {
-            // case for multiple notes
-            auto pred = [string](Momo_Index_Note* note) -> b32 {
-                return string_match(note->string, string);
-            };
-            Momo_Lister_CreateWithProjectNotes(app, string, 0, pred);    
-        }
-    }
-        
-    
+    note = Momo_Index_FindFirstNonPrototypeNote(note);
+    Momo_Index_GoToDefinitionInNote(app, note, 0);  
 }
 
 
 
-CUSTOM_UI_COMMAND_SIG(momo_search_for_definition_project_wide)
+CUSTOM_UI_COMMAND_SIG(momo_list_notes_project_wide)
 CUSTOM_DOC("List all definitions in the index and jump to the one selected by the user.")
 {
     String_Const_u8 str = {};
     Momo_Lister_CreateWithProjectNotes(app, str, 1);
+}
+
+CUSTOM_UI_COMMAND_SIG(momo_list_notes_project_wide_other_panel)
+CUSTOM_DOC("List all definitions in the index and jump to the one selected by the user.")
+{
+    String_Const_u8 str = {};
+    Momo_Lister_CreateWithProjectNotes(app, str, 0);
 }
 
 CUSTOM_COMMAND_SIG(snipe_forward_whitespace_and_token_boundary)
@@ -776,13 +758,35 @@ CUSTOM_DOC("Goto mode")
                 break;
             }
             else if (match_key_code(&in, KeyCode_G)) {
-                momo_search_for_definition_project_wide(app);
+                Input_Modifier_Set* mods = &in.event.key.modifiers;
+                if (has_modifier(mods, KeyCode_Shift)) {
+                    momo_list_notes_project_wide(app);
+                }
+                else {
+                    momo_list_notes_project_wide_other_panel(app);
+                    
+                }
                 break;
             }
 
         }
     }
 }
+
+
+CUSTOM_COMMAND_SIG(momo_reset_view_x)
+CUSTOM_DOC("Reset the view to x = 0")
+{
+    View_ID view = get_active_view(app, Access_ReadVisible);
+    i64 pos = view_get_cursor_pos(app, view);
+    Buffer_Cursor cursor = view_compute_cursor(app, view, seek_pos(pos));
+    Vec2_f32 p = view_relative_xy_of_pos(app, view, cursor.line, pos);
+    Buffer_Scroll scroll = view_get_buffer_scroll(app, view);
+    scroll.target.pixel_shift.x = 0.f;
+    view_set_buffer_scroll(app, view, scroll, SetBufferScroll_SnapCursorIntoView);
+    no_mark_snap_to_cursor(app, view);
+}
+
 
 CUSTOM_COMMAND_SIG(momo_z_mode)
 CUSTOM_DOC("Z mode")

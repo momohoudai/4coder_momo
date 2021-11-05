@@ -237,7 +237,7 @@ Momo_Lister_Render(Application_Links *app, Frame_Info frame_info, View_ID view){
         Range_f32 view_y = If32_size(scroll_y, view_h);
         if (view_y.min > item_y.min || item_y.max > view_y.max){
             f32 item_center = (item_y.min + item_y.max)*0.5f;
-            f32 view_center = (view_y.min + view_y.max)*0.5f;
+            f32 view_center = (view_y.min + view_y.max)*0.4f;
             f32 margin = view_h*.3f;
             margin = clamp_top(margin, block_height*3.f);
             if (item_center < view_center){
