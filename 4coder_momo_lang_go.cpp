@@ -155,7 +155,8 @@ Momo_Go_Parse_StructBody(Momo_Index_ParseCtx *ctx)
 
                 if (!constructor) {
                     if(Momo_Go_Parse_FunctionBody(ctx)) {
-                        Momo_Index_MakeNote(ctx->app, ctx->file, parent_struct, Momo_Index_StringFromToken(ctx, func_name),
+                        auto name = Momo_Index_StringFromToken(ctx, func_name);
+                        Momo_Index_MakeNote(ctx->app, ctx->file, name, name,
                                         MOMO_INDEX_NOTE_KIND_FUNCTION, 0, Ii64(func_name));
                     }
                 }

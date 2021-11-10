@@ -205,16 +205,16 @@ Momo_Index_ClearFile(Momo_Index_File *file)
 
 
 internal Momo_Index_Note *
-Momo_Index_LookupNote(String_Const_u8 string)
+Momo_Index_LookupNote(String_Const_u8 key)
 {
     Momo_Index_Note *result = 0;
-    u64 hash = table_hash_u8(string.str, string.size);
+    u64 hash = table_hash_u8(key.str, key.size);
     u64 slot = hash % ArrayCount(momo_index.note_table);
     for(Momo_Index_Note *note = momo_index.note_table[slot]; note; note = note->hash_next)
     {
         if(note->hash == hash)
         {
-            if(string_match(string, note->string))
+            if(string_match(key, note->key))
             {
                 result = note;
                 break;
@@ -225,16 +225,16 @@ Momo_Index_LookupNote(String_Const_u8 string)
 }
 
 internal Momo_Index_Note *
-Momo_Index_LookupNote(String_Const_u8 string, Momo_Index_Note *parent)
+Momo_Index_LookupNote(String_Const_u8 key, Momo_Index_Note *parent)
 {
     Momo_Index_Note *result = 0;
-    u64 hash = table_hash_u8(string.str, string.size);
+    u64 hash = table_hash_u8(key.str, key.size);
     u64 slot = hash % ArrayCount(momo_index.note_table);
     for(Momo_Index_Note *note = momo_index.note_table[slot]; note; note = note->hash_next)
     {
         if(note->hash == hash && note->parent == parent)
         {
-            if(string_match(string, note->string))
+            if(string_match(key, note->key))
             {
                 result = note;
                 break;
@@ -244,32 +244,11 @@ Momo_Index_LookupNote(String_Const_u8 string, Momo_Index_Note *parent)
     return result;
 }
 
-internal Momo_Index_Note*
-Momo_Index_FindFirstNonPrototypeNote(Momo_Index_Note* note) { 
-    while(note != 0) {        
-        if (!(note->flags & MOMO_INDEX_NOTE_FLAG_PROTOTYPE)) {
-           return note; 
-        }
-        note = note->next;
-
-    }
-    return note;
-
-}
-
-#if 0
-internal Momo_Index_Note *
-Momo_Index_LookupNote(String_Const_u8 string)
-{
-    return Momo_Index_LookupNote(string, 0);
-}
-#endif
-
 internal Momo_Index_Note *
 Momo_Index_MakeNote(Application_Links *app,
                   Momo_Index_File *file,
-                  Momo_Index_Note *parent,
-                  String_Const_u8 string,
+                  String_Const_u8 key,
+                  String_Const_u8 display, 
                   Momo_Index_Note_Kind note_kind,
                   Momo_Index_Note_Flags note_flags,
                   Range_i64 range)
@@ -279,7 +258,7 @@ Momo_Index_MakeNote(Application_Links *app,
     Momo_Index_Note *result = 0;
     if(file)
     {
-        u64 hash = table_hash_u8(string.str, string.size);
+        u64 hash = table_hash_u8(key.str, key.size);
         u64 slot = hash % ArrayCount(momo_index.note_table);
         
         if(momo_index.free_note)
@@ -295,7 +274,7 @@ Momo_Index_MakeNote(Application_Links *app,
         
         // NOTE(rjf): Push to duplicate chain.
         {
-            Momo_Index_Note *list_head = Momo_Index_LookupNote(string);
+            Momo_Index_Note *list_head = Momo_Index_LookupNote(key);
             Momo_Index_Note *list_tail = list_head;
             for(Momo_Index_Note *note = list_tail; note; list_tail = note, note = note->next);
             if(list_tail != 0)
@@ -320,6 +299,8 @@ Momo_Index_MakeNote(Application_Links *app,
         result->next = 0;
         
         // NOTE(rjf): Push to tree.
+        // TODO(Momo): assume parent is 0 for now. What is it used for anyway?
+        Momo_Index_Note* parent = 0;
         {
             result->parent = parent;
             if(parent)
@@ -355,7 +336,8 @@ Momo_Index_MakeNote(Application_Links *app,
         // NOTE(rjf): Fill out data.
         {
             result->hash = hash;
-            result->string = push_string_copy(&file->arena, string);
+            result->display = push_string_copy(&file->arena, display);
+            result->key = push_string_copy(&file->arena, key);
             result->kind = note_kind;
             result->flags = note_flags;
             result->range = range;
@@ -365,6 +347,7 @@ Momo_Index_MakeNote(Application_Links *app,
     }
     return result;
 }
+
 
 internal void
 _Momo_Index_Parse(Application_Links *app, Momo_Index_File *file, String_Const_u8 string, Token_Array tokens, Momo_Language *language)
@@ -398,6 +381,13 @@ Momo_Index_StringFromToken(Momo_Index_ParseCtx *ctx, Token *token)
 {
     Range_i64 token_range = Ii64(token->pos, token->pos+token->size);
     String_Const_u8 string = string_substring(ctx->string, token_range);
+    return string;
+}
+
+internal String_Const_u8
+Momo_Index_StringFromRange(Momo_Index_ParseCtx *ctx, Range_i64 range)
+{
+    String_Const_u8 string = string_substring(ctx->string, range);
     return string;
 }
 
@@ -601,12 +591,14 @@ Momo_Index_ParseComment(Momo_Index_ParseCtx *ctx, Token *token)
     {
         if(string.str[i] == '@')
         {
-            Momo_Index_MakeNote(ctx->app, ctx->file, 0, string_substring(string, Ii64(i, string.size)), MOMO_INDEX_NOTE_KIND_COMMENT_TAG, 0, Ii64(token));
+            String_Const_u8 name_str = string_substring(string, Ii64(i, string.size));
+            Momo_Index_MakeNote(ctx->app, ctx->file, name_str, name_str, MOMO_INDEX_NOTE_KIND_COMMENT_TAG, 0, Ii64(token));
             break;
         }
         else if(i+4 < string.size && string_match(S8Lit("TODO"), string_substring(string, Ii64(i, i + 4))))
         {
-            Momo_Index_MakeNote(ctx->app, ctx->file, 0, string_substring(string, Ii64(i, string.size)), MOMO_INDEX_NOTE_KIND_COMMENT_TODO, 0, Ii64(token));
+            String_Const_u8 name_str = string_substring(string, Ii64(i, string.size));
+            Momo_Index_MakeNote(ctx->app, ctx->file, name_str, name_str, MOMO_INDEX_NOTE_KIND_COMMENT_TODO, 0, Ii64(token));
         }
     }
 }

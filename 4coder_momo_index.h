@@ -37,9 +37,13 @@ struct Momo_Index_Note
     Momo_Index_Note *last_child;
     
     u64 hash;
-    String_Const_u8 string;
+
+    String_Const_u8 key;
+    String_Const_u8 display; 
+
     Momo_Index_Note_Kind kind;
     Momo_Index_Note_Flags flags;
+
     Range_i64 range;
     Momo_Index_File *file;
 	int file_generation;
@@ -92,8 +96,8 @@ internal Momo_Index_Note *Momo_Index_LookupNote(String_Const_u8 string, Momo_Ind
 internal Momo_Index_Note *Momo_Index_LookupNote(String_Const_u8 string);
 internal Momo_Index_Note *Momo_Index_MakeNote(Application_Links *app,
                                           Momo_Index_File *file,
-                                          Momo_Index_Note *parent,
-                                          String_Const_u8 string,
+                                          String_Const_u8 key,
+                                          String_Const_u8 display,
                                           Momo_Index_Note_Kind note_kind,
                                           Momo_Index_Note_Flags note_flags,
                                           Range_i64 range);
@@ -111,6 +115,7 @@ internal void Momo_Index_ParseComment(Momo_Index_ParseCtx *ctx, Token *token);
 internal void Momo_Index_SkipSoftTokens(Momo_Index_ParseCtx *ctx, b32 preproc);
 internal void Momo_Index_SkipOpTokens(Momo_Index_ParseCtx *ctx);
 internal String_Const_u8 Momo_Index_StringFromToken(Momo_Index_ParseCtx* ctx, Token* token);
+internal String_Const_u8 Momo_Index_StringFromRange(Momo_Index_ParseCtx *ctx, Range_i64 range);
 internal void Momo_Index_Tick(Application_Links *app);
 internal void Momo_Index_GoToDefinitionInNote(Application_Links *app, Momo_Index_Note *note, b32 same_panel);
 // Format:

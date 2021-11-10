@@ -5,7 +5,8 @@ Momo_CS_Parse_Macro(Momo_Index_ParseCtx *ctx)
     Token *name = 0;
     if(Momo_Index_ParsePattern(ctx, "%k", TokenBaseKind_Identifier, &name))
     {
-        Momo_Index_MakeNote(ctx->app, ctx->file, 0, Momo_Index_StringFromToken(ctx, name),
+        String_Const_u8 name_str = Momo_Index_StringFromToken(ctx, name);
+        Momo_Index_MakeNote(ctx->app, ctx->file, name_str, name_str,
                           MOMO_INDEX_NOTE_KIND_MACRO, 0, Ii64(name));
         Momo_Index_SkipSoftTokens(ctx, 1);
     }
@@ -125,8 +126,11 @@ Momo_CS_Parse_StructBody(Momo_Index_ParseCtx *ctx)
         }
     }
 
-    Momo_Index_Note *parent_struct = Momo_Index_MakeNote(ctx->app, ctx->file, 0, Momo_Index_StringFromToken(ctx, name),
-                            MOMO_INDEX_NOTE_KIND_TYPE, 0, Ii64(name));
+
+    String_Const_u8 parent_struct_name_str = Momo_Index_StringFromToken(ctx, name);
+    Momo_Index_MakeNote(ctx->app, ctx->file, 
+                        parent_struct_name_str, parent_struct_name_str,
+                        MOMO_INDEX_NOTE_KIND_TYPE, 0, Ii64(name));
 
     // followed by open prases
     if(found_open_brace || Momo_Index_ParsePattern(ctx, "%t", "{")) {
@@ -155,7 +159,13 @@ Momo_CS_Parse_StructBody(Momo_Index_ParseCtx *ctx)
 
                 if (!constructor) {
                     if(Momo_CS_Parse_FunctionBody(ctx)) {
-                        Momo_Index_MakeNote(ctx->app, ctx->file, parent_struct, Momo_Index_StringFromToken(ctx, func_name),
+                        u8 buffer[512];
+                        String_u8 display_str = Su8(buffer, 0, ArrayCount(buffer));
+                        string_append(&display_str, parent_struct_name_str);
+                        string_append(&display_str, string_u8_litexpr("::"));
+
+                        String_Const_u8 key_str =  Momo_Index_StringFromToken(ctx, func_name);
+                        Momo_Index_MakeNote(ctx->app, ctx->file, key_str, display_str.string,
                                         MOMO_INDEX_NOTE_KIND_FUNCTION, 0, Ii64(func_name));
                     }
                 }
@@ -190,11 +200,13 @@ Momo_CS_Parse_EnumBody(Momo_Index_ParseCtx *ctx)
             Token *constant = 0;
             if(Momo_Index_ParsePattern(ctx, "%k%t", TokenBaseKind_Identifier, &constant, ","))
             {
-                Momo_Index_MakeNote(ctx->app, ctx->file, 0, Momo_Index_StringFromToken(ctx, constant), MOMO_INDEX_NOTE_KIND_CONSTANT, 0, Ii64(constant));
+                String_Const_u8 constant_str = Momo_Index_StringFromToken(ctx, constant);
+                Momo_Index_MakeNote(ctx->app, ctx->file, constant_str, constant_str, MOMO_INDEX_NOTE_KIND_CONSTANT, 0, Ii64(constant));
             }
             else if(Momo_Index_ParsePattern(ctx, "%k%t", TokenBaseKind_Identifier, &constant, "="))
             {
-                Momo_Index_MakeNote(ctx->app, ctx->file, 0, Momo_Index_StringFromToken(ctx, constant), MOMO_INDEX_NOTE_KIND_CONSTANT, 0, Ii64(constant));
+                String_Const_u8 constant_str = Momo_Index_StringFromToken(ctx, constant);
+                Momo_Index_MakeNote(ctx->app, ctx->file, constant_str, constant_str, MOMO_INDEX_NOTE_KIND_CONSTANT, 0, Ii64(constant));
                 
                 for(;!ctx->done;)
                 {
@@ -214,7 +226,8 @@ Momo_CS_Parse_EnumBody(Momo_Index_ParseCtx *ctx)
             }
             else if(Momo_Index_ParsePattern(ctx, "%k", TokenBaseKind_Identifier, &constant))
             {
-                Momo_Index_MakeNote(ctx->app, ctx->file, 0, Momo_Index_StringFromToken(ctx, constant), MOMO_INDEX_NOTE_KIND_CONSTANT, 0, Ii64(constant));
+                String_Const_u8 constant_str = Momo_Index_StringFromToken(ctx, constant);
+                Momo_Index_MakeNote(ctx->app, ctx->file, constant_str, constant_str, MOMO_INDEX_NOTE_KIND_CONSTANT, 0, Ii64(constant));
             }
             else if(Momo_Index_ParsePattern(ctx, "%t", "}"))
             {
@@ -282,7 +295,8 @@ internal MOMO_LANGUAGE_INDEXFILE(Momo_CS_Index_File)
         {
             handled = 1;
             //Momo_CS_Parse_EnumBody(ctx);
-            Momo_Index_MakeNote(ctx->app, ctx->file, 0, Momo_Index_StringFromToken(ctx, name),
+            String_Const_u8 name_str = Momo_Index_StringFromToken(ctx, name);
+            Momo_Index_MakeNote(ctx->app, ctx->file, name_str, name_str,
                                   MOMO_INDEX_NOTE_KIND_TYPE, 0, Ii64(name));
         }
 

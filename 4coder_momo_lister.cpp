@@ -1036,27 +1036,19 @@ Momo_Lister_PushNote(Application_Links *app, Arena *arena, Momo_Lister *lister, 
         jump->buffer = buffer;
         jump->pos = note->range.first;
         
-        String_Const_u8 buffer_name = push_buffer_unique_name(app, arena, buffer);
-        String_Const_u8 name = {};
-        if (note->parent != 0) 
-            name = push_stringf(arena, "[%.*s] %.*s::%.*s", string_expand(buffer_name), string_expand(note->parent->string), string_expand(note->string));
-        else
-            name = push_stringf(arena, "[%.*s] %.*s", string_expand(buffer_name), string_expand(note->string));
+        //String_Const_u8 buffer_name = push_buffer_unique_name(app, arena, buffer);
+        String_Const_u8 display_name = {};
+        display_name = push_stringf(arena, "%.*s", string_expand(note->display));
         String_Const_u8 sort = S8Lit("");
         switch(note->kind)
         {
             case MOMO_INDEX_NOTE_KIND_TYPE:
             {
-                sort = push_stringf(arena, "type [%s] [%s]",
-                                    note->flags & MOMO_INDEX_NOTE_FLAG_PROTOTYPE ? "prototype" : "def",
-                                    note->flags & MOMO_INDEX_NOTE_FLAG_SUM_TYPE ? "sum" : "product");
-            }break;
-            
+                sort = push_stringf(arena, "type");
+            }break;            
             case MOMO_INDEX_NOTE_KIND_FUNCTION:
             {
-                sort = push_stringf(arena, "func [%s]", 
-                                    note->flags & MOMO_INDEX_NOTE_FLAG_PROTOTYPE ? "prototype" : "def");
-               
+                sort = push_stringf(arena, "func"); 
             }break;
             
             case MOMO_INDEX_NOTE_KIND_MACRO:
@@ -1066,12 +1058,12 @@ Momo_Lister_PushNote(Application_Links *app, Arena *arena, Momo_Lister *lister, 
             
             case MOMO_INDEX_NOTE_KIND_CONSTANT:
             {
-                sort = S8Lit("constant");
+                sort = S8Lit("const");
             }break;
             
             case MOMO_INDEX_NOTE_KIND_COMMENT_TAG:
             {
-                sort = S8Lit("comment tag");
+                sort = S8Lit("Tag");
             }break;
             
             case MOMO_INDEX_NOTE_KIND_COMMENT_TODO:
@@ -1082,7 +1074,7 @@ Momo_Lister_PushNote(Application_Links *app, Arena *arena, Momo_Lister *lister, 
             default: break;
         }
         
-        Momo_Lister_AddItem(lister, name, sort, jump, 0);
+        Momo_Lister_AddItem(lister, display_name, sort, jump, 0);
     }
 }
 
@@ -1146,49 +1138,6 @@ Momo_Lister_CreateToGetFilenameFromUser(Application_Links *app, Arena *arena, ch
 }
 
 
-// NOTE(Momo): Pred must be of type: b32(Momo_Index_Note*)
-function void
-Momo_Lister_CreateWithNote(Application_Links* app, String_Const_u8 init_str, b32 same_panel, Pred pred){
-    char *query = "Index (Project):";
-    
-    Scratch_Block scratch(app);
-    Momo_Lister_Block lister(app, scratch);
-    Momo_Lister_SetQuery(lister, query);
-    Momo_Lister_SetKey(lister, init_str);
-    Momo_Lister_SetTextField(lister, init_str);
-    Momo_Lister_SetDefaultHandlers(lister);
-    
-    for(Momo_Index_Note *note = file->first_note; note; note = note->next_sibling)
-    {
-        Momo_Lister_PushNoteWithChildren(app, scratch, lister, note, pred);                   
-    }
-
-    Momo_Lister_Result l_result = Momo_Lister_Run(app, lister);
-    Tiny_Jump result = {};
-    if (!l_result.canceled && l_result.user_data != 0){
-        block_copy_struct(&result, (Tiny_Jump*)l_result.user_data);
-    }
-    
-    if (result.buffer != 0)
-    {
-        View_ID view = get_this_ctx_view(app, Access_Always);
-        if(!same_panel)
-        {
-            view = get_next_view_looped_primary_panels(app, view, Access_Always);
-        }
-        point_stack_push_view_cursor(app, view);
-        Momo_JumpToLocation(app, view, result.buffer, result.pos);
-    }
-}
-
-function void
-Momo_Lister_CreateWithProjectNotes(Application_Links* app, String_Const_u8 init_str, b32 same_panel)
-{
-    Momo_Lister_CreateWithProjectNotes(app, init_str, same_panel,   
-        [](Momo_Index_Note*) -> b32 { 
-            return true; 
-    });
-}
 
 // NOTE(Momo): Pred must be of type: b32(Momo_Index_Note*)
 template<typename Pred>

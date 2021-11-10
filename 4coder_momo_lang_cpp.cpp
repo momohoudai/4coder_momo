@@ -5,7 +5,9 @@ momo_cpp_parse_macro(Momo_Index_ParseCtx *ctx)
     Token *name = 0;
     if(Momo_Index_ParsePattern(ctx, "%k", TokenBaseKind_Identifier, &name))
     {
-        Momo_Index_MakeNote(ctx->app, ctx->file, 0, Momo_Index_StringFromToken(ctx, name),
+        String_Const_u8 name_str = Momo_Index_StringFromToken(ctx, name);
+
+        Momo_Index_MakeNote(ctx->app, ctx->file, name_str, name_str,
                           MOMO_INDEX_NOTE_KIND_MACRO, 0, Ii64(name));
         Momo_Index_SkipSoftTokens(ctx, 1);
     }
@@ -55,7 +57,7 @@ momo_cpp_parse_skippable_content(Momo_Index_ParseCtx *ctx)
 }
 
 function void
-momo_cpp_parse_struct(Momo_Index_ParseCtx *ctx, Momo_Index_Note_Flags note_flags)
+momo_cpp_parse_struct(Momo_Index_ParseCtx *ctx)
 {
     Token *name = 0;
     b32 valid = 0;
@@ -75,7 +77,8 @@ momo_cpp_parse_struct(Momo_Index_ParseCtx *ctx, Momo_Index_Note_Flags note_flags
     }
     else
     {
-        note_flags |= MOMO_INDEX_NOTE_FLAG_PROTOTYPE;
+        // NOTE(Momo): ignore prototypes
+        return;
     }
     
     if(need_end_name)
@@ -88,10 +91,13 @@ momo_cpp_parse_struct(Momo_Index_ParseCtx *ctx, Momo_Index_Note_Flags note_flags
     
     if(valid)
     {
-        Momo_Index_MakeNote(ctx->app, ctx->file, 0, Momo_Index_StringFromToken(ctx, name),
-                          MOMO_INDEX_NOTE_KIND_TYPE, note_flags, Ii64(name));
+        // struct have same key and display
+        String_Const_u8 name_str = Momo_Index_StringFromToken(ctx, name);
+        Momo_Index_MakeNote(ctx->app, ctx->file, name_str, name_str, 
+                          MOMO_INDEX_NOTE_KIND_TYPE, 0, Ii64(name));
     }
 }
+
 
 function b32
 momo_cpp_parse_function_body(Momo_Index_ParseCtx *ctx, b32 *prototype_ptr)
@@ -143,11 +149,13 @@ momo_cpp_parse_enum_body(Momo_Index_ParseCtx *ctx)
             Token *constant = 0;
             if(Momo_Index_ParsePattern(ctx, "%k%t", TokenBaseKind_Identifier, &constant, ","))
             {
-                Momo_Index_MakeNote(ctx->app, ctx->file, 0, Momo_Index_StringFromToken(ctx, constant), MOMO_INDEX_NOTE_KIND_CONSTANT, 0, Ii64(constant));
+                String_Const_u8 constant_str = Momo_Index_StringFromToken(ctx, constant);
+                Momo_Index_MakeNote(ctx->app, ctx->file, constant_str, constant_str, MOMO_INDEX_NOTE_KIND_CONSTANT, 0, Ii64(constant));
             }
             else if(Momo_Index_ParsePattern(ctx, "%k%t", TokenBaseKind_Identifier, &constant, "="))
             {
-                Momo_Index_MakeNote(ctx->app, ctx->file, 0, Momo_Index_StringFromToken(ctx, constant), MOMO_INDEX_NOTE_KIND_CONSTANT, 0, Ii64(constant));
+                String_Const_u8 constant_str = Momo_Index_StringFromToken(ctx, constant);
+                Momo_Index_MakeNote(ctx->app, ctx->file, constant_str, constant_str, MOMO_INDEX_NOTE_KIND_CONSTANT, 0, Ii64(constant));
                 
                 for(;!ctx->done;)
                 {
@@ -167,7 +175,8 @@ momo_cpp_parse_enum_body(Momo_Index_ParseCtx *ctx)
             }
             else if(Momo_Index_ParsePattern(ctx, "%k", TokenBaseKind_Identifier, &constant))
             {
-                Momo_Index_MakeNote(ctx->app, ctx->file, 0, Momo_Index_StringFromToken(ctx, constant), MOMO_INDEX_NOTE_KIND_CONSTANT, 0, Ii64(constant));
+                String_Const_u8 constant_str = Momo_Index_StringFromToken(ctx, constant);
+                Momo_Index_MakeNote(ctx->app, ctx->file, constant_str, constant_str, MOMO_INDEX_NOTE_KIND_CONSTANT, 0, Ii64(constant));
             }
             else if(Momo_Index_ParsePattern(ctx, "%t", "}"))
             {
@@ -190,8 +199,9 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
         
         Token *name = 0;
         Token *base_type = 0;
-        Momo_Index_Note *containing_struct = 0;
-        Momo_Index_Note *note = 0;
+        Token *scope_name = 0;
+
+
         
         if(0){}
         
@@ -223,41 +233,49 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
         else if(Momo_Index_ParsePattern(ctx, "%t", "struct"))
         {
             handled = 1;
-            momo_cpp_parse_struct(ctx, MOMO_INDEX_NOTE_FLAG_PRODUCT_TYPE);
+            momo_cpp_parse_struct(ctx);
         }
         else if(Momo_Index_ParsePattern(ctx, "%t%t", "typedef", "struct"))
         {
             handled = 1;
-            momo_cpp_parse_struct(ctx, 0);
+            momo_cpp_parse_struct(ctx);
+
+            // What is this for?
+    #if 0
             if (Momo_Index_ParsePattern(ctx, "%k", TokenBaseKind_Identifier, &name))
             {
                 Momo_Index_MakeNote(ctx->app, ctx->file, 0, Momo_Index_StringFromToken(ctx, name),
                                   MOMO_INDEX_NOTE_KIND_TYPE, MOMO_INDEX_NOTE_FLAG_PRODUCT_TYPE, Ii64(name));
-            }
+           }
+    #endif
         }
 
         //~ NOTE(Momo): Class
         else if(Momo_Index_ParsePattern(ctx, "%t", "class"))
         {
             handled = 1;
-            momo_cpp_parse_struct(ctx, MOMO_INDEX_NOTE_FLAG_PRODUCT_TYPE);
+            momo_cpp_parse_struct(ctx);
         }
         
         //~ NOTE(rjf): Unions
         else if(Momo_Index_ParsePattern(ctx, "%t", "union"))
         {
             handled = 1;
-            momo_cpp_parse_struct(ctx, MOMO_INDEX_NOTE_FLAG_SUM_TYPE);
+            momo_cpp_parse_struct(ctx);
         }
         else if (Momo_Index_ParsePattern(ctx, "%t%t", "typedef", "union"))
         {
             handled = 1;
-            momo_cpp_parse_struct(ctx, MOMO_INDEX_NOTE_FLAG_SUM_TYPE);
+            momo_cpp_parse_struct(ctx);
+
+            // What is this for?
+#if 0
             if (Momo_Index_ParsePattern(ctx, "%k", TokenBaseKind_Identifier, &name))
             {
                 Momo_Index_MakeNote(ctx->app, ctx->file, 0, Momo_Index_StringFromToken(ctx, name),
                                   MOMO_INDEX_NOTE_KIND_TYPE, MOMO_INDEX_NOTE_FLAG_SUM_TYPE, Ii64(name));
             }
+#endif
         }
         
         //~ NOTE(rjf): Typedef'd Enums
@@ -280,10 +298,11 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
                 if(Momo_Index_ParsePattern(ctx, "%k", TokenBaseKind_Identifier, &name))
                 {}
             }
-            if(name != 0)
+            if(name != 0 && !prototype)
             {
-                Momo_Index_MakeNote(ctx->app, ctx->file, 0, Momo_Index_StringFromToken(ctx, name),
-                                  MOMO_INDEX_NOTE_KIND_TYPE, prototype ? MOMO_INDEX_NOTE_FLAG_PROTOTYPE : 0, Ii64(name));
+                String_Const_u8 name_str = Momo_Index_StringFromToken(ctx, name);
+                Momo_Index_MakeNote(ctx->app, ctx->file, name_str, name_str, 
+                                  MOMO_INDEX_NOTE_KIND_TYPE, 0, Ii64(name));
             }
         }
         
@@ -301,14 +320,16 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
             {
                 momo_cpp_parse_enum_body(ctx);
             }
-            if(name != 0)
+            if(name != 0 && !prototype)
             {
-                Momo_Index_MakeNote(ctx->app, ctx->file, 0, Momo_Index_StringFromToken(ctx, name),
-                                  MOMO_INDEX_NOTE_KIND_TYPE, prototype ? MOMO_INDEX_NOTE_FLAG_PROTOTYPE : 0, Ii64(name));
+                String_Const_u8 name_str = Momo_Index_StringFromToken(ctx, name);  
+                Momo_Index_MakeNote(ctx->app, ctx->file, name_str, name_str,
+                                  MOMO_INDEX_NOTE_KIND_TYPE, 0, Ii64(name));
             }
         }
         
         //~ NOTE(rjf): Pure Typedefs
+        // TODO(Momo): I don't think we care about sum/product types here
         else if(Momo_Index_ParsePattern(ctx, "%t", "typedef"))
         {
             handled = 1;
@@ -326,8 +347,8 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
                 }
                 else if(nest == 0 && Momo_Index_ParsePattern(ctx, "%k", TokenBaseKind_Identifier, &name))
                 {
-                    String8 namestr = Momo_Index_StringFromToken(ctx, name);
-                    Momo_Index_Note *namenote = Momo_Index_LookupNote(namestr, 0);
+                    String8 name_str = Momo_Index_StringFromToken(ctx, name);
+                    Momo_Index_Note *namenote = Momo_Index_LookupNote(name_str, 0);
                     if(namenote != 0 && namenote->kind == MOMO_INDEX_NOTE_KIND_TYPE &&
                        namenote->flags & MOMO_INDEX_NOTE_FLAG_SUM_TYPE)
                     {
@@ -350,7 +371,8 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
                 {
                     note_flags |= MOMO_INDEX_NOTE_FLAG_SUM_TYPE;
                 }
-                Momo_Index_MakeNote(ctx->app, ctx->file, 0, Momo_Index_StringFromToken(ctx, name),
+                String_Const_u8 name_str =  Momo_Index_StringFromToken(ctx, name);
+                Momo_Index_MakeNote(ctx->app, ctx->file, name_str, name_str,
                                   MOMO_INDEX_NOTE_KIND_TYPE, note_flags, Ii64(name));
             }
         }
@@ -367,57 +389,105 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
                                        "(")))
         {
             handled = 1;
-            b32 prototype = 0;
-            if(momo_cpp_parse_function_body(ctx, &prototype) && !prototype)
-            {
-                Momo_Index_MakeNote(ctx->app, ctx->file, 0, Momo_Index_StringFromToken(ctx, name),
-                                    MOMO_INDEX_NOTE_KIND_FUNCTION, 0, Ii64(name));
-                
+            b32 is_valid = 0;
 
+            Range_i64 prototype_range = {};
+            prototype_range.min = name->pos;
+
+            while(!ctx->done) {
+                Token* token = token_it_read(&ctx->it);
+                if (token == 0) {
+                    break;
+                }
+                if (token->sub_kind == TokenCppKind_Semicolon) {
+                    // This is a prototype, so we ignore.
+                    break;
+                }
+                else if (token->sub_kind == TokenCppKind_ParenCl) {
+                    prototype_range.max = token->pos+token->size;
+                }
+
+                else if(token->kind == TokenBaseKind_ScopeOpen)
+                {
+                    is_valid = 1;
+                    break;
+                }
+                Momo_Index_ParseCtx_Inc(ctx, 0);
+
+            }
+
+            if (is_valid) {
+                // For functions, the display is the whole function itself
+                u8 buffer[512];
+                String_u8 display_str = Su8(buffer, 0, ArrayCount(buffer));
+
+                String_Const_u8 key_str = Momo_Index_StringFromToken(ctx, name);  
+                string_append(&display_str, Momo_Index_StringFromRange(ctx, prototype_range));
+                Momo_Index_MakeNote(ctx->app, ctx->file, key_str, display_str.string,
+                                    MOMO_INDEX_NOTE_KIND_FUNCTION, 0, Ii64(name));
+
+    
             }
         }
         
-        //~ NOTE(rjf): Member Functions
+        //~ NOTE(Momo): C++ Member Functions (outside of the struct/class)
+        // TODO(Momo): Ignore constructors?
         else if(scope_nest == 0 &&
-                (Momo_Index_ParsePattern(ctx, "%k%o%n%t%k%t",
+                (Momo_Index_ParsePattern(ctx, "%k%o%k%t%k%t",
                                        TokenBaseKind_Identifier, &base_type,
-                                       MOMO_INDEX_NOTE_KIND_TYPE, &containing_struct,
+                                       TokenBaseKind_Identifier, &scope_name,
                                        "::",
                                        TokenBaseKind_Identifier, &name,
                                        "(") ||
-                 Momo_Index_ParsePattern(ctx, "%k%o%n%t%k%t",
+                 Momo_Index_ParsePattern(ctx, "%k%o%k%t%k%t",
                                        TokenBaseKind_Keyword, &base_type,
-                                       MOMO_INDEX_NOTE_KIND_TYPE, &containing_struct,
+                                       TokenBaseKind_Identifier, &scope_name,
                                        "::",
                                        TokenBaseKind_Identifier, &name,
                                        "(")))
         {
-            String_Const_u8 name_str = Momo_Index_StringFromToken(ctx, name);
+            handled = 1;         
+            b32 is_valid = 0;
+            Range_i64 prototype_range = {};
 
-            // ignore constructors
-            if(!string_match(containing_struct->string, name_str)) {
-                
-                handled = 1;
-                b32 prototype = 0;
-                if(momo_cpp_parse_function_body(ctx, &prototype) && !prototype)
-                {
-                    u8 buffer[512];
-                    String_u8 str = Su8(buffer, 0, ArrayCount(buffer));
-                    if (containing_struct != 0) {
-                        string_append(&str, containing_struct->string);
-                        string_append(&str, string_u8_litexpr("::"));
-                        string_append(&str, Momo_Index_StringFromToken(ctx, name));
-                        
-                        Momo_Index_MakeNote(ctx->app, ctx->file, 0, str.string,
-                            MOMO_INDEX_NOTE_KIND_FUNCTION, 0, Ii64(name));
-                    }
-                    else {
-                        Momo_Index_MakeNote(ctx->app, ctx->file, 0, Momo_Index_StringFromToken(ctx,name),
-                            MOMO_INDEX_NOTE_KIND_FUNCTION, 0, Ii64(name));
-                    }
-
+            while(!ctx->done) {
+                Token* token = token_it_read(&ctx->it);
+                if (token == 0) {
+                    break;
                 }
+                if (token->sub_kind == TokenCppKind_Semicolon) {
+                    // This is a prototype, so we ignore.
+                    break;
+                }
+                else if (token->sub_kind == TokenCppKind_ParenCl) {
+                    prototype_range.max = token->pos+token->size;
+                }
+
+                else if(token->kind == TokenBaseKind_ScopeOpen)
+                {
+                    is_valid = 1;
+                    break;
+                }
+                Momo_Index_ParseCtx_Inc(ctx, 0);
+                
+
+                
             }
+            if (is_valid && scope_name) {
+                prototype_range.min = scope_name->pos;
+
+                // For functions, the display is the whole function itself
+                u8 buffer[512];
+                String_u8 display_str = Su8(buffer, 0, ArrayCount(buffer));
+
+                String_Const_u8 key_str = Momo_Index_StringFromToken(ctx, name);  
+                string_append(&display_str, Momo_Index_StringFromRange(ctx, prototype_range));
+                Momo_Index_MakeNote(ctx->app, ctx->file, key_str, display_str.string,
+                                    MOMO_INDEX_NOTE_KIND_FUNCTION, 0, Ii64(name));
+
+        
+            }
+        
         }
         
         //~ NOTE(rjf): Declarations
@@ -444,11 +514,14 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
                                        "=")))
         {
             handled = 1;
-            Momo_Index_MakeNote(ctx->app, ctx->file, 0, Momo_Index_StringFromToken(ctx, name), MOMO_INDEX_NOTE_KIND_DECL, 0, Ii64(name));
+            String_Const_u8 name_str = Momo_Index_StringFromToken(ctx, name);
+            Momo_Index_MakeNote(ctx->app, ctx->file, name_str, name_str, MOMO_INDEX_NOTE_KIND_DECL, 0, Ii64(name));
         }
         
         //~ NOTE(rjf): Macro Functions
-        else if(0 && Momo_Index_ParsePattern(ctx, "%n%t%k",
+        // TODO(Momo): Should get this to work. Could actually be useful!
+#if 0
+        else if(Momo_Index_ParsePattern(ctx, "%n%t%k",
                                            MOMO_INDEX_NOTE_KIND_MACRO, &note,
                                            "(",
                                            TokenBaseKind_Identifier, &name))
@@ -485,7 +558,8 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
                 momo_cpp_parse_skippable_content(ctx);
             }
         }
-        
+#endif        
+
         //~ NOTE(rjf): Comment Tags
         else if(Momo_Index_ParsePattern(ctx, "%k", TokenBaseKind_Comment, &name))
         {

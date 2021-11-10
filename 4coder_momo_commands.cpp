@@ -445,7 +445,7 @@ CUSTOM_DOC("List all definitions in the index and enter the token under the curs
     Scratch_Block scratch(app);
     String_Const_u8 string = push_token_or_word_under_active_cursor(app, scratch);
     Momo_Index_Note* note = Momo_Index_LookupNote(string);
-    note = Momo_Index_FindFirstNonPrototypeNote(note);
+    //note = Momo_Index_FindFirstNonPrototypeNote(note);
     Momo_Index_GoToDefinitionInNote(app, note, 1);  
 }
 
@@ -455,7 +455,7 @@ CUSTOM_DOC("List all definitions in the index and enter the token under the curs
     Scratch_Block scratch(app);
     String_Const_u8 string = push_token_or_word_under_active_cursor(app, scratch);
     Momo_Index_Note* note = Momo_Index_LookupNote(string);
-    note = Momo_Index_FindFirstNonPrototypeNote(note);
+    //note = Momo_Index_FindFirstNonPrototypeNote(note);
     Momo_Index_GoToDefinitionInNote(app, note, 0);  
 }
 

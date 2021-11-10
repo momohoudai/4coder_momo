@@ -102,11 +102,13 @@ Momo_Colors_GetColor(Application_Links *app, Momo_Colors_ColorCtx ctx)
     {
         Scratch_Block scratch(app);
         
+        String_Const_u8 string = push_buffer_range(app, scratch, ctx.buffer, Ii64(ctx.token.pos, ctx.token.pos + ctx.token.size));
+                
         switch(ctx.token.kind)
         {
             case TokenBaseKind_Identifier:
             {
-                String_Const_u8 string = push_buffer_range(app, scratch, ctx.buffer, Ii64(ctx.token.pos, ctx.token.pos + ctx.token.size));
+                //String_Const_u8 string = push_buffer_range(app, scratch, ctx.buffer, Ii64(ctx.token.pos, ctx.token.pos + ctx.token.size));
                 Momo_Index_Note *note = Momo_Index_LookupNote(string);
                 if(note)
                 {
