@@ -290,6 +290,7 @@ CUSTOM_DOC("EDIT MODE ACTIVATED")
 {
     switch_to_keybinding_0(app);
     global_insert_mode = false;
+    momo_indent_whole_file(app);
 }
 
 CUSTOM_COMMAND_SIG(momo_switch_to_insert_mode)

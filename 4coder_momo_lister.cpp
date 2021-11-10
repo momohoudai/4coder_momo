@@ -1145,6 +1145,51 @@ Momo_Lister_CreateToGetFilenameFromUser(Application_Links *app, Arena *arena, ch
     return(Momo_Lister_CreateToGetFilenameFromUser(app, arena, SCu8(query), view));
 }
 
+
+// NOTE(Momo): Pred must be of type: b32(Momo_Index_Note*)
+function void
+Momo_Lister_CreateWithNote(Application_Links* app, String_Const_u8 init_str, b32 same_panel, Pred pred){
+    char *query = "Index (Project):";
+    
+    Scratch_Block scratch(app);
+    Momo_Lister_Block lister(app, scratch);
+    Momo_Lister_SetQuery(lister, query);
+    Momo_Lister_SetKey(lister, init_str);
+    Momo_Lister_SetTextField(lister, init_str);
+    Momo_Lister_SetDefaultHandlers(lister);
+    
+    for(Momo_Index_Note *note = file->first_note; note; note = note->next_sibling)
+    {
+        Momo_Lister_PushNoteWithChildren(app, scratch, lister, note, pred);                   
+    }
+
+    Momo_Lister_Result l_result = Momo_Lister_Run(app, lister);
+    Tiny_Jump result = {};
+    if (!l_result.canceled && l_result.user_data != 0){
+        block_copy_struct(&result, (Tiny_Jump*)l_result.user_data);
+    }
+    
+    if (result.buffer != 0)
+    {
+        View_ID view = get_this_ctx_view(app, Access_Always);
+        if(!same_panel)
+        {
+            view = get_next_view_looped_primary_panels(app, view, Access_Always);
+        }
+        point_stack_push_view_cursor(app, view);
+        Momo_JumpToLocation(app, view, result.buffer, result.pos);
+    }
+}
+
+function void
+Momo_Lister_CreateWithProjectNotes(Application_Links* app, String_Const_u8 init_str, b32 same_panel)
+{
+    Momo_Lister_CreateWithProjectNotes(app, init_str, same_panel,   
+        [](Momo_Index_Note*) -> b32 { 
+            return true; 
+    });
+}
+
 // NOTE(Momo): Pred must be of type: b32(Momo_Index_Note*)
 template<typename Pred>
 function void
