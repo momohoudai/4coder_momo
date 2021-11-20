@@ -670,7 +670,7 @@ momo_render(Application_Links *app, Frame_Info frame_info, View_ID view_id)
         if(def_get_config_b32(vars_save_string_lit("f4_margin_use_mode_color")) &&
            is_active_view)
         {
-            color = Momo_Colors_GetColor(app, Momo_Colors_GetColorCtxFromCursor(0, GlobalKeybindingMode));
+            color = Momo_Colors_GetColor(app, Momo_Colors_GetColorCtxFromCursor(0, global_keybinding_mode));
         }
         draw_margin(app, view_rect, region, color);
     }

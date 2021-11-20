@@ -288,7 +288,7 @@ CUSTOM_DOC("Page down halfway")
 CUSTOM_COMMAND_SIG(momo_switch_to_edit_mode)
 CUSTOM_DOC("EDIT MODE ACTIVATED")
 {
-    switch_to_keybinding_0(app);
+    global_keybinding_mode = Momo_KeyBindingMode_Normal;
     global_insert_mode = false;
     momo_indent_whole_file(app);
 }
@@ -296,7 +296,7 @@ CUSTOM_DOC("EDIT MODE ACTIVATED")
 CUSTOM_COMMAND_SIG(momo_switch_to_insert_mode)
 CUSTOM_DOC("INSERT MODE ACTIVATED")
 {
-    switch_to_keybinding_1(app);
+    global_keybinding_mode = Momo_KeyBindingMode_Insert;
     global_insert_mode = true;
 }
 

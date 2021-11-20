@@ -44,7 +44,7 @@ struct Momo_Colors_ColorCtx
     Token token;
     Buffer_ID buffer;
     Momo_Colors_FlagType flags;
-    keybinding_mode mode;
+    Momo_KeybindingMode mode;
 };
 
 internal Momo_Colors_ColorCtx
@@ -57,7 +57,7 @@ Momo_Colors_GetColorCtxFromToken(Token token, Buffer_ID buffer)
 }
 
 internal Momo_Colors_ColorCtx
-Momo_Colors_GetColorCtxFromCursor(Momo_Colors_FlagType flags, keybinding_mode mode)
+Momo_Colors_GetColorCtxFromCursor(Momo_Colors_FlagType flags, Momo_KeybindingMode mode)
 {
     Momo_Colors_ColorCtx ctx = {0};
     ctx.flags = flags;

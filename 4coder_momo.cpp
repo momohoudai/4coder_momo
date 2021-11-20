@@ -454,7 +454,7 @@ void custom_layer_init(Application_Links *app)
         mapping_init(tctx, &framework_mapping);
         String_Const_u8 bindings_file = string_u8_litexpr("bindings.4coder");
         dynamic_binding_load_from_file(app, &framework_mapping, bindings_file);
-        momo_set_essential_bindings(&framework_mapping);
+        Momo_KeyBindings_Init(&framework_mapping);
     }
     
     // NOTE(rjf): Set up custom code index.
@@ -604,7 +604,7 @@ CUSTOM_DOC("Momo startup event")
     {
         String_Const_u8 bindings_file = string_u8_litexpr("bindings.4coder");
         dynamic_binding_load_from_file(app, &framework_mapping, bindings_file);
-        momo_set_essential_bindings(&framework_mapping);
+        Momo_KeyBindings_Init(&framework_mapping);
     }
     
     

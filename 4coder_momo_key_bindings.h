@@ -1,6 +1,25 @@
-struct Command_Map_ID_Pair
+enum Momo_KeybindingMode
 {
-	Command_Map_ID From;
-	Command_Map_ID To;
+	Momo_KeyBindingMode_Default,
+
+	Momo_KeyBindingMode_Normal,
+    Momo_KeyBindingMode_Insert,
+//  Momo_KeyBindingMode_Visual,	
+
+    Momo_KeyBindingMode_Count
 };
-static Command_Map_ID_Pair GlobalCommandMapReroute[4] = {};
+
+enum Momo_CommandMapType
+{
+	Momo_CommandMapType_Global,
+	Momo_CommandMapType_File,
+    Momo_CommandMapType_Code,
+	
+    Momo_CommandMapType_Count
+};
+
+static Momo_KeybindingMode global_keybinding_mode = {};
+static Command_Map_ID global_command_maps[Momo_KeyBindingMode_Count][Momo_CommandMapType_Count] ={};
+
+function Implicit_Map_Result Momo_KeyBinding_ImplicitMap(Application_Links *app, String_ID lang, String_ID mode, Input_Event *event);
+function void Momo_KeyBindings_Init(Mapping *mapping);

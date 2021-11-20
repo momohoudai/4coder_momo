@@ -14,16 +14,7 @@ namespace zawarudo {
 #define AnonVar(x) AnonVarSub(x)
 #define Defer auto AnonVar(__COUNTER__) = zawarudo::defer_dummy{} + [&]()
 
-enum keybinding_mode
-{
-	KeyBindingMode_0,
-	KeyBindingMode_1,
-    KeyBindingMode_2,
-    KeyBindingMode_3,
-    KeyBindingMode_MAX
-};
 
-static keybinding_mode GlobalKeybindingMode;
 static Face_ID global_styled_title_face = 0;
 static Face_ID global_styled_label_face = 0;
 static Face_ID global_small_code_face = 0;
