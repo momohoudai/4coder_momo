@@ -495,8 +495,7 @@ Momo_Lister_Run(Application_Links *app, Momo_Lister *lister){
     
     b32 is_done = false;
     while (!is_done){
-        //User_Input in = get_next_input(app, EventPropertyGroup_Any, EventProperty_Escape);
-        User_Input in = get_next_input(app, EventPropertyGroup_Any, 0);
+        User_Input in = get_next_input(app, EventPropertyGroup_Any, EventProperty_Escape);
         if (in.abort){
             block_zero_struct(&lister->out);
             lister->out.canceled = true;
@@ -508,27 +507,14 @@ Momo_Lister_Run(Application_Links *app, Momo_Lister *lister){
         switch (in.event.kind){
             case InputEventKind_TextInsert:
             {
-                if (lister->is_insert_mode) {
-                    if (lister->handlers.write_character != 0){
-                        result = lister->handlers.write_character(app);
-                    }
+                if (lister->handlers.write_character != 0){
+                    result = lister->handlers.write_character(app);
                 }
             }break;
         
             case InputEventKind_KeyStroke:
             {
                 switch (in.event.key.code){
-                    case KeyCode_Escape: {
-                        if (lister->is_insert_mode) {
-                            // return to scroll mode
-                            lister->is_insert_mode = false;
-                        }
-                        else {
-                            block_zero_struct(&lister->out);
-                            lister->out.canceled = true;
-                            is_done = true;
-                        }
-                    }break;
                     case KeyCode_Return:
                     case KeyCode_Tab:
                     {
@@ -554,51 +540,32 @@ Momo_Lister_Run(Application_Links *app, Momo_Lister *lister){
                         }
                     }break;
                     
-                    case KeyCode_I: {
-                        if(!lister->is_insert_mode) {
-                            lister->is_insert_mode = true;
-                        }
-                        else {
-                            handled = false;
-                        }
-                    } break;
-
                     case KeyCode_Up:
-                    case KeyCode_K:
                     {
-                        if (!lister->is_insert_mode) {
-                            if (lister->handlers.navigate != 0){
-                                lister->handlers.navigate(app, view, lister, -1);
-                            }
-                            else if (lister->handlers.key_stroke != 0){
-                                result = lister->handlers.key_stroke(app);
-                            }
-                            else{
-                                handled = false;
-                            }
+                        if (lister->handlers.navigate != 0){
+                            lister->handlers.navigate(app, view, lister, -1);
                         }
-                        else {
+                        else if (lister->handlers.key_stroke != 0){
+                            result = lister->handlers.key_stroke(app);
+                        }
+                        else{
                             handled = false;
                         }
+                    
                     }break;
                     
                     case KeyCode_Down:
-                    case KeyCode_J:
                     {
-                        if (!lister->is_insert_mode) {
-                            if (lister->handlers.navigate != 0){
-                                lister->handlers.navigate(app, view, lister, 1);
-                            }
-                            else if (lister->handlers.key_stroke != 0){
-                                result = lister->handlers.key_stroke(app);
-                            }
-                            else{
-                                handled = false;
-                            }
-                        } 
-                        else {
+                        if (lister->handlers.navigate != 0){
+                            lister->handlers.navigate(app, view, lister, 1);
+                        }
+                        else if (lister->handlers.key_stroke != 0){
+                            result = lister->handlers.key_stroke(app);
+                        }
+                        else{
                             handled = false;
                         }
+                        
                     }break;
                     
                     case KeyCode_PageUp:

@@ -117,16 +117,15 @@ Momo_Indent__GetIntendationArrayToShiftLinesRight(Application_Links *app, Arena 
     i64 count = lines.max - lines.min + 1;
     i64 *indentations = push_array(arena, i64, count);
 
-    /*// Figure out how many indentations each line an increase it by 4
+    // Figure out how many indentations each line has and increase it by 4
     for (i64 line_number = lines.first; line_number <= lines.max; ++line_number)
     {    
-            
+        i64 line_start_pos = get_line_start_pos(app, buffer, count);
+        Indent_Info indent_info = get_indent_info_line_number_and_start(app, buffer, line_number, line_start_pos, tab_width);
+        indentations[line_number - lines.first] = indent_info.indent_pos + 1;
     }
 
-    i64 line_start_pos = get_line_start_pos(app, buffer, count);
-    Indent_Info indent_info = get_indent_info_line_number_and_start(app, buffer, lines, line_start_pos, tab_width);
-    indent_info.is_blank = false;
-*/
+
     return indentations;
     
 }
@@ -140,8 +139,8 @@ Momo_Indent__GetIntendationArrayToShiftLinesLeft(Application_Links *app, Arena *
 }
 
 function void
-Momo_Indent_IndentLinesRight(Application_Links *app, Buffer_ID buffer, Range_i64 lines, Indent_Flag flags) {
-    /*Scratch_Block scratch(app);
+Momo_Indent_IndentLinesRight(Application_Links *app, Buffer_ID buffer, Range_i64 view_range, Indent_Flag flags) {
+    Scratch_Block scratch(app);
     i32 indent_width = (i32)def_get_config_u64(app, vars_save_string_lit("indent_width"));
     i32 tab_width = (i32)def_get_config_u64(app, vars_save_string_lit("default_tab_width"));
     tab_width = clamp_bot(1, tab_width);
@@ -151,9 +150,9 @@ Momo_Indent_IndentLinesRight(Application_Links *app, Buffer_ID buffer, Range_i64
         AddFlag(flags, Indent_UseTab);
     }
 
-    Range_i64 line_numbers = get_line_range_from_pos_range(app, buffer, pos);
-    i64 indentations = Momo_Indent__GetIntendationArrayToShiftLinesRight(app, scratch, line_numbers, flags, tab_width, indent_width)
-    Momo_Indent_SetLineIndents(app, scratch, buffer, line_numbers, indentations, flags, tab_width);*/
+    Range_i64 line_numbers = get_line_range_from_pos_range(app, buffer, view_range);
+    i64* indentations = Momo_Indent__GetIntendationArrayToShiftLinesRight(app, scratch, buffer, line_numbers, flags, tab_width, indent_width);
+    Momo_Indent_SetLineIndents(app, scratch, buffer, line_numbers, indentations, flags, tab_width);
 }
 
 internal i64*

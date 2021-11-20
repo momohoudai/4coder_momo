@@ -445,13 +445,15 @@ CUSTOM_DOC("List all definitions in the index and enter the token under the curs
     Scratch_Block scratch(app);
     String_Const_u8 string = push_token_or_word_under_active_cursor(app, scratch);
     Momo_Index_Note* note = Momo_Index_LookupNote(string);
-    if (note->next) {
-        Momo_Lister_CreateWithProjectNotes(app, {}, 1, [&](Momo_Index_Note* note) {
-            return string_match(note->key, string);
-        });
-    }
-    else {
-        Momo_Index_GoToDefinitionInNote(app, note, 1);  
+    if (note) {
+        if (note->next) {
+            Momo_Lister_CreateWithProjectNotes(app, {}, 1, [&](Momo_Index_Note* note) {
+                return string_match(note->key, string);
+            });
+        }
+        else {
+            Momo_Index_GoToDefinitionInNote(app, note, 1);  
+        }
     }
 }
 
@@ -461,13 +463,15 @@ CUSTOM_DOC("List all definitions in the index and enter the token under the curs
     Scratch_Block scratch(app);
     String_Const_u8 string = push_token_or_word_under_active_cursor(app, scratch);
     Momo_Index_Note* note = Momo_Index_LookupNote(string);
-    if (note->next) {
-        Momo_Lister_CreateWithProjectNotes(app, {}, 0, [&](Momo_Index_Note* note) {
-            return string_match(note->key, string);
-        });
-    }
-    else {
-        Momo_Index_GoToDefinitionInNote(app, note, 0);  
+    if (note) {
+        if (note->next) {
+            Momo_Lister_CreateWithProjectNotes(app, {}, 0, [&](Momo_Index_Note* note) {
+                return string_match(note->key, string);
+            });
+        }
+        else {
+            Momo_Index_GoToDefinitionInNote(app, note, 0);  
+        }
     }
 }
 
@@ -968,7 +972,7 @@ CUSTOM_DOC("Inserts tab at cursor")
 }
 
 CUSTOM_COMMAND_SIG(momo_indent_lines_right)
-CUSTOM_DOC("Shift lines to the left by indent width")
+CUSTOM_DOC("Shift lines to the right by indent width")
 {
     View_ID view = get_active_view(app, Access_ReadWriteVisible);
     Buffer_ID buffer = view_get_buffer(app, view, Access_ReadWriteVisible);

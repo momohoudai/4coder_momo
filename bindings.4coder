@@ -371,7 +371,7 @@ keys_code = {
 
 keys_code_1 = {
     { "word_complete",              "Space", "Control" },
-    { "word_complete_drop_down",    "Space", "Shift" },
+    { "word_complete_drop_down",    "Space", "Shift", "Control" },
     { "momo_leave_event_unhandled", "Z" },
     { "momo_leave_event_unhandled", "Semicolon" },
     { "momo_leave_event_unhandled", "Semicolon", "Control" },

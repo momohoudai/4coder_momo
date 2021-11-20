@@ -230,12 +230,14 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
         }
         
         //~ NOTE(rjf): Structs
-        else if(Momo_Index_ParsePattern(ctx, "%t", "struct"))
+        else if(scope_nest == 0 && 
+                Momo_Index_ParsePattern(ctx, "%t", "struct"))
         {
             handled = 1;
             momo_cpp_parse_struct(ctx);
         }
-        else if(Momo_Index_ParsePattern(ctx, "%t%t", "typedef", "struct"))
+        else if(scope_nest == 0 && 
+                Momo_Index_ParsePattern(ctx, "%t%t", "typedef", "struct"))
         {
             handled = 1;
             momo_cpp_parse_struct(ctx);
@@ -251,19 +253,22 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
         }
 
         //~ NOTE(Momo): Class
-        else if(Momo_Index_ParsePattern(ctx, "%t", "class"))
+        else if(scope_nest == 0 && 
+                Momo_Index_ParsePattern(ctx, "%t", "class"))
         {
             handled = 1;
             momo_cpp_parse_struct(ctx);
         }
         
         //~ NOTE(rjf): Unions
-        else if(Momo_Index_ParsePattern(ctx, "%t", "union"))
+        else if(scope_nest == 0 && 
+                Momo_Index_ParsePattern(ctx, "%t", "union"))
         {
             handled = 1;
             momo_cpp_parse_struct(ctx);
         }
-        else if (Momo_Index_ParsePattern(ctx, "%t%t", "typedef", "union"))
+        else if (scope_nest == 0 && 
+                 Momo_Index_ParsePattern(ctx, "%t%t", "typedef", "union"))
         {
             handled = 1;
             momo_cpp_parse_struct(ctx);
@@ -279,7 +284,8 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
         }
         
         //~ NOTE(rjf): Typedef'd Enums
-        else if(Momo_Index_ParsePattern(ctx, "%t%t%k", "typedef", "enum", TokenBaseKind_Identifier, &name) ||
+        else if(scope_nest == 0 && 
+                Momo_Index_ParsePattern(ctx, "%t%t%k", "typedef", "enum", TokenBaseKind_Identifier, &name) ||
                 Momo_Index_ParsePattern(ctx, "%t%t", "typedef", "enum"))
         {
             handled = 1;
@@ -387,6 +393,7 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
                                        TokenBaseKind_Keyword, &base_type,
                                        TokenBaseKind_Identifier, &name,
                                        "(")))
+                                       
         {
             handled = 1;
             b32 is_valid = 0;
@@ -412,7 +419,7 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
                     is_valid = 1;
                     break;
                 }
-                Momo_Index_ParseCtx_Inc(ctx, 0);
+                Momo_Index_ParseCtx_Inc(ctx, 0);    
 
             }
 
@@ -427,6 +434,38 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
                                     MOMO_INDEX_NOTE_KIND_FUNCTION, 0, Ii64(name));
 
     
+            }
+        }
+
+
+        // ignore C++ operator overloading
+        else if (scope_nest == 0 && 
+                (Momo_Index_ParsePattern(ctx, "%k%o%k%k%t",
+                                       TokenBaseKind_Keyword, &base_type,
+                                       TokenBaseKind_Keyword, &name,
+                                       TokenBaseKind_Operator, &name,
+                                       "(")) ||
+                (Momo_Index_ParsePattern(ctx, "%k%o%k%k%t",
+                                       TokenBaseKind_Identifier, &base_type,
+                                       TokenBaseKind_Keyword, &name,
+                                       TokenBaseKind_Operator, &name,
+                                       "(")))
+        {
+            handled = 1;
+            while(!ctx->done) {
+                Token* token = token_it_read(&ctx->it);
+                if (token == 0) {
+                    break;
+                }
+                if (token->sub_kind == TokenCppKind_Semicolon) {
+                    // This is a prototype, so we ignore.
+                    break;
+                }
+                else if(token->kind == TokenBaseKind_ScopeOpen)
+                {
+                    break;
+                }
+                Momo_Index_ParseCtx_Inc(ctx, 0);
             }
         }
         
@@ -469,9 +508,6 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
                     break;
                 }
                 Momo_Index_ParseCtx_Inc(ctx, 0);
-                
-
-                
             }
             if (is_valid && scope_name) {
                 prototype_range.min = scope_name->pos;

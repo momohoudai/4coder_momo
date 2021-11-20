@@ -81,7 +81,6 @@ struct Momo_Lister{
     i32 visible_count;
     
     Momo_Lister_Result out;
-    b32 is_insert_mode; // switches between 'input mode' and 'scrolling' mode
 };
 
 struct Momo_Lister_Prev_Current{

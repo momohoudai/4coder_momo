@@ -434,7 +434,11 @@ internal b32
 Momo_Index_RequireTokenKind(Momo_Index_ParseCtx *ctx, Token_Base_Kind kind, Token **token_out, Momo_Index_Token_Skip_Flags flags)
 {
     b32 result = 0;
+
     Token *token = token_it_read(&ctx->it);
+    String_Const_u8 token_string =
+        string_substring(ctx->string, Ii64(token->pos, token->pos + token->size));
+
     if(token)
     {
         if(token->kind == kind)
