@@ -124,10 +124,7 @@ Momo_Indent__GetIntendationArrayToShiftLinesRight(Application_Links *app, Arena 
         Indent_Info indent_info = get_indent_info_line_number_and_start(app, buffer, line_number, line_start_pos, tab_width);
         indentations[line_number - lines.first] = indent_info.indent_pos + 1;
     }
-
-
     return indentations;
-    
 }
 
 
@@ -517,7 +514,10 @@ actual_indent = N; )
             }
             
             if (token->kind != TokenBaseKind_Comment){
-
+                in_unfinished_statement = Momo_Indent__IsUnfinishedStatement(token, nest);
+                if (in_unfinished_statement){
+                    following_indent += indent_width;
+                }
             }
             
             last_indent = following_indent;
@@ -543,9 +543,7 @@ Momo_Indent__GetIndentationArrayBasedOnExtension(Application_Links *app, Arena *
             return Momo_Indent__GetIndentationArrayGolang(app, arena, buffer, lines, flags, tab_width, indent_width);
         }
     }
-        
-        
-   
+
     return Momo_Indent__GetIndentationArrayDefault(app, arena, buffer, lines, flags, tab_width, indent_width);
     
 }

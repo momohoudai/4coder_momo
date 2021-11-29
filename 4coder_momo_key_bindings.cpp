@@ -35,43 +35,6 @@ Momo_KeyBinding_ImplicitMap(Application_Links *app, String_ID lang, String_ID mo
     result.map = 0;
     result.command = binding.custom;
     
-#if 0 
-    // TODO(allen): map_id <-> map name?
-    result.map = 0;
-    result.command = binding.custom;
-
-    Implicit_Map_Result result = {};
-    
-    View_ID view = get_this_ctx_view(app, Access_Always);
-    
-	Command_Map_ID orig_id = default_get_map_id(app, view);
-    Command_Map_ID map_id = orig_id;
-
-
-	if(GlobalKeybindingMode == KeyBindingMode_1)
-	{
-		for(int PairIndex = 0;
-			PairIndex < ArrayCount(GlobalCommandMapReroute);
-			++PairIndex)
-		{
-			if(GlobalCommandMapReroute[PairIndex].From == map_id)
-			{
-				map_id = GlobalCommandMapReroute[PairIndex].To;
-				break;
-			}
-		}
-	}
-	
-	Command_Binding binding = map_get_binding_recursive(&framework_mapping, map_id, event);
-	if(!binding.custom)
-	{
-		binding = map_get_binding_recursive(&framework_mapping, orig_id, event);
-	}
-    
-    // TODO(allen): map_id <-> map name?
-    result.map = 0;
-    result.command = binding.custom;
-#endif 
 
     return(result);
 }
@@ -116,7 +79,7 @@ Momo_KeyBindings_Init(Mapping *mapping)
 	// 'Normal' mode bindings
 	String_ID global_normal_map_id = vars_save_string_lit("keys_normal_global");
 	String_ID file_normal_map_id = vars_save_string_lit("keys_normal_file");
-    String_ID code_normal_map_id = vars_save_string_lit("keys_normal_code1");
+    String_ID code_normal_map_id = vars_save_string_lit("keys_normal_code");
 	SelectMap(global_normal_map_id);
 	ParentMap(global_map_id);
    

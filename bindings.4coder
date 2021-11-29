@@ -38,7 +38,7 @@ keys_normal_global = {
     { "momo_number_mode_9", "9" },
     { "quick_swap_buffer",             "O", "Control" },
     { "momo_command_lister",                "Semicolon", "Shift" },
-    
+    { "momo_goto_mode", "G"	},
 
 };
 
@@ -105,7 +105,7 @@ keys_normal_file = {
 
 
 keys_normal_code = {
-    { "momo_goto_mode", "G"	},
+    
     { "momo_indent_range", "Equal" },
     { "momo_indent_whole_file", "Equal", "Shift" },
     { "if0_off", "Semicolon" },

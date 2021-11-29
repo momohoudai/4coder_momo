@@ -275,7 +275,7 @@ Momo_Brace_RenderLines(Application_Links *app, Buffer_ID buffer, View_ID view,
                         break;
                     }
                     else if (line.str[char_idx] == '\t') {
-                        advance += 4;
+                        advance += tab_width;
                     } 
                     else {
                         advance += 1;
