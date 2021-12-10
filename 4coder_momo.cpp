@@ -323,7 +323,7 @@
 
 //~ TODO for Momo
 // [ ] lister should have insert and normal mode just like vim
-// [ ] Cycling windows should be more intuitive (like VIM)
+// [ ] 
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -405,8 +405,7 @@
 #include "4coder_momo_error_annotations.h"
 #include "4coder_momo_lister.h"
 #include "4coder_momo_auto_indent.h"
-
-#include "4coder_momo_commands.h"
+//#include "4coder_momo_commands.h"
 
 #include "4coder_momo_lang.cpp"
 #include "4coder_momo_index.cpp"

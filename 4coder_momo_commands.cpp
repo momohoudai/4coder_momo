@@ -405,21 +405,32 @@ CUSTOM_COMMAND_SIG(momo_open_panel_hsplit)
 CUSTOM_DOC("Hsplit panel but don't go")
 {
   View_ID view = get_active_view(app, Access_Always);
+  Buffer_ID buffer = view_get_buffer(app, view, Access_Always);
+  Buffer_Scroll buffer_scroll = view_get_buffer_scroll(app, view);
+
   View_ID new_view = open_view(app, view, ViewSplit_Bottom);
   new_view_settings(app, new_view);
+  view_set_buffer(app, new_view, buffer, 0);
+  view_set_buffer_scroll(app, new_view, buffer_scroll, SetBufferScroll_SnapCursorIntoView);
+
+  view_set_active(app, new_view);
+
 }
 
 CUSTOM_COMMAND_SIG(momo_open_panel_vsplit)
 CUSTOM_DOC("Vsplit panel but don't go")
 {
   View_ID view = get_active_view(app, Access_Always);
+  Buffer_ID buffer = view_get_buffer(app, view, Access_Always);
+  Buffer_Scroll buffer_scroll = view_get_buffer_scroll(app, view);
+
   View_ID new_view = open_view(app, view, ViewSplit_Right);
-  
-  
-  
-  
   new_view_settings(app, new_view);
-  
+  view_set_buffer(app, new_view, buffer, 0);
+  view_set_buffer_scroll(app, new_view, buffer_scroll, SetBufferScroll_SnapCursorIntoView);
+
+  view_set_active(app, new_view);
+ 
 }
 
 // NOTE(Momo): Yeah this is pretty dumb, but hey
@@ -903,6 +914,12 @@ CUSTOM_DOC("Goto mode")
   }
 }
 
+
+
+CUSTOM_COMMAND_SIG(b)
+CUSTOM_DOC("list buffers") {
+   interactive_switch_buffer(app);
+}
 
 CUSTOM_COMMAND_SIG(momo_reset_view_x)
 CUSTOM_DOC("Reset the view to x = 0")

@@ -1,8 +1,1 @@
-#define asdlkjasdlkajsd \
-asdlkjasldkjasd \
-asldkjasdlkasdl
-
-
-int main() {
-  
-}
+typedef void (*wtf)();

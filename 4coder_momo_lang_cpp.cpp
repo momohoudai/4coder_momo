@@ -313,7 +313,8 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
         }
         
         //~ NOTE(rjf): Enums
-        else if(Momo_Index_ParsePattern(ctx, "%t%k", "enum", TokenBaseKind_Identifier, &name) ||
+        else if(scope_nest == 0 &&
+                Momo_Index_ParsePattern(ctx, "%t%k", "enum", TokenBaseKind_Identifier, &name) ||
                 Momo_Index_ParsePattern(ctx, "%t", "enum"))
         {
             handled = 1;
@@ -334,9 +335,30 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
             }
         }
         
+           //~ NOTE(rjf): Typedef'ed functions
+        else if(scope_nest == 0 &&
+                Momo_Index_ParsePattern(ctx, "%t%k%t%t%o%k%t%t",
+                                       "typedef",
+                                       TokenBaseKind_Keyword, &base_type,
+                                        "(", "*",
+                                       TokenBaseKind_Identifier, &name,
+                                       ")", "("))
+                                        
+        {
+            handled = 1;
+            if(name != 0)
+            {
+                Momo_Index_Note_Flags note_flags = 0;
+                String_Const_u8 name_str =  Momo_Index_StringFromToken(ctx, name);
+                Momo_Index_MakeNote(ctx->app, ctx->file, name_str, name_str,
+                                  MOMO_INDEX_NOTE_KIND_TYPE, note_flags, Ii64(name));
+            }
+        }
+
         //~ NOTE(rjf): Pure Typedefs
         // TODO(Momo): I don't think we care about sum/product types here
-        else if(Momo_Index_ParsePattern(ctx, "%t", "typedef"))
+        else if(scope_nest == 0 &&
+                Momo_Index_ParsePattern(ctx, "%t", "typedef"))
         {
             handled = 1;
             int nest = 0;
@@ -381,7 +403,11 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
                 Momo_Index_MakeNote(ctx->app, ctx->file, name_str, name_str,
                                   MOMO_INDEX_NOTE_KIND_TYPE, note_flags, Ii64(name));
             }
+
+
         }
+
+     
         
         //~ NOTE(rjf): Functions
         else if(scope_nest == 0 &&

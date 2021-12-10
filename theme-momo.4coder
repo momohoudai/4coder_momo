@@ -1,9 +1,28 @@
+momo_bg                        = 0xFF161612;
+
+momo_bg1                       = 0x03ffffff;
+momo_bg2                       = 0x06ffffff;
+momo_bg3                       = 0x09ffffff;
+momo_bg4                       = 0x0cffffff;
+
+momo_fg                        = 0xFFA08563;
+
+momo_black                     = 0xFF12120e;
+momo_yellow                    = 0xffAAAA44;
+momo_red                       = 0xFFa55a5a;
+momo_green                     = 0xFF6B8E23;
+momo_purple                    = 0xffa26ca2;
+momo_aqua                      = 0xff8ab07d;
+momo_grey                      = 0xff888888;
+momo_orange                    = 0xF0bc8a34;
+momo_blue                      = 0xFF83a598;
+
 
 defcolor_bar                   = 0xFF30302C;
 defcolor_base                  = 0xffE8E8D3;
 defcolor_pop1                  = 0xff00D1D1;
 defcolor_pop2                  = 0xFFFF0000;
-defcolor_back                  = 0xFF121212;
+defcolor_back                  = momo_bg;
 
 defcolor_margin                = 0xFF262626;
 defcolor_margin_hover          = 0xFF333333;
@@ -19,19 +38,19 @@ defcolor_highlight_cursor_line = 0xFF1E1E1E;
 defcolor_highlight             = 0xFF303040;
 defcolor_at_highlight          = 0xFFFF44DD;
 defcolor_mark                  = 0xFF494949;
-defcolor_text_default          = 0xFFA08563;
-defcolor_comment               = 0xff888888;
+defcolor_text_default          = momo_fg;
+defcolor_comment               = momo_grey;
 defcolor_comment_pop           = { 0xff00a000, 0xC0ffdcf6 };
-defcolor_keyword               = 0xffa26ca2;
+defcolor_keyword               = momo_purple;
 
-defcolor_str_constant          = 0xFF6B8E23;
+defcolor_str_constant          = momo_green;
 defcolor_char_constant         = defcolor_str_constant;
 defcolor_int_constant          = defcolor_str_constant;
 defcolor_float_constant        = defcolor_str_constant;
 defcolor_bool_constant         = defcolor_str_constant;
 
-defcolor_preproc               = 0xFFa55a5a;
-defcolor_include               = 0xFFa55a5a;
+defcolor_preproc               = momo_red;
+defcolor_include               = momo_red;
 
 defcolor_special_character     = 0xFFFF0000;
 defcolor_ghost_character       = 0xFF5B4D3C;
@@ -40,26 +59,26 @@ defcolor_highlight_white       = 0xFF003A3A;
 
 defcolor_paste                 = 0xFFDDEE00;
 defcolor_undo                  = 0xFF00DDEE;
-defcolor_back_cycle            = { 0x08A00000, 0x0800A000, 0x080000A0, 0x08A0A000 };
+defcolor_back_cycle            = { momo_bg1, momo_bg2, momo_bg3, momo_bg4 };
 defcolor_text_cycle            = { 0xFFA00000, 0xFF00A000, 0xFF0030B0, 0xFFA0A000 };
 defcolor_line_numbers_back     = 0xFF181818;
 defcolor_line_numbers_text     = 0xFF404040;
 
 fleury_color_syntax_crap           = defcolor_text_default;
 fleury_color_operators             = defcolor_text_default;
-fleury_color_inactive_pane_overlay = 0x33000000;
-fleury_color_inactive_pane_background = 0xff101010;
+fleury_color_inactive_pane_overlay = 0x00000000;
+fleury_color_inactive_pane_background = 0xFF12120e;
 fleury_color_file_progress_bar     = 0xff4E4E43;
 fleury_color_brace_highlight       = { 0xf0bd2d2d };
 fleury_color_brace_line            = { 0x809ba290 };
 fleury_color_brace_annotation      = { 0x80afafaf };
-fleury_color_index_product_type    = 0xF0bc8a34;
-fleury_color_index_sum_type        = 0xF0bc8a34;
-fleury_color_index_function        = 0xffa5a549;
-fleury_color_index_macro           = 0xFF54abab;
+fleury_color_index_product_type    = momo_orange;
+fleury_color_index_sum_type        = momo_orange;
+fleury_color_index_function        = momo_yellow;
+fleury_color_index_macro           = momo_blue;
 fleury_color_index_constant        = defcolor_str_constant;
 fleury_color_index_comment_tag     = defcolor_comment;
-fleury_color_index_decl            = 0xffc3a771;
+fleury_color_index_decl            = momo_aqua;
 fleury_color_cursor_macro          = 0xffde2368;
 fleury_color_cursor_power_mode     = 0xffefaf2f;
 fleury_color_cursor_inactive       = 0xFF888888;
