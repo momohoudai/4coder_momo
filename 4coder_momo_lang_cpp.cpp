@@ -358,15 +358,21 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
       }
     }
     
+#if 0
     //~ NOTE(rjf): Typedef'ed functions
     else if(scope_nest == 0 &&
-            Momo_Index_ParsePattern(ctx, "%t%k%t%t%o%k%t%t",
-                                    "typedef",
-                                    TokenBaseKind_Keyword, &base_type,
-                                    "(", "*",
-                                    TokenBaseKind_Identifier, &name,
-                                    ")", "("))
-      
+            (Momo_Index_ParsePattern(ctx, "%t%k%t%t%o%k%t%t",
+                                     "typedef",
+                                     TokenBaseKind_Keyword, &base_type,
+                                     "(", "*",
+                                     TokenBaseKind_Identifier, &name,
+                                     ")", "(") ||
+             Momo_Index_ParsePattern(ctx, "%t%k%t%t%o%k%t%t",
+                                     "typedef",
+                                     TokenBaseKind_Identifier, &base_type,
+                                     "(", "*",
+                                     TokenBaseKind_Identifier, &name,
+                                     ")", "(")))
     {
       handled = 1;
       int is_valid = 0;
@@ -402,7 +408,7 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
         }
       }
     }
-    
+#endif 
     //~ NOTE(rjf): Pure Typedefs
     // TODO(Momo): I don't think we care about sum/product types here
     else if(Momo_Index_ParsePattern(ctx, "%t", "typedef"))

@@ -10,3 +10,9 @@ enum Cursor_Type
 	CURSOR_OPEN_RANGE,
 	CURSOR_CLOSE_RANGE,
 };
+
+
+function void
+Momo_Cursor_Render(Application_Links *app, View_ID view_id, b32 is_active_view,
+                           Buffer_ID buffer, Text_Layout_ID text_layout_id,
+                           f32 roundness, f32 outline_thickness, Frame_Info frame_info);

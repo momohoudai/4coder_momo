@@ -3,10 +3,8 @@
 #define FCODER_MOMO_CURSOR_H
 
 //~ NOTE(rjf): Cursor rendering
-
-
-function void
-momo_render_cursor_symbol_thingy(Application_Links *app, Rect_f32 rect,
+internal void
+Momo__Cursor_RenderSymbol(Application_Links *app, Rect_f32 rect,
                             f32 roundness, f32 thickness,
                             ARGB_Color color, Cursor_Type type)
 {
@@ -75,8 +73,8 @@ momo_render_cursor_symbol_thingy(Application_Links *app, Rect_f32 rect,
 	}
 }
 
-function void
-momo_do_cursor_interpolation(Application_Links *app, Frame_Info frame_info,
+internal void
+Momo__Cursor_DoInterpolation(Application_Links *app, Frame_Info frame_info,
                          Rect_f32 *rect, Rect_f32 *last_rect, Rect_f32 target)
 {
     *last_rect = *rect;
@@ -127,7 +125,7 @@ momo_do_cursor_interpolation(Application_Links *app, Frame_Info frame_info,
 }
 
 function void
-momo_cursor_render_emacs_style(Application_Links *app, View_ID view_id, b32 is_active_view,
+Momo_Cursor_Render(Application_Links *app, View_ID view_id, b32 is_active_view,
                            Buffer_ID buffer, Text_Layout_ID text_layout_id,
                            f32 roundness, f32 outline_thickness, Frame_Info frame_info)
 {
@@ -204,7 +202,7 @@ momo_cursor_render_emacs_style(Application_Links *app, View_ID view_id, b32 is_a
                         target_cursor.x1 = target_cursor.x0 + width;
                     }
                     
-                    momo_do_cursor_interpolation(app, frame_info, &global_cursor_rect,
+                    Momo__Cursor_DoInterpolation(app, frame_info, &global_cursor_rect,
                                              &global_last_cursor_rect, target_cursor);
                     
                     
@@ -222,14 +220,14 @@ momo_cursor_render_emacs_style(Application_Links *app, View_ID view_id, b32 is_a
                         target_mark.x1 = target_mark.x0 + width;
                     }
                     
-                    momo_do_cursor_interpolation(app, frame_info, &global_mark_rect, &global_last_mark_rect,
+                    Momo__Cursor_DoInterpolation(app, frame_info, &global_mark_rect, &global_last_mark_rect,
                                              target_mark);
                 }
                 
                 // NOTE(rjf): Draw main cursor.
                 {
-                    momo_render_cursor_symbol_thingy(app, global_cursor_rect, roundness, 4.f, cursor_color, cursor_type);
-					momo_render_cursor_symbol_thingy(app, target_cursor, roundness, 4.f, cursor_color, cursor_type);
+                    Momo__Cursor_RenderSymbol(app, global_cursor_rect, roundness, 2.f, cursor_color, cursor_type);
+					Momo__Cursor_RenderSymbol(app, target_cursor, roundness, 2.f, cursor_color, cursor_type);
                 }
                 
                 // NOTE(rjf): GLOW IT UP
@@ -243,7 +241,7 @@ momo_cursor_render_emacs_style(Application_Links *app, View_ID view_id, b32 is_a
                         glow_rect.y0 -= glow;
                         glow_rect.x1 += glow;
                         glow_rect.y1 += glow;
-                        momo_render_cursor_symbol_thingy(app, glow_rect, roundness + glow*0.7f, 2.f,
+                        Momo__Cursor_RenderSymbol(app, glow_rect, roundness + glow*0.7f, 2.f,
                                                     fcolor_resolve(fcolor_change_alpha(fcolor_argb(cursor_color), alpha)), cursor_type);
                     }
                     else
@@ -256,9 +254,9 @@ momo_cursor_render_emacs_style(Application_Links *app, View_ID view_id, b32 is_a
             
             // paint_text_color_pos(app, text_layout_id, cursor_pos,
             // fcolor_id(defcolor_at_cursor));
-            momo_render_cursor_symbol_thingy(app, global_mark_rect, roundness, 2.f,
+            Momo__Cursor_RenderSymbol(app, global_mark_rect, roundness, 2.f,
                                         fcolor_resolve(fcolor_change_alpha(fcolor_argb(mark_color), 0.5f)), mark_type);
-			momo_render_cursor_symbol_thingy(app, target_mark, roundness, 2.f,
+			Momo__Cursor_RenderSymbol(app, target_mark, roundness, 2.f,
                                         fcolor_resolve(fcolor_change_alpha(fcolor_argb(mark_color), 0.75f)), mark_type);
         }
     }
@@ -266,71 +264,6 @@ momo_cursor_render_emacs_style(Application_Links *app, View_ID view_id, b32 is_a
     draw_set_clip(app, clip);
 }
 
-internal b32
-momo_draw_cursor_highlight_range(Application_Links *app, View_ID view_id,
-                             Buffer_ID buffer, Text_Layout_ID text_layout_id,
-                             f32 roundness)
-{
-    b32 has_highlight_range = false;
-    Managed_Scope scope = view_get_managed_scope(app, view_id);
-    Buffer_ID *highlight_buffer = scope_attachment(app, scope, view_highlight_buffer, Buffer_ID);
-    if (*highlight_buffer != 0){
-        if (*highlight_buffer != buffer){
-            view_disable_highlight_range(app, view_id);
-        }
-        else{
-            has_highlight_range = true;
-            Managed_Object *highlight = scope_attachment(app, scope, view_highlight_range, Managed_Object);
-            Marker marker_range[2];
-            if (managed_object_load_data(app, *highlight, 0, 2, marker_range)){
-                Range_i64 range = Ii64(marker_range[0].pos, marker_range[1].pos);
-                draw_character_block(app, text_layout_id, range, roundness,
-                                     fcolor_id(defcolor_highlight));
-            }
-        }
-    }
-    return(has_highlight_range);
-}
-
-function void
-momo_cursor_render_notepad_style(Application_Links *app, View_ID view_id, b32 is_active_view,
-                             Buffer_ID buffer, Text_Layout_ID text_layout_id,
-                             f32 roundness, f32 outline_thickness, Frame_Info frame_info)
-{
-    Rect_f32 view_rect = view_get_screen_rect(app, view_id);
-    b32 has_highlight_range = draw_highlight_range(app, view_id, buffer, text_layout_id, roundness);
-    if(!has_highlight_range)
-    {
-        i64 cursor_pos = view_get_cursor_pos(app, view_id);
-        i64 mark_pos = view_get_mark_pos(app, view_id);
-        
-        if (cursor_pos != mark_pos)
-        {
-            Range_i64 range = Ii64(cursor_pos, mark_pos);
-            draw_character_block(app, text_layout_id, range, roundness, fcolor_id(defcolor_highlight));
-        }
-        
-        // NOTE(rjf): Draw cursor
-        {
-            ARGB_Color cursor_color = Momo_Colors_GetColor(app, Momo_Colors_GetColorCtxFromCursor(0, global_keybinding_mode));
-            ARGB_Color ghost_color = fcolor_resolve(fcolor_change_alpha(fcolor_argb(cursor_color), 0.5f));
-            Rect_f32 rect = text_layout_character_on_screen(app, text_layout_id, cursor_pos);
-            rect.x1 = rect.x0 + outline_thickness;
-            if(rect.x0 < view_rect.x0)
-            {
-                rect.x0 = view_rect.x0;
-                rect.x1 = view_rect.x0 + outline_thickness;
-            }
-            
-            if(is_active_view)
-            {
-                momo_do_cursor_interpolation(app, frame_info, &global_cursor_rect, &global_last_cursor_rect, rect);
-            }
-            draw_rectangle(app, global_cursor_rect, roundness, ghost_color);
-            draw_rectangle(app, rect, roundness, cursor_color);
-        }
-    }
-}
 
 static void
 momo_hook_highlight_cursor_mark_range(Application_Links *app, View_ID view_id)

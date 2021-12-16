@@ -3,9 +3,6 @@
 
 
 
-
-
-
 //~ Commands
 CUSTOM_COMMAND_SIG(momo_interactive_open_or_new)
 CUSTOM_DOC("Interactively open a file out of the file system.") 
@@ -101,8 +98,6 @@ CUSTOM_DOC("Inserts text and auto-indents the line on which the cursor sits if a
 }
 
 
-
-#if 0
 CUSTOM_COMMAND_SIG(momo_toggle_compilation_expand)
 CUSTOM_DOC("Expand the compilation window.")
 {
@@ -111,15 +106,13 @@ CUSTOM_DOC("Expand the compilation window.")
   Face_Metrics metrics = get_face_metrics(app, face_id);
   if(global_compilation_view_expanded ^= 1)
   {
-    view_set_split_pixel_size(app, global_compilation_view, (i32)(metrics.line_height*32.f));
+    view_set_split_pixel_size(app, global_compilation_view, (i32)(metrics.line_height*25.f));
   }
   else
   {
-    view_set_split_pixel_size(app, global_compilation_view, (i32)(metrics.line_height*4.f));
+    view_set_split_pixel_size(app, global_compilation_view, (i32)(metrics.line_height*0.f));
   }
 }
-#endif
-
 
 CUSTOM_COMMAND_SIG(momo_home)
 CUSTOM_DOC("Goes to the beginning of the line.")
@@ -407,11 +400,15 @@ CUSTOM_DOC("Hsplit panel but don't go")
   View_ID view = get_active_view(app, Access_Always);
   Buffer_ID buffer = view_get_buffer(app, view, Access_Always);
   Buffer_Scroll buffer_scroll = view_get_buffer_scroll(app, view);
+  i64 cursor_pos = view_get_cursor_pos(app, view);
+  i64 mark_pos = view_get_mark_pos(app, view);
 
   View_ID new_view = open_view(app, view, ViewSplit_Bottom);
   new_view_settings(app, new_view);
   view_set_buffer(app, new_view, buffer, 0);
   view_set_buffer_scroll(app, new_view, buffer_scroll, SetBufferScroll_SnapCursorIntoView);
+  view_set_mark(app, new_view, seek_pos(mark_pos));
+  view_set_cursor(app, new_view, seek_pos(cursor_pos));
 
   view_set_active(app, new_view);
 
@@ -423,11 +420,15 @@ CUSTOM_DOC("Vsplit panel but don't go")
   View_ID view = get_active_view(app, Access_Always);
   Buffer_ID buffer = view_get_buffer(app, view, Access_Always);
   Buffer_Scroll buffer_scroll = view_get_buffer_scroll(app, view);
+  i64 cursor_pos = view_get_cursor_pos(app, view);
+  i64 mark_pos = view_get_mark_pos(app, view);
 
   View_ID new_view = open_view(app, view, ViewSplit_Right);
   new_view_settings(app, new_view);
   view_set_buffer(app, new_view, buffer, 0);
   view_set_buffer_scroll(app, new_view, buffer_scroll, SetBufferScroll_SnapCursorIntoView);
+  view_set_mark(app, new_view, seek_pos(mark_pos));
+  view_set_cursor(app, new_view, seek_pos(cursor_pos));
 
   view_set_active(app, new_view);
  
@@ -725,6 +726,11 @@ CUSTOM_DOC("Window manipulation mode")
         momo_change_active_panel_down(app);
         break;
       }
+      else if (match_key_code(&in, KeyCode_Semicolon)) {
+        momo_toggle_compilation_expand(app);
+        break;
+      }
+
       
     }
   }

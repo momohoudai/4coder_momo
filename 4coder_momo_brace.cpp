@@ -186,8 +186,7 @@ Momo_Brace_RenderCloseBraceAnnotation(Application_Links *app, Buffer_ID buffer, 
 }
 
 //~ NOTE(rjf): Brace lines
-
-static void
+function void
 Momo_Brace_RenderLines(Application_Links *app, Buffer_ID buffer, View_ID view,
                      Text_Layout_ID text_layout_id, i64 pos)
 {

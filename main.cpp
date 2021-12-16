@@ -1,8 +1,8 @@
 #define HELLO 
 #define hello asdlkj##name
 
-
-typedef void (*test)(int);
+typedef int u32;
+typedef Renderer (*test)(int);
 int main()
 {
   

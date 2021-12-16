@@ -39,7 +39,7 @@ keys_normal_global = {
     { "quick_swap_buffer",             "O", "Control" },
     { "momo_command_lister",                "Semicolon", "Shift" },
     { "momo_goto_mode", "G"	},
-
+    
 };
 
 keys_normal_file = {
@@ -121,7 +121,7 @@ keys_normal_code = {
     { "place_in_scope",             "ForwardSlash", "Alt" },
 
     { "open_file_in_quotes",        "1", "Alt" },
-    { "open_matching_file_cpp",     "2", "Alt" },
+    { "momo_open_matching_file_cpp",     "2", "Alt" },
 };
 
 

@@ -548,7 +548,7 @@ Momo_Indent__GetIndentationArrayBasedOnExtension(Application_Links *app, Arena *
     
 }
 
-internal b32
+function b32
 Momo_Indent_IndentBuffer(Application_Links *app, Buffer_ID buffer, Range_i64 pos, Indent_Flag flags, i32 tab_width, i32 indent_width){
     ProfileScope(app, "auto indent buffer");
     Token_Array token_array = get_token_array_from_buffer(app, buffer);

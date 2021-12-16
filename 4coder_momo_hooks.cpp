@@ -343,20 +343,7 @@ momo_render_buffer(Application_Links *app, View_ID view_id, Face_ID face_id,
     f32 mark_thickness = (f32)def_get_config_u64(app, vars_save_string_lit("mark_thickness"));
     
     // NOTE(rjf): Cursor
-    switch (fcoder_mode)
-    {
-        case FCoderMode_Original:
-        {
-            momo_cursor_render_emacs_style(app, view_id, is_active_view, buffer, text_layout_id, cursor_roundness, mark_thickness, frame_info);
-        }break;
-        
-        case FCoderMode_NotepadLike:
-        {
-            momo_cursor_render_notepad_style(app, view_id, is_active_view, buffer, text_layout_id, cursor_roundness,
-                                            mark_thickness, frame_info);
-            break;
-        }
-    }
+    Momo_Cursor_Render(app, view_id, is_active_view, buffer, text_layout_id, cursor_roundness, mark_thickness, frame_info);
 
     // NOTE(Momo): render brace ending annotation and brace lines
     Momo_Brace_RenderCloseBraceAnnotation(app, buffer, text_layout_id, cursor_pos);
