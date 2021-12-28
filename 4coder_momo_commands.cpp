@@ -789,7 +789,7 @@ CUSTOM_DOC("Delete/Cut mode")
 
       // dm 
       // "delete within mark"
-      else if (match_key_code(&in, KeyCode_B)) {
+      else if (match_key_code(&in, KeyCode_M)) {
         cut(app);
         return;
       }
