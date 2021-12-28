@@ -278,6 +278,7 @@ CUSTOM_DOC("Page down halfway")
   move_vertical_pixels(app, page_jump);
 }
 
+
 CUSTOM_COMMAND_SIG(momo_switch_to_edit_mode)
 CUSTOM_DOC("EDIT MODE ACTIVATED")
 {
@@ -507,13 +508,20 @@ CUSTOM_DOC("List all definitions in the index and jump to the one selected by th
   Momo_Lister_CreateWithProjectNotes(app, str, 0);
 }
 
-CUSTOM_COMMAND_SIG(snipe_forward_whitespace_and_token_boundary)
+CUSTOM_COMMAND_SIG(momo_snipe_forward_whitespace_and_token_boundary)
 CUSTOM_DOC("Delete a single, whole token on or to the right of the cursor and post it to the clipboard.")
 {
   Scratch_Block scratch(app);
   current_view_snipe_delete(app, Scan_Forward, push_boundary_list(scratch, Momo_BoundaryTokenAndWhiteSpace));
-  
 }
+
+CUSTOM_COMMAND_SIG(momo_snipe_backward_whitespace_and_token_boundary)
+CUSTOM_DOC("Delete a single, whole token on or to the left of the cursor and post it to the clipboard.")
+{
+  Scratch_Block scratch(app);
+  current_view_snipe_delete(app, Scan_Backward, push_boundary_list(scratch, Momo_BoundaryTokenAndWhiteSpace));
+}
+
 
 CUSTOM_COMMAND_SIG(momo_change_mode)
 CUSTOM_DOC("Change mode")
@@ -563,7 +571,7 @@ CUSTOM_DOC("Change mode")
           
           // caw
           if (match_key_code(&in, KeyCode_W)) {
-            snipe_forward_whitespace_and_token_boundary(app);
+            momo_snipe_forward_whitespace_and_token_boundary(app);
             momo_switch_to_insert_mode(app);
             return;
           }
@@ -735,6 +743,79 @@ CUSTOM_DOC("Window manipulation mode")
     }
   }
 }
+
+CUSTOM_COMMAND_SIG(momo_delete_mode)
+CUSTOM_DOC("Delete/Cut mode")
+{
+  QueryLock;
+  
+  View_ID view = get_active_view(app, Access_ReadWriteVisible);
+  Buffer_ID buffer = view_get_buffer(app, view, Access_ReadWriteVisible);
+  if (buffer != 0) {
+    Query_Bar_Group group(app);
+    Query_Bar bar = {};
+    bar.prompt = string_u8_litexpr("Delete mode\n");
+    if (!start_query_bar(app, &bar, 0)) {
+      return;
+    }
+    
+    User_Input in = {};
+    for (;;) {
+      in = get_next_input(app, EventPropertyGroup_Any, EventProperty_Escape|EventProperty_MouseButton);
+      if (in.abort) {
+        return;
+      }
+      
+      // dd
+      // "delete current line"
+      else if (match_key_code(&in, KeyCode_D)) {
+        momo_cut_line(app);
+        return;
+      }
+
+      // dw
+      // "delete one word forward"
+      else if (match_key_code(&in, KeyCode_W)) {
+        momo_delete_token_boundary(app);
+        return;
+      }
+
+      // db
+      // "delete one word back"
+      else if (match_key_code(&in, KeyCode_B)) {
+        momo_backspace_token_boundary(app);
+        return;
+      }
+
+      // dm 
+      // "delete within mark"
+      else if (match_key_code(&in, KeyCode_B)) {
+        cut(app);
+        return;
+      }
+
+      else if (match_key_code(&in, KeyCode_I)) {
+        for (;;) {
+          in = get_next_input(app, EventPropertyGroup_Any, EventProperty_Escape | EventProperty_MouseButton);
+          if (in.abort) {
+            return;
+          }
+          
+          // diw
+          // "delete inner word"
+          if (match_key_code(&in, KeyCode_W)) {
+            snipe_forward_whitespace_or_token_boundary(app);
+            return;
+          }
+        }
+      }
+      
+    
+      
+    }
+  }
+}
+
 
 CUSTOM_COMMAND_SIG(momo_if0_on)
 CUSTOM_DOC("Removes #if 0/#endif")

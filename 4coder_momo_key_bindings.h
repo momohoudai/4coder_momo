@@ -4,7 +4,7 @@ enum Momo_KeybindingMode
 
 	Momo_KeyBindingMode_Normal,
     Momo_KeyBindingMode_Insert,
-//  Momo_KeyBindingMode_Visual,	
+    //Momo_KeyBindingMode_Visual,	
 
     Momo_KeyBindingMode_Count
 };

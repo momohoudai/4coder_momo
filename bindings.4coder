@@ -39,6 +39,7 @@ keys_normal_global = {
     { "quick_swap_buffer",             "O", "Control" },
     { "momo_command_lister",                "Semicolon", "Shift" },
     { "momo_goto_mode", "G"	},
+    { "momo_delete_mode", "D" },
     
 };
 
@@ -85,7 +86,6 @@ keys_normal_file = {
 	
 	{ "copy",                   "Y" },
 	{ "paste_and_indent",       "P"},
-	{ "cut",                    "D" },	
 	{ "redo",                   "R", "Control" },
     { "undo",                   "U" },
     { "momo_change_mode",       "C", },
@@ -99,7 +99,6 @@ keys_normal_file = {
     { "keyboard_macro_replay",           "Q", "Shift" },
     { "momo_write_todo",                 "T" },
     { "momo_write_note",                 "N" },
-	{ "momo_cut_line",	   "D", "Shift" },
 };
 
 
