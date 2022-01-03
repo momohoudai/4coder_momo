@@ -1,14 +1,16 @@
 
-static b32 global_insert_mode = false;
-static b32 global_query_lock = false;
+static b32 g_insert_mode = false;
+static b32 g_query_lock = false;
+static String_Const_u8 g_file_bar_message = {};
+
 
 #define QueryLock \
-if (global_query_lock) { \
+if (g_query_lock) { \
     momo_leave_event_unhandled(app); \
     return; \
 } \
-global_query_lock = true; \
-Defer { global_query_lock = false; }; 
+g_query_lock = true; \
+Defer { g_query_lock = false; }; 
 
 
 function void

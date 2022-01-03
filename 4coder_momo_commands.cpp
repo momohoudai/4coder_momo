@@ -88,7 +88,7 @@ CUSTOM_DOC("Auto-indents the range between the cursor and the mark.")
 CUSTOM_COMMAND_SIG(momo_write_text_and_indent)
 CUSTOM_DOC("Inserts text and auto-indents the line on which the cursor sits if any of the text contains 'layout punctuation' such as ;:{}()[]# and new lines.")
 {
-  if (!global_insert_mode) {
+  if (!g_insert_mode) {
     return;
   }
   ProfileScope(app, "write and auto indent");
@@ -283,7 +283,7 @@ CUSTOM_COMMAND_SIG(momo_switch_to_edit_mode)
 CUSTOM_DOC("EDIT MODE ACTIVATED")
 {
   global_keybinding_mode = Momo_KeyBindingMode_Normal;
-  global_insert_mode = false;
+  g_insert_mode = false;
   momo_indent_whole_file(app);
 }
 
@@ -291,7 +291,7 @@ CUSTOM_COMMAND_SIG(momo_switch_to_insert_mode)
 CUSTOM_DOC("INSERT MODE ACTIVATED")
 {
   global_keybinding_mode = Momo_KeyBindingMode_Insert;
-  global_insert_mode = true;
+  g_insert_mode = true;
 }
 
 CUSTOM_COMMAND_SIG(w)
@@ -327,7 +327,7 @@ CUSTOM_DOC("Alias for closing panels. If no panels are left, exit")
 CUSTOM_COMMAND_SIG(momo_write_text_input)
 CUSTOM_DOC("Inserts whatever text was used to trigger this command.")
 {
-  if (global_insert_mode) {
+  if (g_insert_mode) {
     write_text_input(app);
   }
 }
@@ -531,12 +531,10 @@ CUSTOM_DOC("Change mode")
   View_ID view = get_active_view(app, Access_ReadWriteVisible);
   Buffer_ID buffer = view_get_buffer(app, view, Access_ReadWriteVisible);
   if (buffer != 0) {
-    Query_Bar_Group group(app);
-    Query_Bar bar = {};
-    bar.prompt = string_u8_litexpr("Change mode\n");
-    if (!start_query_bar(app, &bar, 0)) {
-      return;
-    }
+    
+    g_file_bar_message = string_u8_litexpr("- Change Mode");
+    Defer { g_file_bar_message = string_u8_litexpr(""); };
+
     
     User_Input in = {};
     for (;;) {
@@ -698,11 +696,9 @@ CUSTOM_DOC("Window manipulation mode")
   View_ID view = get_active_view(app, Access_ReadVisible);
   Buffer_ID buffer = view_get_buffer(app, view, Access_ReadVisible);
   if (buffer != 0) {
-    Query_Bar_Group group(app);
-    Query_Bar bar = {};
-    bar.prompt = string_u8_litexpr("Window action mode!\n");
-    start_query_bar(app, &bar, 0);
-    
+    g_file_bar_message = string_u8_litexpr("- Window Mode");
+    Defer { g_file_bar_message = string_u8_litexpr(""); };
+
     User_Input in = {};
     for (;;) {
       in = get_next_input(app, EventPropertyGroup_Any, EventProperty_Escape|EventProperty_MouseButton);
@@ -752,13 +748,9 @@ CUSTOM_DOC("Delete/Cut mode")
   View_ID view = get_active_view(app, Access_ReadWriteVisible);
   Buffer_ID buffer = view_get_buffer(app, view, Access_ReadWriteVisible);
   if (buffer != 0) {
-    Query_Bar_Group group(app);
-    Query_Bar bar = {};
-    bar.prompt = string_u8_litexpr("Delete mode\n");
-    if (!start_query_bar(app, &bar, 0)) {
-      return;
-    }
-    
+    g_file_bar_message = string_u8_litexpr("- Delete Mode");
+    Defer { g_file_bar_message = string_u8_litexpr(""); };
+
     User_Input in = {};
     for (;;) {
       in = get_next_input(app, EventPropertyGroup_Any, EventProperty_Escape|EventProperty_MouseButton);
@@ -951,10 +943,8 @@ CUSTOM_DOC("Goto mode")
   View_ID view = get_active_view(app, Access_ReadVisible);
   Buffer_ID buffer = view_get_buffer(app, view, Access_ReadVisible);
   if (buffer != 0) {
-    Query_Bar_Group group(app);
-    Query_Bar bar = {};
-    bar.prompt = string_u8_litexpr("Goto mode!\n");
-    start_query_bar(app, &bar, 0);
+    g_file_bar_message = string_u8_litexpr("- Goto Mode");
+    Defer { g_file_bar_message = string_u8_litexpr(""); };
     
     User_Input in = {};
     for (;;) {

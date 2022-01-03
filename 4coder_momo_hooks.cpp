@@ -480,7 +480,7 @@ momo_draw_file_bar(Application_Links *app, View_ID view_id, Buffer_ID buffer, Fa
     Fancy_Line list = {};
     String_Const_u8 unique_name = push_buffer_unique_name(app, scratch, buffer);
     push_fancy_string(scratch, &list, base_color, unique_name);
-    push_fancy_stringf(scratch, &list, base_color, " - Row: %3.lld Col: %3.lld -", cursor.line, cursor.col);
+    //push_fancy_stringf(scratch, &list, base_color, " - Row: %3.lld Col: %3.lld -", cursor.line, cursor.col);
     
     Managed_Scope scope = buffer_get_managed_scope(app, buffer);
     Line_Ending_Kind *eol_setting = scope_attachment(app, scope, buffer_eol_setting,
@@ -488,17 +488,17 @@ momo_draw_file_bar(Application_Links *app, View_ID view_id, Buffer_ID buffer, Fa
     switch (*eol_setting){
         case LineEndingKind_Binary:
         {
-            push_fancy_string(scratch, &list, base_color, string_u8_litexpr(" bin"));
+            push_fancy_string(scratch, &list, base_color, string_u8_litexpr(" - bin "));
         }break;
         
         case LineEndingKind_LF:
         {
-            push_fancy_string(scratch, &list, base_color, string_u8_litexpr(" lf"));
+            push_fancy_string(scratch, &list, base_color, string_u8_litexpr(" - lf "));
         }break;
         
         case LineEndingKind_CRLF:
         {
-            push_fancy_string(scratch, &list, base_color, string_u8_litexpr(" crlf"));
+            push_fancy_string(scratch, &list, base_color, string_u8_litexpr(" - crlf "));
         }break;
     }
     
@@ -518,8 +518,9 @@ momo_draw_file_bar(Application_Links *app, View_ID view_id, Buffer_ID buffer, Fa
         push_fancy_string(scratch, &list, pop2_color, str.string);
     }
     
-    push_fancy_string(scratch, &list, base_color, S8Lit(" Syntax Mode: "));
-    push_fancy_string(scratch, &list, base_color, momo_syntax_option_string());
+    //push_fancy_string(scratch, &list, base_color, S8Lit(" Syntax Mode: "));
+    //push_fancy_string(scratch, &list, base_color, momo_syntax_option_string());
+    push_fancy_string(scratch, &list, base_color, g_file_bar_message);
     
     Vec2_f32 p = bar.p0 + V2f32(2.f, 2.f);
     draw_fancy_line(app, face_id, fcolor_zero(), &list, p);
