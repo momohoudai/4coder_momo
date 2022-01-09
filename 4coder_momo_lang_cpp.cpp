@@ -549,7 +549,6 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
     }
     
     //~ NOTE(Momo): C++ Member Functions (outside of the struct/class)
-    // TODO(Momo): Ignore constructors?
     else if(scope_nest == 0 &&
             (Momo_Index_ParsePattern(ctx, "%k%o%k%t%k%t",
                                      TokenBaseKind_Identifier, &base_type,
@@ -567,7 +566,8 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
       handled = 1;         
       b32 is_valid = 0;
       Range_i64 prototype_range = {};
-      
+
+  
       while(!ctx->done) {
         Token* token = token_it_read(&ctx->it);
         if (token == 0) {

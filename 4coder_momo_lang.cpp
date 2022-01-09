@@ -20,10 +20,10 @@ Momo_Language_GetFromString(String_Const_u8 name)
     return result;
 }
 
-#define Momo_Language_Register(name, IndexFile, LexInit, LexFullInput, PosContext, Highlight, lex_state_type) _Momo_Language_Resgister(name, IndexFile, (Momo_Language_LexInit *)LexInit, (Momo_Language_LexFullInput *)LexFullInput, (Momo_Language_PosContext *)PosContext, (Momo_Language_Highlight *)Highlight, sizeof(lex_state_type))
+#define Momo_Language_Register(name, IndexFile, LexInit, LexFullInput, PosContext, Highlight, lex_state_type) _Momo_Language_Register(name, IndexFile, (Momo_Language_LexInit *)LexInit, (Momo_Language_LexFullInput *)LexFullInput, (Momo_Language_PosContext *)PosContext, (Momo_Language_Highlight *)Highlight, sizeof(lex_state_type))
 
 internal void
-_Momo_Language_Resgister(String_Const_u8 name,
+_Momo_Language_Register(String_Const_u8 name,
                      Momo_Language_IndexFile          *IndexFile,
                      Momo_Language_LexInit            *LexInit,
                      Momo_Language_LexFullInput       *LexFullInput,
