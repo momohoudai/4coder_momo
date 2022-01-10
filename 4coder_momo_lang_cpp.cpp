@@ -68,23 +68,34 @@ momo_cpp_parse_struct(Momo_Index_ParseCtx *ctx)
   }
 
   // Parse until we reach open brace and close brace
-  b32 found_open_brace = 0;
-  b32 found_close_brace = 0;
+  u32 found_open_brace = 0;
+  u32 found_close_brace = 0;
 
   for(;!ctx->done;) {
     if(Momo_Index_ParsePattern(ctx, "%t", "{")) {
       found_open_brace = 1;
       break;
     }
-    Momo_Index_ParseCtx_Inc(ctx, 0);
+    Momo_Index_ParseCtx_Inc(ctx, MOMO_INDEX_TOKEN_SKIP_FLAG_WHITESPACE);
   }
 
+  // Look for corresponding close brace
+  u32 brace_set_count = 1;
   for(;!ctx->done;) {
-    if(Momo_Index_ParsePattern(ctx, "%t", "}")) {
-      found_close_brace = 1;
-      break;
+    if(Momo_Index_ParsePattern(ctx, "%t", "{")) {
+      ++brace_set_count;
     }
-    Momo_Index_ParseCtx_Inc(ctx, 0);
+
+    else if(Momo_Index_ParsePattern(ctx, "%t", "}")) {
+      --brace_set_count;
+      if (brace_set_count == 0)  {
+        found_close_brace = 1;
+        break;
+      }
+    }
+    else {
+      Momo_Index_ParseCtx_Inc(ctx, MOMO_INDEX_TOKEN_SKIP_FLAG_WHITESPACE);
+    }
   }
 
 
