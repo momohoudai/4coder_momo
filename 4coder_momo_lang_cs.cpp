@@ -111,8 +111,6 @@ Momo_CS_Parse_StructBody(Momo_Index_ParseCtx *ctx)
         return;
     }
 
-    String_Const_u8 t = Momo_Index_StringFromToken(ctx, name);
-   
     b32 found_open_brace = 0;
     if(Momo_Index_ParsePattern(ctx, "%t", ":")) {
         for(;!ctx->done;) {

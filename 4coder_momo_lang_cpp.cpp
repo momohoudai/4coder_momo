@@ -60,47 +60,55 @@ function void
 momo_cpp_parse_struct(Momo_Index_ParseCtx *ctx)
 {
   Token *name = 0;
-  b32 valid = 0;
   b32 need_end_name = 0;
   
-  if(Momo_Index_ParsePattern(ctx, "%k", TokenBaseKind_Identifier, &name))
-  {
-    valid = 1;
-  }
-  else
+  if(!Momo_Index_ParsePattern(ctx, "%k", TokenBaseKind_Identifier, &name))
   {
     need_end_name = 1;
   }
-  
-  if(Momo_Index_ParsePattern(ctx, "%b", TokenCppKind_PPDefine, &name))
-  {
-    momo_cpp_parse_macro(ctx);
+
+  // Parse until we reach open brace and close brace
+  b32 found_open_brace = 0;
+  b32 found_close_brace = 0;
+
+  for(;!ctx->done;) {
+    if(Momo_Index_ParsePattern(ctx, "%t", "{")) {
+      found_open_brace = 1;
+      break;
+    }
+    Momo_Index_ParseCtx_Inc(ctx, 0);
   }
-  
-  if(momo_cpp_parse_skippable_content(ctx))
-  {
+
+  for(;!ctx->done;) {
+    if(Momo_Index_ParsePattern(ctx, "%t", "}")) {
+      found_close_brace = 1;
+      break;
+    }
+    Momo_Index_ParseCtx_Inc(ctx, 0);
   }
-  else
-  {
-    // NOTE(Momo): ignore prototypes
-    return;
-  }
-  
-  if(need_end_name)
-  {
-    if(Momo_Index_ParsePattern(ctx, "%k", TokenBaseKind_Identifier, &name))
-    {
+
+
+  if (found_open_brace && found_close_brace) {
+    b32 valid = 0;
+    if(need_end_name) {
+      if(Momo_Index_ParsePattern(ctx, "%k", TokenBaseKind_Identifier, &name))
+      {
+        valid = 1;
+      }
+    }
+    else {
       valid = 1;
     }
+
+    if(valid)
+    {
+      // struct have same key and display
+      String_Const_u8 name_str = Momo_Index_StringFromToken(ctx, name);
+      Momo_Index_MakeNote(ctx->app, ctx->file, name_str, name_str, 
+                          MOMO_INDEX_NOTE_KIND_TYPE, 0, Ii64(name));
+    }
   }
-  
-  if(valid)
-  {
-    // struct have same key and display
-    String_Const_u8 name_str = Momo_Index_StringFromToken(ctx, name);
-    Momo_Index_MakeNote(ctx->app, ctx->file, name_str, name_str, 
-                        MOMO_INDEX_NOTE_KIND_TYPE, 0, Ii64(name));
-  }
+
 }
 
 
