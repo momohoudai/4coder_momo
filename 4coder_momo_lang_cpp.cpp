@@ -1,6 +1,6 @@
 
 internal void
-momo_cpp_parse_macro(Momo_Index_ParseCtx *ctx)
+Momo_CPP_ParseMacro(Momo_Index_ParseCtx *ctx)
 {
   Token *name = 0;
   if(Momo_Index_ParsePattern(ctx, "%k", TokenBaseKind_Identifier, &name))
@@ -14,7 +14,7 @@ momo_cpp_parse_macro(Momo_Index_ParseCtx *ctx)
 }
 
 internal b32
-momo_cpp_parse_skippable_content(Momo_Index_ParseCtx *ctx)
+Momo_CPP_ParseSkippableContent(Momo_Index_ParseCtx *ctx)
 {
   b32 body_found = 0;
   int nest = 0;
@@ -29,7 +29,7 @@ momo_cpp_parse_skippable_content(Momo_Index_ParseCtx *ctx)
     }
     else if(Momo_Index_ParsePattern(ctx, "%b", TokenCppKind_PPDefine, &name))
     {
-      momo_cpp_parse_macro(ctx);
+      Momo_CPP_ParseMacro(ctx);
     }
     else if(Momo_Index_ParsePattern(ctx, "%t", "{"))
     {
@@ -57,7 +57,7 @@ momo_cpp_parse_skippable_content(Momo_Index_ParseCtx *ctx)
 }
 
 function void
-momo_cpp_parse_struct(Momo_Index_ParseCtx *ctx)
+Momo_CPP_ParseStruct(Momo_Index_ParseCtx *ctx)
 {
   Token *name = 0;
   b32 need_end_name = 0;
@@ -99,6 +99,7 @@ momo_cpp_parse_struct(Momo_Index_ParseCtx *ctx)
   }
 
 
+  // Confirm that this is a definition and do the remaining.
   if (found_open_brace && found_close_brace) {
     b32 valid = 0;
     if(need_end_name) {
@@ -124,7 +125,7 @@ momo_cpp_parse_struct(Momo_Index_ParseCtx *ctx)
 
 
 function b32
-momo_cpp_parse_function_body(Momo_Index_ParseCtx *ctx, b32 *prototype_ptr)
+Momo_CPP_ParseFunctionBody(Momo_Index_ParseCtx *ctx, b32 *prototype_ptr)
 {
   b32 valid = 0;
   b32 prototype = 0;
@@ -154,7 +155,7 @@ momo_cpp_parse_function_body(Momo_Index_ParseCtx *ctx, b32 *prototype_ptr)
   {
     if(prototype == 0)
     {
-      momo_cpp_parse_skippable_content(ctx);
+      Momo_CPP_ParseSkippableContent(ctx);
     }
   }
   
@@ -164,7 +165,7 @@ momo_cpp_parse_function_body(Momo_Index_ParseCtx *ctx, b32 *prototype_ptr)
 }
 
 function void
-momo_cpp_parse_enum_body(Momo_Index_ParseCtx *ctx)
+Momo_CPP_ParseEnumBody(Momo_Index_ParseCtx *ctx)
 {
   if(Momo_Index_ParsePattern(ctx, "%t", "{"))
   {
@@ -177,7 +178,7 @@ momo_cpp_parse_enum_body(Momo_Index_ParseCtx *ctx)
       }
       else if(Momo_Index_ParsePattern(ctx, "%b", TokenCppKind_PPDefine, &constant))
       {
-        momo_cpp_parse_macro(ctx);
+        Momo_CPP_ParseMacro(ctx);
       }
       else if(Momo_Index_ParsePattern(ctx, "%k%t", TokenBaseKind_Identifier, &constant, ","))
       {
@@ -267,7 +268,7 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
     else if(Momo_Index_ParsePattern(ctx, "%b", TokenCppKind_PPDefine, &name))
     {
       handled = 1;
-      momo_cpp_parse_macro(ctx);
+      Momo_CPP_ParseMacro(ctx);
     }
     
     
@@ -276,13 +277,13 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
             Momo_Index_ParsePattern(ctx, "%t", "struct"))
     {
       handled = 1;
-      momo_cpp_parse_struct(ctx);
+      Momo_CPP_ParseStruct(ctx);
     }
     else if(scope_nest == 0 && 
             Momo_Index_ParsePattern(ctx, "%t%t", "typedef", "struct"))
     {
       handled = 1;
-      momo_cpp_parse_struct(ctx);
+      Momo_CPP_ParseStruct(ctx);
       
       // What is this for?
 #if 0
@@ -299,7 +300,7 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
             Momo_Index_ParsePattern(ctx, "%t", "class"))
     {
       handled = 1;
-      momo_cpp_parse_struct(ctx);
+      Momo_CPP_ParseStruct(ctx);
     }
     
     //~ NOTE(rjf): Unions
@@ -307,13 +308,13 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
             Momo_Index_ParsePattern(ctx, "%t", "union"))
     {
       handled = 1;
-      momo_cpp_parse_struct(ctx);
+      Momo_CPP_ParseStruct(ctx);
     }
     else if (scope_nest == 0 && 
              Momo_Index_ParsePattern(ctx, "%t%t", "typedef", "union"))
     {
       handled = 1;
-      momo_cpp_parse_struct(ctx);
+      Momo_CPP_ParseStruct(ctx);
       
       // What is this for?
 #if 0
@@ -339,7 +340,7 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
       }
       if(prototype == 0)
       {
-        momo_cpp_parse_enum_body(ctx);
+        Momo_CPP_ParseEnumBody(ctx);
       }
       if(possible_name_at_end)
       {
@@ -367,7 +368,7 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
       }
       if(prototype == 0)
       {
-        momo_cpp_parse_enum_body(ctx);
+        Momo_CPP_ParseEnumBody(ctx);
       }
       if(name != 0 && !prototype)
       {
@@ -689,7 +690,7 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
         handled = 1;
         Momo_Index_MakeNote(ctx->app, ctx->file, 0, Momo_Index_StringFromToken(ctx, name),
                             MOMO_INDEX_NOTE_KIND_FUNCTION, prototype ? MOMO_INDEX_NOTE_FLAG_PRODUCT_TYPE : 0, Ii64(name));
-        momo_cpp_parse_skippable_content(ctx);
+        Momo_CPP_ParseSkippableContent(ctx);
       }
     }
 #endif        
