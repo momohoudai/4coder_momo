@@ -1075,7 +1075,7 @@ momo_tick(Application_Links *app, Frame_Info frame_info)
     linalloc_clear(&global_frame_arena);
     global_tooltip_count = 0;
     
-    Momo_Colors_Tick(app, frame_info);
+    //Momo_Colors_Tick(app, frame_info);
     Momo_Index_Tick(app);
     //F4_CLC_Tick(frame_info);
     //F4_UpdateFlashes(app, frame_info);

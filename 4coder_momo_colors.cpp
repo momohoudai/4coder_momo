@@ -6,34 +6,6 @@ Momo_Colors_IsArgbValid(ARGB_Color color)
     return color != 0xFF990099;
 }
 
-internal void
-Momo_Colors_Tick(Application_Links *app, Frame_Info frame_info)
-{
-    Momo_Colors_SyntaxOptions opts = momo_syntax_opts[momo_active_syntax_opt_idx];
-    for(int i = 0; i < sizeof(Momo_Colors_SyntaxFlagType)*8; i += 1)
-    {
-        f32 delta = ((f32)!!(opts.flags & (1<<i)) - momo_syntax_flag_transitions[i]) * frame_info.animation_dt * 8.f;
-        momo_syntax_flag_transitions[i] += delta;
-        if(fabsf(delta) > 0.001f)
-        {
-            animate_in_n_milliseconds(app, 0);
-        }
-    }
-}
-
-CUSTOM_COMMAND_SIG(momo_switch_syntax_option)
-CUSTOM_DOC("Switches the syntax highlighting mode.")
-{
-    momo_active_syntax_opt_idx = (momo_active_syntax_opt_idx + 1) % ArrayCount(momo_syntax_opts);
-}
-
-internal String8
-momo_syntax_option_string(void)
-{
-    return momo_syntax_opts[momo_active_syntax_opt_idx].name;
-}
-
-
 static ARGB_Color
 Momo_Colors_ARGBFromID(Color_Table table, Managed_ID id, int subindex)
 {
@@ -95,9 +67,10 @@ Momo_Colors_GetTokenColor(Application_Links *app, Token* token, Buffer_ID buffer
                         {
                             // We only attempt to highlight a function when it 'looks' like a function
                             // (i.e. opening braces after the token)
-                            //if (next_token && next_token->kind == TokenBaseKind_ParentheticalOpen) {
-                            color = Momo_Colors_ARGBFromID(table, fleury_color_index_function);
-                            //}
+                            // TODO: this is kind of C/C++ only. Might want to refactor this if we do different languages
+                            if (next_token && next_token->kind == TokenBaseKind_ParentheticalOpen) {
+                                color = Momo_Colors_ARGBFromID(table, fleury_color_index_function);
+                            }
                         }break;
                         
                         case MOMO_INDEX_NOTE_KIND_CONSTANT:
