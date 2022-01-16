@@ -95,9 +95,9 @@ Momo_Colors_GetTokenColor(Application_Links *app, Token* token, Buffer_ID buffer
                         {
                             // We only attempt to highlight a function when it 'looks' like a function
                             // (i.e. opening braces after the token)
-                            if (next_token && next_token->kind == TokenBaseKind_ParentheticalOpen) {
-                                color = Momo_Colors_ARGBFromID(table, fleury_color_index_function);
-                            }
+                            //if (next_token && next_token->kind == TokenBaseKind_ParentheticalOpen) {
+                            color = Momo_Colors_ARGBFromID(table, fleury_color_index_function);
+                            //}
                         }break;
                         
                         case MOMO_INDEX_NOTE_KIND_CONSTANT:
@@ -110,7 +110,9 @@ Momo_Colors_GetTokenColor(Application_Links *app, Token* token, Buffer_ID buffer
                             color = Momo_Colors_ARGBFromID(table, fleury_color_index_decl);
                         }break;
                         
-                        default: color = default_color; break;
+                        default: {
+                            color = default_color; break;
+                        }
                     }
                     
                     if(!Momo_Colors_IsArgbValid(color)) { color = default_color; }
