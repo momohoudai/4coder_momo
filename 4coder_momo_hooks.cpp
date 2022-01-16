@@ -658,7 +658,7 @@ momo_render(Application_Links *app, Frame_Info frame_info, View_ID view_id)
         if(def_get_config_b32(vars_save_string_lit("f4_margin_use_mode_color")) &&
            is_active_view)
         {
-            color = Momo_Colors_GetColor(app, Momo_Colors_GetColorCtxFromCursor(0, global_keybinding_mode));
+            color = Momo_Colors_GetCursorColor(app, global_keybinding_mode, global_keyboard_macro_is_recording);
         }
         draw_margin(app, view_rect, region, color);
     }

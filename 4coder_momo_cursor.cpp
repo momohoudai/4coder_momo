@@ -135,9 +135,7 @@ Momo_Cursor_Render(Application_Links *app, View_ID view_id, b32 is_active_view,
     
     b32 has_highlight_range = draw_highlight_range(app, view_id, buffer, text_layout_id, roundness);
     
-    Momo_Colors_FlagType flags = 0;
-    flags |= !!global_keyboard_macro_is_recording * Momo_Colors_FlagType_Macro;
-    ARGB_Color cursor_color = Momo_Colors_GetColor(app, Momo_Colors_GetColorCtxFromCursor(flags, global_keybinding_mode));
+    ARGB_Color cursor_color = Momo_Colors_GetCursorColor(app, global_keybinding_mode, global_keyboard_macro_is_recording);
     ARGB_Color mark_color = cursor_color;
     ARGB_Color inactive_cursor_color = Momo_Colors_ARGBFromID(active_color_table, fleury_color_cursor_inactive, 0);
     
