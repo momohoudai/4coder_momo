@@ -44,228 +44,228 @@ lexeme_table_lookup(u64 *hash_array, String_Const_u8 *key_array,
 
 #endif
 u64 go_main_keys_hash_array[47] = {
-0x0000000000000000,0x0000000000000000,0x29564790b5fe507d,0x0000000000000000,
-0x1a822741f12c37e7,0x0000000000000000,0x822a81b9d37fcbb1,0x0000000000000000,
-0x0000000000000000,0x0000000000000000,0x958bbbcb97565f7d,0x0000000000000000,
-0x0000000000000000,0x1799621c48b7db03,0xa9c5578535980687,0x9d76302b801b1d23,
-0x0000000000000000,0x1a822741f1d9dd53,0x0000000000000000,0x958bbbcb9755de17,
-0x29564790b2cf0edb,0xcf335042260b05b5,0xb7e19494bbe41c29,0x0000000000000000,
-0x1a822741f1f493ab,0x1a822741f1228aef,0xb7e195691ec14773,0x0000000000000000,
-0x0000000000000000,0x1a822741f1e2dcbd,0x0000000000000000,0x0000000000000000,
-0xb7e1956d0f9b04f3,0x0000000000000000,0xb7e1956ecfa572f3,0x822a81b9d37fcb41,
-0x0000000000000000,0xb7e1956d63004b3f,0x958bbbcb9755b8b5,0x0000000000000000,
-0x1a822741f1db5ba9,0x0000000000000000,0x29564790bad2786b,0x29564790cec21cdd,
-0x29564790e85ad3ab,0x1a822741f1e731e3,0xcf3351077b12cc03,
+0xd6c87e44ddb107b9,0x0000000000000000,0x3b806c83cc4a8517,0x0d493d8d65cf48f3,
+0x0000000000000000,0x3c436499ab4a980f,0x0000000000000000,0x9fe284c6afba47f9,
+0x0000000000000000,0x3dc8feab4785ac2f,0x0000000000000000,0x0000000000000000,
+0x3b806c83313ac817,0x0000000000000000,0x90604154f39de4d7,0x3dc8feab488321b9,
+0x440e821f829ba119,0x3dc8feab7ae44f07,0x0000000000000000,0x440e8e5f5b743b6f,
+0x3b806c833c63be8b,0x0000000000000000,0x9fe284c6affeec57,0x3dc8feab47b601b7,
+0x9fe284c6afbac0d7,0x9fe284c6aff86e75,0xd6c87e44ddb1e56b,0x0000000000000000,
+0x3b806c83c30772d7,0x3b806c8822cd7f9d,0x0000000000000000,0x0000000000000000,
+0x9fe284c6affbfc03,0xd15546ea7f0f4a8d,0x9fe284c6af8401b3,0x0000000000000000,
+0xd6c87e44ddb23729,0x0000000000000000,0x0000000000000000,0x9fe284c6aff411b7,
+0xd15546ea7f0f4a65,0x0000000000000000,0x3dc8feab478d35e1,0x0000000000000000,
+0x0000000000000000,0x0000000000000000,0x0000000000000000,
 };
-u8 go_main_keys_key_array_2[] = {0x62,0x72,0x65,0x61,0x6b,};
-u8 go_main_keys_key_array_4[] = {0x66,0x75,0x6e,0x63,};
-u8 go_main_keys_key_array_6[] = {0x67,0x6f,};
-u8 go_main_keys_key_array_10[] = {0x76,0x61,0x72,};
-u8 go_main_keys_key_array_13[] = {0x63,0x6f,0x6e,0x74,0x69,0x6e,0x75,0x65,};
-u8 go_main_keys_key_array_14[] = {0x66,0x61,0x6c,0x6c,0x74,0x68,0x72,0x6f,0x75,0x67,0x68,};
-u8 go_main_keys_key_array_15[] = {0x69,0x6e,0x74,0x65,0x72,0x66,0x61,0x63,0x65,};
-u8 go_main_keys_key_array_17[] = {0x63,0x61,0x73,0x65,};
-u8 go_main_keys_key_array_19[] = {0x6d,0x61,0x70,};
-u8 go_main_keys_key_array_20[] = {0x63,0x6f,0x6e,0x73,0x74,};
-u8 go_main_keys_key_array_21[] = {0x64,0x65,0x66,0x61,0x75,0x6c,0x74,};
-u8 go_main_keys_key_array_22[] = {0x69,0x6d,0x70,0x6f,0x72,0x74,};
-u8 go_main_keys_key_array_24[] = {0x65,0x6c,0x73,0x65,};
-u8 go_main_keys_key_array_25[] = {0x67,0x6f,0x74,0x6f,};
-u8 go_main_keys_key_array_26[] = {0x72,0x65,0x74,0x75,0x72,0x6e,};
-u8 go_main_keys_key_array_29[] = {0x74,0x79,0x70,0x65,};
-u8 go_main_keys_key_array_32[] = {0x73,0x74,0x72,0x75,0x63,0x74,};
-u8 go_main_keys_key_array_34[] = {0x73,0x65,0x6c,0x65,0x63,0x74,};
-u8 go_main_keys_key_array_35[] = {0x69,0x66,};
-u8 go_main_keys_key_array_37[] = {0x73,0x77,0x69,0x74,0x63,0x68,};
-u8 go_main_keys_key_array_38[] = {0x66,0x6f,0x72,};
-u8 go_main_keys_key_array_40[] = {0x63,0x68,0x61,0x6e,};
-u8 go_main_keys_key_array_42[] = {0x72,0x61,0x6e,0x67,0x65,};
-u8 go_main_keys_key_array_43[] = {0x64,0x65,0x66,0x65,0x72,};
-u8 go_main_keys_key_array_44[] = {0x66,0x61,0x6c,0x73,0x65,};
-u8 go_main_keys_key_array_45[] = {0x74,0x72,0x75,0x65,};
-u8 go_main_keys_key_array_46[] = {0x70,0x61,0x63,0x6b,0x61,0x67,0x65,};
+u8 go_main_keys_key_array_0[] = {0x76,0x61,0x72,};
+u8 go_main_keys_key_array_2[] = {0x73,0x65,0x6c,0x65,0x63,0x74,};
+u8 go_main_keys_key_array_3[] = {0x66,0x61,0x6c,0x6c,0x74,0x68,0x72,0x6f,0x75,0x67,0x68,};
+u8 go_main_keys_key_array_5[] = {0x63,0x6f,0x6e,0x74,0x69,0x6e,0x75,0x65,};
+u8 go_main_keys_key_array_7[] = {0x74,0x79,0x70,0x65,};
+u8 go_main_keys_key_array_9[] = {0x63,0x6f,0x6e,0x73,0x74,};
+u8 go_main_keys_key_array_12[] = {0x73,0x74,0x72,0x75,0x63,0x74,};
+u8 go_main_keys_key_array_14[] = {0x69,0x6e,0x74,0x65,0x72,0x66,0x61,0x63,0x65,};
+u8 go_main_keys_key_array_15[] = {0x64,0x65,0x66,0x65,0x72,};
+u8 go_main_keys_key_array_16[] = {0x64,0x65,0x66,0x61,0x75,0x6c,0x74,};
+u8 go_main_keys_key_array_17[] = {0x72,0x61,0x6e,0x67,0x65,};
+u8 go_main_keys_key_array_19[] = {0x70,0x61,0x63,0x6b,0x61,0x67,0x65,};
+u8 go_main_keys_key_array_20[] = {0x73,0x77,0x69,0x74,0x63,0x68,};
+u8 go_main_keys_key_array_22[] = {0x63,0x61,0x73,0x65,};
+u8 go_main_keys_key_array_23[] = {0x66,0x61,0x6c,0x73,0x65,};
+u8 go_main_keys_key_array_24[] = {0x74,0x72,0x75,0x65,};
+u8 go_main_keys_key_array_25[] = {0x63,0x68,0x61,0x6e,};
+u8 go_main_keys_key_array_26[] = {0x6d,0x61,0x70,};
+u8 go_main_keys_key_array_28[] = {0x72,0x65,0x74,0x75,0x72,0x6e,};
+u8 go_main_keys_key_array_29[] = {0x69,0x6d,0x70,0x6f,0x72,0x74,};
+u8 go_main_keys_key_array_32[] = {0x66,0x75,0x6e,0x63,};
+u8 go_main_keys_key_array_33[] = {0x67,0x6f,};
+u8 go_main_keys_key_array_34[] = {0x67,0x6f,0x74,0x6f,};
+u8 go_main_keys_key_array_36[] = {0x66,0x6f,0x72,};
+u8 go_main_keys_key_array_39[] = {0x65,0x6c,0x73,0x65,};
+u8 go_main_keys_key_array_40[] = {0x69,0x66,};
+u8 go_main_keys_key_array_42[] = {0x62,0x72,0x65,0x61,0x6b,};
 String_Const_u8 go_main_keys_key_array[47] = {
+{go_main_keys_key_array_0, 3},
+{0, 0},
+{go_main_keys_key_array_2, 6},
+{go_main_keys_key_array_3, 11},
+{0, 0},
+{go_main_keys_key_array_5, 8},
+{0, 0},
+{go_main_keys_key_array_7, 4},
+{0, 0},
+{go_main_keys_key_array_9, 5},
 {0, 0},
 {0, 0},
-{go_main_keys_key_array_2, 5},
+{go_main_keys_key_array_12, 6},
 {0, 0},
-{go_main_keys_key_array_4, 4},
+{go_main_keys_key_array_14, 9},
+{go_main_keys_key_array_15, 5},
+{go_main_keys_key_array_16, 7},
+{go_main_keys_key_array_17, 5},
 {0, 0},
-{go_main_keys_key_array_6, 2},
+{go_main_keys_key_array_19, 7},
+{go_main_keys_key_array_20, 6},
 {0, 0},
-{0, 0},
-{0, 0},
-{go_main_keys_key_array_10, 3},
-{0, 0},
-{0, 0},
-{go_main_keys_key_array_13, 8},
-{go_main_keys_key_array_14, 11},
-{go_main_keys_key_array_15, 9},
-{0, 0},
-{go_main_keys_key_array_17, 4},
-{0, 0},
-{go_main_keys_key_array_19, 3},
-{go_main_keys_key_array_20, 5},
-{go_main_keys_key_array_21, 7},
-{go_main_keys_key_array_22, 6},
-{0, 0},
+{go_main_keys_key_array_22, 4},
+{go_main_keys_key_array_23, 5},
 {go_main_keys_key_array_24, 4},
 {go_main_keys_key_array_25, 4},
-{go_main_keys_key_array_26, 6},
+{go_main_keys_key_array_26, 3},
+{0, 0},
+{go_main_keys_key_array_28, 6},
+{go_main_keys_key_array_29, 6},
 {0, 0},
 {0, 0},
-{go_main_keys_key_array_29, 4},
+{go_main_keys_key_array_32, 4},
+{go_main_keys_key_array_33, 2},
+{go_main_keys_key_array_34, 4},
+{0, 0},
+{go_main_keys_key_array_36, 3},
 {0, 0},
 {0, 0},
-{go_main_keys_key_array_32, 6},
-{0, 0},
-{go_main_keys_key_array_34, 6},
-{go_main_keys_key_array_35, 2},
-{0, 0},
-{go_main_keys_key_array_37, 6},
-{go_main_keys_key_array_38, 3},
-{0, 0},
-{go_main_keys_key_array_40, 4},
+{go_main_keys_key_array_39, 4},
+{go_main_keys_key_array_40, 2},
 {0, 0},
 {go_main_keys_key_array_42, 5},
-{go_main_keys_key_array_43, 5},
-{go_main_keys_key_array_44, 5},
-{go_main_keys_key_array_45, 4},
-{go_main_keys_key_array_46, 7},
+{0, 0},
+{0, 0},
+{0, 0},
+{0, 0},
 };
 Lexeme_Table_Value go_main_keys_value_array[47] = {
-{0, 0},
-{0, 0},
-{4, TokenGoKind_Break},
-{0, 0},
-{4, TokenGoKind_Func},
-{0, 0},
-{4, TokenGoKind_Go},
-{0, 0},
-{0, 0},
-{0, 0},
 {4, TokenGoKind_Var},
 {0, 0},
+{4, TokenGoKind_Select},
+{4, TokenGoKind_Fallthrough},
 {0, 0},
 {4, TokenGoKind_Continue},
-{4, TokenGoKind_Fallthrough},
-{4, TokenGoKind_Interface},
-{0, 0},
-{4, TokenGoKind_Case},
-{0, 0},
-{4, TokenGoKind_Map},
-{4, TokenGoKind_Const},
-{4, TokenGoKind_Default},
-{4, TokenGoKind_Import},
-{0, 0},
-{4, TokenGoKind_Else},
-{4, TokenGoKind_Goto},
-{4, TokenGoKind_Return},
-{0, 0},
 {0, 0},
 {4, TokenGoKind_Type},
+{0, 0},
+{4, TokenGoKind_Const},
 {0, 0},
 {0, 0},
 {4, TokenGoKind_Struct},
 {0, 0},
-{4, TokenGoKind_Select},
-{4, TokenGoKind_If},
-{0, 0},
-{4, TokenGoKind_Switch},
-{4, TokenGoKind_For},
-{0, 0},
-{4, TokenGoKind_Chan},
-{0, 0},
-{4, TokenGoKind_Range},
+{4, TokenGoKind_Interface},
 {4, TokenGoKind_Defer},
+{4, TokenGoKind_Default},
+{4, TokenGoKind_Range},
+{0, 0},
+{4, TokenGoKind_Package},
+{4, TokenGoKind_Switch},
+{0, 0},
+{4, TokenGoKind_Case},
 {8, TokenGoKind_LiteralFalse},
 {8, TokenGoKind_LiteralTrue},
-{4, TokenGoKind_Package},
+{4, TokenGoKind_Chan},
+{4, TokenGoKind_Map},
+{0, 0},
+{4, TokenGoKind_Return},
+{4, TokenGoKind_Import},
+{0, 0},
+{0, 0},
+{4, TokenGoKind_Func},
+{4, TokenGoKind_Go},
+{4, TokenGoKind_Goto},
+{0, 0},
+{4, TokenGoKind_For},
+{0, 0},
+{0, 0},
+{4, TokenGoKind_Else},
+{4, TokenGoKind_If},
+{0, 0},
+{4, TokenGoKind_Break},
+{0, 0},
+{0, 0},
+{0, 0},
+{0, 0},
 };
 i32 go_main_keys_slot_count = 47;
-u64 go_main_keys_seed = 0x17d5549e85b68d94;
+u64 go_main_keys_seed = 0xc8f5e0a35a386268;
 u64 go_pp_directives_hash_array[25] = {
-0x98e54be0fc4832e1,0x0000000000000000,0xac4056996d9031e7,0xac4056997a464d5f,
-0x0000000000000000,0x98e54be18e62509b,0xc2ee0de3306a63eb,0x0000000000000000,
-0x98e54be31299396b,0x98e54be18ac7a65f,0x0000000000000000,0xecd44f0f75e33477,
-0x0000000000000000,0x0000000000000000,0x0000000000000000,0x264ce3ded44a5b4b,
-0x264ce3cbf407ab47,0x0000000000000000,0xc2ee0de330a51977,0xac4056996c3d9c9f,
-0xc2ee0de330a51495,0x0000000000000000,0x0000000000000000,0xac4056996725365f,
-0xac4056997a59fb25,
+0xd5da882b20215cd1,0x0000000000000000,0x0000000000000000,0x3c41a620e89190db,
+0x0b07772db4d593ab,0x3c41a620e893f849,0x0b07772db4d27251,0x0000000000000000,
+0x4858614177eb7eb5,0xd5da89d1767b8049,0x0000000000000000,0xd5da89d0a1f21fe7,
+0x0000000000000000,0x0b07772da4034975,0x0000000000000000,0x0b07772dd16160b1,
+0xd5da882b2c3caad9,0x0000000000000000,0x3c41a620e8918b41,0x0b07772dd1a7fb51,
+0x0000000000000000,0xecee477e35ff1bf1,0x4859c2348b2db939,0x0000000000000000,
+0x0000000000000000,
 };
-u8 go_pp_directives_key_array_0[] = {0x70,0x72,0x61,0x67,0x6d,0x61,};
-u8 go_pp_directives_key_array_2[] = {0x65,0x6e,0x64,0x69,0x66,};
-u8 go_pp_directives_key_array_3[] = {0x75,0x6e,0x64,0x65,0x66,};
-u8 go_pp_directives_key_array_5[] = {0x69,0x6d,0x70,0x6f,0x72,0x74,};
-u8 go_pp_directives_key_array_6[] = {0x6c,0x69,0x6e,0x65,};
-u8 go_pp_directives_key_array_8[] = {0x64,0x65,0x66,0x69,0x6e,0x65,};
-u8 go_pp_directives_key_array_9[] = {0x69,0x66,0x6e,0x64,0x65,0x66,};
-u8 go_pp_directives_key_array_11[] = {0x69,0x66,};
-u8 go_pp_directives_key_array_15[] = {0x69,0x6e,0x63,0x6c,0x75,0x64,0x65,};
-u8 go_pp_directives_key_array_16[] = {0x76,0x65,0x72,0x73,0x69,0x6f,0x6e,};
+u8 go_pp_directives_key_array_0[] = {0x69,0x66,0x6e,0x64,0x65,0x66,};
+u8 go_pp_directives_key_array_3[] = {0x65,0x6c,0x73,0x65,};
+u8 go_pp_directives_key_array_4[] = {0x75,0x73,0x69,0x6e,0x67,};
+u8 go_pp_directives_key_array_5[] = {0x6c,0x69,0x6e,0x65,};
+u8 go_pp_directives_key_array_6[] = {0x75,0x6e,0x64,0x65,0x66,};
+u8 go_pp_directives_key_array_8[] = {0x69,0x6e,0x63,0x6c,0x75,0x64,0x65,};
+u8 go_pp_directives_key_array_9[] = {0x64,0x65,0x66,0x69,0x6e,0x65,};
+u8 go_pp_directives_key_array_11[] = {0x70,0x72,0x61,0x67,0x6d,0x61,};
+u8 go_pp_directives_key_array_13[] = {0x65,0x72,0x72,0x6f,0x72,};
+u8 go_pp_directives_key_array_15[] = {0x65,0x6e,0x64,0x69,0x66,};
+u8 go_pp_directives_key_array_16[] = {0x69,0x6d,0x70,0x6f,0x72,0x74,};
 u8 go_pp_directives_key_array_18[] = {0x65,0x6c,0x69,0x66,};
-u8 go_pp_directives_key_array_19[] = {0x65,0x72,0x72,0x6f,0x72,};
-u8 go_pp_directives_key_array_20[] = {0x65,0x6c,0x73,0x65,};
-u8 go_pp_directives_key_array_23[] = {0x69,0x66,0x64,0x65,0x66,};
-u8 go_pp_directives_key_array_24[] = {0x75,0x73,0x69,0x6e,0x67,};
+u8 go_pp_directives_key_array_19[] = {0x69,0x66,0x64,0x65,0x66,};
+u8 go_pp_directives_key_array_21[] = {0x69,0x66,};
+u8 go_pp_directives_key_array_22[] = {0x76,0x65,0x72,0x73,0x69,0x6f,0x6e,};
 String_Const_u8 go_pp_directives_key_array[25] = {
 {go_pp_directives_key_array_0, 6},
 {0, 0},
-{go_pp_directives_key_array_2, 5},
-{go_pp_directives_key_array_3, 5},
 {0, 0},
-{go_pp_directives_key_array_5, 6},
-{go_pp_directives_key_array_6, 4},
+{go_pp_directives_key_array_3, 4},
+{go_pp_directives_key_array_4, 5},
+{go_pp_directives_key_array_5, 4},
+{go_pp_directives_key_array_6, 5},
 {0, 0},
-{go_pp_directives_key_array_8, 6},
+{go_pp_directives_key_array_8, 7},
 {go_pp_directives_key_array_9, 6},
 {0, 0},
-{go_pp_directives_key_array_11, 2},
+{go_pp_directives_key_array_11, 6},
 {0, 0},
+{go_pp_directives_key_array_13, 5},
 {0, 0},
-{0, 0},
-{go_pp_directives_key_array_15, 7},
-{go_pp_directives_key_array_16, 7},
+{go_pp_directives_key_array_15, 5},
+{go_pp_directives_key_array_16, 6},
 {0, 0},
 {go_pp_directives_key_array_18, 4},
 {go_pp_directives_key_array_19, 5},
-{go_pp_directives_key_array_20, 4},
+{0, 0},
+{go_pp_directives_key_array_21, 2},
+{go_pp_directives_key_array_22, 7},
 {0, 0},
 {0, 0},
-{go_pp_directives_key_array_23, 5},
-{go_pp_directives_key_array_24, 5},
 };
 Lexeme_Table_Value go_pp_directives_value_array[25] = {
-{5, TokenGoKind_PPPragma},
-{0, 0},
-{5, TokenGoKind_PPEndIf},
-{5, TokenGoKind_PPUndef},
-{0, 0},
-{5, TokenGoKind_PPImport},
-{5, TokenGoKind_PPLine},
-{0, 0},
-{5, TokenGoKind_PPDefine},
 {5, TokenGoKind_PPIfNDef},
 {0, 0},
-{5, TokenGoKind_PPIf},
 {0, 0},
-{0, 0},
+{5, TokenGoKind_PPElse},
+{5, TokenGoKind_PPUsing},
+{5, TokenGoKind_PPLine},
+{5, TokenGoKind_PPUndef},
 {0, 0},
 {5, TokenGoKind_PPInclude},
-{5, TokenGoKind_PPVersion},
+{5, TokenGoKind_PPDefine},
+{0, 0},
+{5, TokenGoKind_PPPragma},
+{0, 0},
+{5, TokenGoKind_PPError},
+{0, 0},
+{5, TokenGoKind_PPEndIf},
+{5, TokenGoKind_PPImport},
 {0, 0},
 {5, TokenGoKind_PPElIf},
-{5, TokenGoKind_PPError},
-{5, TokenGoKind_PPElse},
-{0, 0},
-{0, 0},
 {5, TokenGoKind_PPIfDef},
-{5, TokenGoKind_PPUsing},
+{0, 0},
+{5, TokenGoKind_PPIf},
+{5, TokenGoKind_PPVersion},
+{0, 0},
+{0, 0},
 };
 i32 go_pp_directives_slot_count = 25;
-u64 go_pp_directives_seed = 0x81d1281e27c4ede6;
+u64 go_pp_directives_seed = 0x54258777a05c51e4;
 u64 go_pp_keys_hash_array[2] = {
-0x0000000000000000,0xa32c4c171f396e75,
+0x0000000000000000,0x7ccd8ac631f5942d,
 };
 u8 go_pp_keys_key_array_1[] = {0x64,0x65,0x66,0x69,0x6e,0x65,0x64,};
 String_Const_u8 go_pp_keys_key_array[2] = {
@@ -277,7 +277,7 @@ Lexeme_Table_Value go_pp_keys_value_array[2] = {
 {4, TokenGoKind_PPDefined},
 };
 i32 go_pp_keys_slot_count = 2;
-u64 go_pp_keys_seed = 0x5b7ae05c31bcaad5;
+u64 go_pp_keys_seed = 0xe7837e2d61926c5d;
 struct Lex_State_Go{
 u32 flags_ZF0;
 u32 flags_KF0;
