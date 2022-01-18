@@ -67,10 +67,7 @@ Momo_Colors_GetTokenColor(Application_Links *app, Token* token, Buffer_ID buffer
                         {
                             // We only attempt to highlight a function when it 'looks' like a function
                             // (i.e. opening braces after the token)
-                            // TODO: this is kind of C/C++ only. Might want to refactor this if we do different languages
-                            if (next_token && next_token->kind == TokenBaseKind_ParentheticalOpen) {
-                                color = Momo_Colors_ARGBFromID(table, fleury_color_index_function);
-                            }
+                            color = Momo_Colors_ARGBFromID(table, fleury_color_index_function);
                         }break;
                         
                         case MOMO_INDEX_NOTE_KIND_CONSTANT:
