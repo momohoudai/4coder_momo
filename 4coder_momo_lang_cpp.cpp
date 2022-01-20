@@ -175,7 +175,28 @@ Momo_CPP_ParseFunctionBody(Momo_Index_ParseCtx *ctx, b32 *prototype_ptr)
 }
 
 function void
-Momo_CPP_ParseEnumBody(Momo_Index_ParseCtx *ctx)
+Momo_CPP_MakeEnumNote(Momo_Index_ParseCtx * ctx, Token* constant, Token* parent_name = 0) {
+  if(parent_name) {
+    u8 buffer[512];
+    String_u8 display_str = Su8(buffer, 0, ArrayCount(buffer));            
+    String_Const_u8 constant_str = Momo_Index_StringFromToken(ctx, constant);
+    String_Const_u8 parent_str = Momo_Index_StringFromToken(ctx, parent_name);
+
+    string_append(&display_str, parent_str);
+    string_append(&display_str, string_u8_litexpr("::"));
+    string_append(&display_str, constant_str);
+
+    Momo_Index_MakeNote(ctx->app, ctx->file, constant_str, display_str.string, MOMO_INDEX_NOTE_KIND_CONSTANT, 0, Ii64(constant));
+  }
+  else {
+    String_Const_u8 constant_str = Momo_Index_StringFromToken(ctx, constant);
+    Momo_Index_MakeNote(ctx->app, ctx->file, constant_str, constant_str, MOMO_INDEX_NOTE_KIND_CONSTANT, 0, Ii64(constant));
+  }
+
+}
+
+function void
+Momo_CPP_ParseEnumBody(Momo_Index_ParseCtx *ctx, Token* parent_name = 0)
 {
   if(Momo_Index_ParsePattern(ctx, "%t", "{"))
   {
@@ -192,14 +213,12 @@ Momo_CPP_ParseEnumBody(Momo_Index_ParseCtx *ctx)
       }
       else if(Momo_Index_ParsePattern(ctx, "%k%t", TokenBaseKind_Identifier, &constant, ","))
       {
-        String_Const_u8 constant_str = Momo_Index_StringFromToken(ctx, constant);
-        Momo_Index_MakeNote(ctx->app, ctx->file, constant_str, constant_str, MOMO_INDEX_NOTE_KIND_CONSTANT, 0, Ii64(constant));
+        Momo_CPP_MakeEnumNote(ctx, constant, parent_name);              
       }
       else if(Momo_Index_ParsePattern(ctx, "%k%t", TokenBaseKind_Identifier, &constant, "="))
       {
-        String_Const_u8 constant_str = Momo_Index_StringFromToken(ctx, constant);
-        Momo_Index_MakeNote(ctx->app, ctx->file, constant_str, constant_str, MOMO_INDEX_NOTE_KIND_CONSTANT, 0, Ii64(constant));
-        
+        Momo_CPP_MakeEnumNote(ctx, constant, parent_name);             
+
         for(;!ctx->done;)
         {
           Token *token = token_it_read(&ctx->it);
@@ -218,8 +237,7 @@ Momo_CPP_ParseEnumBody(Momo_Index_ParseCtx *ctx)
       }
       else if(Momo_Index_ParsePattern(ctx, "%k", TokenBaseKind_Identifier, &constant))
       {
-        String_Const_u8 constant_str = Momo_Index_StringFromToken(ctx, constant);
-        Momo_Index_MakeNote(ctx->app, ctx->file, constant_str, constant_str, MOMO_INDEX_NOTE_KIND_CONSTANT, 0, Ii64(constant));
+        Momo_CPP_MakeEnumNote(ctx, constant, parent_name);              
       }
       else if(Momo_Index_ParsePattern(ctx, "%t", "}"))
       {
@@ -364,7 +382,27 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
                             MOMO_INDEX_NOTE_KIND_TYPE, 0, Ii64(name));
       }
     }
-    
+   
+    else if (scope_nest == 0 &&
+             Momo_Index_ParsePattern(ctx, "%t%t%k", "enum", "struct", TokenBaseKind_Identifier, &name))
+    {
+      handled = 1;
+      b32 prototype = 0;
+      if(Momo_Index_ParsePattern(ctx, "%t", ";"))
+      {
+        prototype = 1;
+      }
+      if(prototype == 0)
+      {
+        Momo_CPP_ParseEnumBody(ctx, name);
+      }
+      if(name != 0 && !prototype)
+      {
+        String_Const_u8 name_str = Momo_Index_StringFromToken(ctx, name);  
+        Momo_Index_MakeNote(ctx->app, ctx->file, name_str, name_str,
+                            MOMO_INDEX_NOTE_KIND_TYPE, 0, Ii64(name));
+      }
+    }
     //~ NOTE(rjf): Enums
     else if(scope_nest == 0 &&
             Momo_Index_ParsePattern(ctx, "%t%k", "enum", TokenBaseKind_Identifier, &name) ||
