@@ -28,12 +28,6 @@ struct Momo_Indent_LineCache {
     Indent_Info indent_info;
 };
 
-function void write_text_and_indent(Application_Links* app, String_Const_u8 insert);
-function void indent_lines_right(Application_Links *app, Buffer_ID buffer, Range_i64 view_range, Indent_Flag flags);
-function b32  indent_buffer(Application_Links *app, Buffer_ID buffer, Range_i64 pos);
-function b32  indent_buffer(Application_Links *app, Buffer_ID buffer, Range_i64 pos, Indent_Flag flags);
-function b32  indent_buffer(Application_Links *app, Buffer_ID buffer, Range_i64 pos, Indent_Flag flags, i32 tab_width, i32 indent_width);
-
 #endif
 
 // BOTTOM

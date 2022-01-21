@@ -60,7 +60,7 @@ CUSTOM_DOC("Audo-indents the entire current buffer.")
   View_ID view = get_active_view(app, Access_ReadWriteVisible);
   Buffer_ID buffer = view_get_buffer(app, view, Access_ReadWriteVisible);
   i64 buffer_size = buffer_get_size(app, buffer);
-  indent_buffer(app, buffer, Ii64(0, buffer_size));
+  Momo_Indent_IndentBuffer(app, buffer, Ii64(0, buffer_size));
 }
 
 CUSTOM_COMMAND_SIG(momo_indent_line_at_cursor)
@@ -69,7 +69,7 @@ CUSTOM_DOC("Auto-indents the line on which the cursor sits.")
   View_ID view = get_active_view(app, Access_ReadWriteVisible);
   Buffer_ID buffer = view_get_buffer(app, view, Access_ReadWriteVisible);
   i64 pos = view_get_cursor_pos(app, view);
-  indent_buffer(app, buffer, Ii64(pos));
+  Momo_Indent_IndentBuffer(app, buffer, Ii64(pos));
   move_past_lead_whitespace(app, view, buffer);
 }
 
@@ -79,7 +79,7 @@ CUSTOM_DOC("Auto-indents the range between the cursor and the mark.")
   View_ID view = get_active_view(app, Access_ReadWriteVisible);
   Buffer_ID buffer = view_get_buffer(app, view, Access_ReadWriteVisible);
   Range_i64 range = get_view_range(app, view);
-  indent_buffer(app, buffer, range);
+  Momo_Indent_IndentBuffer(app, buffer, range);
   move_past_lead_whitespace(app, view, buffer);
 }
 
@@ -94,7 +94,7 @@ CUSTOM_DOC("Inserts text and auto-indents the line on which the cursor sits if a
   ProfileScope(app, "write and auto indent");
   User_Input in = get_current_input(app);
   String_Const_u8 insert = to_writable(&in);
-  write_text_and_indent(app, insert);
+  Momo_Indent_WriteTextAndIndent(app, insert);
 }
 
 
@@ -337,7 +337,7 @@ CUSTOM_COMMAND_SIG(momo_append_line_and_enter_insert)
 CUSTOM_DOC("Inserts text and auto-indents the line on which the cursor sits if any of the text contains 'layout punctuation' such as ;:{}()[]# and new lines.")
 {
   seek_end_of_textual_line(app);
-  //write_text_and_indent(app, string_u8_litexpr("\n"));
+  //Momo_Indent_WriteTextAndIndent(app, string_u8_litexpr("\n"));
   
   View_ID view = get_active_view(app, Access_ReadWriteVisible);
   Buffer_ID buffer = view_get_buffer(app, view, Access_ReadWriteVisible);
@@ -345,7 +345,7 @@ CUSTOM_DOC("Inserts text and auto-indents the line on which the cursor sits if a
   pos.min = view_get_cursor_pos(app, view);
   write_text(app, string_u8_litexpr("\n"));
   pos.max = view_get_cursor_pos(app, view);
-  indent_buffer(app, buffer, pos, 0);
+  Momo_Indent_IndentBuffer(app, buffer, pos, 0);
   move_past_lead_whitespace(app, view, buffer);
   
   momo_switch_to_insert_mode(app);
@@ -1187,7 +1187,7 @@ CUSTOM_DOC("Shift lines to the right by indent width")
   View_ID view = get_active_view(app, Access_ReadWriteVisible);
   Buffer_ID buffer = view_get_buffer(app, view, Access_ReadWriteVisible);
   Range_i64 range = get_view_range(app, view);
-  indent_lines_right(app, buffer, range, 0);
+  Momo_Indent_IndentLinesRight(app, buffer, range, 0);
   
 }
 

@@ -5,7 +5,7 @@
 // TOP
 
 internal Batch_Edit*
-_make_batch_edits_from_indentations(Application_Links *app, Arena *arena, Buffer_ID buffer, Range_i64 lines, i64 *indentations, Indent_Flag flags, i32 tab_width){
+Momo_Indent_MakeBatchFromIndentations(Application_Links *app, Arena *arena, Buffer_ID buffer, Range_i64 lines, i64 *indentations, Indent_Flag flags, i32 tab_width){
     i64 *shifted_indentations = indentations - lines.first;
     
     Batch_Edit *batch_first = 0;
@@ -54,8 +54,8 @@ _make_batch_edits_from_indentations(Application_Links *app, Arena *arena, Buffer
 }
 
 internal void
-_set_line_indents(Application_Links *app, Arena *arena, Buffer_ID buffer, Range_i64 lines, i64 *indentations, Indent_Flag flags, i32 tab_width){
-    Batch_Edit *batch = _make_batch_edits_from_indentations(app, arena, buffer, lines, indentations, flags, tab_width);
+Momo_Indent_SetLineIndents(Application_Links *app, Arena *arena, Buffer_ID buffer, Range_i64 lines, i64 *indentations, Indent_Flag flags, i32 tab_width){
+    Batch_Edit *batch = Momo_Indent_MakeBatchFromIndentations(app, arena, buffer, lines, indentations, flags, tab_width);
     if (batch != 0){
         buffer_batch_edit(app, buffer, batch);
     }
@@ -63,7 +63,7 @@ _set_line_indents(Application_Links *app, Arena *arena, Buffer_ID buffer, Range_
 
 
 internal Momo_Indent_Nest*
-_new_indent_nest(Arena *arena, Momo_Indent_NestAlloc *alloc){
+Momo_Indent__NewNest(Arena *arena, Momo_Indent_NestAlloc *alloc){
     Momo_Indent_Nest *new_nest = alloc->free_nest;
     if (new_nest == 0){
         new_nest = push_array(arena, Momo_Indent_Nest, 1);
@@ -75,12 +75,12 @@ _new_indent_nest(Arena *arena, Momo_Indent_NestAlloc *alloc){
 }
 
 internal void
-_free_indent_nest(Momo_Indent_NestAlloc *alloc, Momo_Indent_Nest *nest){
+Momo_Indent__FreeNest(Momo_Indent_NestAlloc *alloc, Momo_Indent_Nest *nest){
     sll_stack_push(alloc->free_nest, nest);
 }
 
 internal b32
-_is_unfinished_statment(Token *token, Momo_Indent_Nest *current_nest){
+Momo_Indent__IsUnfinishedStatement(Token *token, Momo_Indent_Nest *current_nest){
     b32 result = false;
     if (current_nest != 0 && current_nest->kind == TokenBaseKind_ScopeOpen){
         result = true;
@@ -100,7 +100,7 @@ _is_unfinished_statment(Token *token, Momo_Indent_Nest *current_nest){
 }
 
 internal void
-_update_line_cache(Application_Links *app, Buffer_ID buffer, i32 tab_width, Momo_Indent_LineCache *line_cache){
+Momo_Indent__LineCache_Update(Application_Links *app, Buffer_ID buffer, i32 tab_width, Momo_Indent_LineCache *line_cache){
     if (line_cache->line_number_for_cached_indent != line_cache->where_token_starts){
         ProfileScope(app, "get indent info");
         line_cache->line_number_for_cached_indent = line_cache->where_token_starts;
@@ -113,7 +113,7 @@ _update_line_cache(Application_Links *app, Buffer_ID buffer, i32 tab_width, Momo
 
 
 internal i64* 
-_get_indentations_to_shift_lines_right(Application_Links *app, Arena *arena, Buffer_ID buffer, Range_i64 lines, Indent_Flag flags, i32 tab_width, i32 indent_width) {
+Momo_Indent__GetIntendationArrayToShiftLinesRight(Application_Links *app, Arena *arena, Buffer_ID buffer, Range_i64 lines, Indent_Flag flags, i32 tab_width, i32 indent_width) {
     i64 count = lines.max - lines.min + 1;
     i64 *indentations = push_array(arena, i64, count);
 
@@ -130,14 +130,30 @@ _get_indentations_to_shift_lines_right(Application_Links *app, Arena *arena, Buf
 
 
 internal i64* 
-_get_indentations_to_shift_lines_left(Application_Links *app, Arena *arena, Buffer_ID buffer, Range_i64 lines, Indent_Flag flags, i32 tab_width, i32 indent_width) {
+Momo_Indent__GetIntendationArrayToShiftLinesLeft(Application_Links *app, Arena *arena, Buffer_ID buffer, Range_i64 lines, Indent_Flag flags, i32 tab_width, i32 indent_width) {
     // TODO
     
 }
 
+function void
+Momo_Indent_IndentLinesRight(Application_Links *app, Buffer_ID buffer, Range_i64 view_range, Indent_Flag flags) {
+    Scratch_Block scratch(app);
+    i32 indent_width = (i32)def_get_config_u64(app, vars_save_string_lit("indent_width"));
+    i32 tab_width = (i32)def_get_config_u64(app, vars_save_string_lit("default_tab_width"));
+    tab_width = clamp_bot(1, tab_width);
+    AddFlag(flags, Indent_FullTokens);
+    b32 indent_with_tabs = def_get_config_b32(vars_save_string_lit("indent_with_tabs"));
+    if (indent_with_tabs){
+        AddFlag(flags, Indent_UseTab);
+    }
+
+    Range_i64 line_numbers = get_line_range_from_pos_range(app, buffer, view_range);
+    i64* indentations = Momo_Indent__GetIntendationArrayToShiftLinesRight(app, scratch, buffer, line_numbers, flags, tab_width, indent_width);
+    Momo_Indent_SetLineIndents(app, scratch, buffer, line_numbers, indentations, flags, tab_width);
+}
 
 internal i64*
-_get_indentations_for_golang(Application_Links *app, Arena *arena, Buffer_ID buffer, Range_i64 lines, Indent_Flag flags, i32 tab_width, i32 indent_width){
+Momo_Indent__GetIndentationArrayGolang(Application_Links *app, Arena *arena, Buffer_ID buffer, Range_i64 lines, Indent_Flag flags, i32 tab_width, i32 indent_width){
     ProfileScope(app, "get indentation array golang");
     i64 count = lines.max - lines.min + 1;
     i64 *indentations = push_array(arena, i64, count);
@@ -197,7 +213,7 @@ _get_indentations_for_golang(Application_Links *app, Arena *arena, Buffer_ID buf
                 switch (token->kind){
                     case TokenBaseKind_ScopeOpen:
                     {
-                        Momo_Indent_Nest *new_nest = _new_indent_nest(arena, &nest_alloc);
+                        Momo_Indent_Nest *new_nest = Momo_Indent__NewNest(arena, &nest_alloc);
                         sll_stack_push(nest, new_nest);
                         nest->kind = TokenBaseKind_ScopeOpen;
                         nest->indent = current_indent + indent_width;
@@ -210,12 +226,12 @@ _get_indentations_for_golang(Application_Links *app, Arena *arena, Buffer_ID buf
                         for (;nest != 0 && nest->kind != TokenBaseKind_ScopeOpen;){
                             Momo_Indent_Nest *n = nest;
                             sll_stack_pop(nest);
-                            _free_indent_nest(&nest_alloc, n);
+                            Momo_Indent__FreeNest(&nest_alloc, n);
                         }
                         if (nest != 0 && nest->kind == TokenBaseKind_ScopeOpen){
                             Momo_Indent_Nest *n = nest;
                             sll_stack_pop(nest);
-                            _free_indent_nest(&nest_alloc, n);
+                            Momo_Indent__FreeNest(&nest_alloc, n);
                         }
                         this_indent = 0;
                         if (nest != 0){
@@ -227,10 +243,10 @@ _get_indentations_for_golang(Application_Links *app, Arena *arena, Buffer_ID buf
                     
                     case TokenBaseKind_ParentheticalOpen:
                     {
-                        Momo_Indent_Nest *new_nest = _new_indent_nest(arena, &nest_alloc);
+                        Momo_Indent_Nest *new_nest = Momo_Indent__NewNest(arena, &nest_alloc);
                         sll_stack_push(nest, new_nest);
                         nest->kind = TokenBaseKind_ParentheticalOpen;
-                        _update_line_cache(app, buffer, tab_width, &line_cache);
+                        Momo_Indent__LineCache_Update(app, buffer, tab_width, &line_cache);
                         nest->indent = (token->pos - line_cache.indent_info.first_char_pos) + 1;
                         following_indent = nest->indent;
                         shift_by_actual_indent = true;
@@ -242,7 +258,7 @@ _get_indentations_for_golang(Application_Links *app, Arena *arena, Buffer_ID buf
                         if (nest != 0 && nest->kind == TokenBaseKind_ParentheticalOpen){
                             Momo_Indent_Nest *n = nest;
                             sll_stack_pop(nest);
-                            _free_indent_nest(&nest_alloc, n);
+                            Momo_Indent__FreeNest(&nest_alloc, n);
                         }
                         following_indent = 0;
                         if (nest != 0){
@@ -286,7 +302,7 @@ actual_indent = N; )
             
             i64 line_where_token_ends = get_line_number_from_pos(app, buffer, token->pos + token->size);
             if (lines.first <= line_where_token_ends){
-                _update_line_cache(app, buffer, tab_width, &line_cache);
+                Momo_Indent__LineCache_Update(app, buffer, tab_width, &line_cache);
                 i64 line_where_token_starts_shift = this_indent - line_cache.indent_info.indent_pos;
                 for (;line_it < line_where_token_ends;){
                     line_it += 1;
@@ -308,7 +324,7 @@ actual_indent = N; )
             }
             
             if (token->kind != TokenBaseKind_Comment){
-                in_unfinished_statement = _is_unfinished_statment(token, nest);
+                in_unfinished_statement = Momo_Indent__IsUnfinishedStatement(token, nest);
                 if (in_unfinished_statement) {
                     //following_indent += indent_width;
                 }
@@ -328,7 +344,7 @@ actual_indent = N; )
 }
 
 internal i64*
-_get_indentations_for_default(Application_Links *app, Arena *arena, Buffer_ID buffer, Range_i64 lines, Indent_Flag flags, i32 tab_width, i32 indent_width){
+Momo_Indent__GetIndentationArrayDefault(Application_Links *app, Arena *arena, Buffer_ID buffer, Range_i64 lines, Indent_Flag flags, i32 tab_width, i32 indent_width){
     ProfileScope(app, "get indentation array");
     i64 count = lines.max - lines.min + 1;
     i64 *indentations = push_array(arena, i64, count);
@@ -387,7 +403,7 @@ _get_indentations_for_default(Application_Links *app, Arena *arena, Buffer_ID bu
                 switch (token->kind){
                     case TokenBaseKind_ScopeOpen:
                     {
-                        Momo_Indent_Nest *new_nest = _new_indent_nest(arena, &nest_alloc);
+                        Momo_Indent_Nest *new_nest = Momo_Indent__NewNest(arena, &nest_alloc);
                         sll_stack_push(nest, new_nest);
                         nest->kind = TokenBaseKind_ScopeOpen;
                         nest->indent = current_indent + indent_width;
@@ -400,12 +416,12 @@ _get_indentations_for_default(Application_Links *app, Arena *arena, Buffer_ID bu
                         for (;nest != 0 && nest->kind != TokenBaseKind_ScopeOpen;){
                             Momo_Indent_Nest *n = nest;
                             sll_stack_pop(nest);
-                            _free_indent_nest(&nest_alloc, n);
+                            Momo_Indent__FreeNest(&nest_alloc, n);
                         }
                         if (nest != 0 && nest->kind == TokenBaseKind_ScopeOpen){
                             Momo_Indent_Nest *n = nest;
                             sll_stack_pop(nest);
-                            _free_indent_nest(&nest_alloc, n);
+                            Momo_Indent__FreeNest(&nest_alloc, n);
                         }
                         this_indent = 0;
                         if (nest != 0){
@@ -417,10 +433,10 @@ _get_indentations_for_default(Application_Links *app, Arena *arena, Buffer_ID bu
                     
                     case TokenBaseKind_ParentheticalOpen:
                     {
-                        Momo_Indent_Nest *new_nest = _new_indent_nest(arena, &nest_alloc);
+                        Momo_Indent_Nest *new_nest = Momo_Indent__NewNest(arena, &nest_alloc);
                         sll_stack_push(nest, new_nest);
                         nest->kind = TokenBaseKind_ParentheticalOpen;
-                        _update_line_cache(app, buffer, tab_width, &line_cache);
+                        Momo_Indent__LineCache_Update(app, buffer, tab_width, &line_cache);
                         nest->indent = (token->pos - line_cache.indent_info.first_char_pos) + 1;
                         following_indent = nest->indent;
                         shift_by_actual_indent = true;
@@ -432,7 +448,7 @@ _get_indentations_for_default(Application_Links *app, Arena *arena, Buffer_ID bu
                         if (nest != 0 && nest->kind == TokenBaseKind_ParentheticalOpen){
                             Momo_Indent_Nest *n = nest;
                             sll_stack_pop(nest);
-                            _free_indent_nest(&nest_alloc, n);
+                            Momo_Indent__FreeNest(&nest_alloc, n);
                         }
                         following_indent = 0;
                         if (nest != 0){
@@ -476,7 +492,7 @@ actual_indent = N; )
             
             i64 line_where_token_ends = get_line_number_from_pos(app, buffer, token->pos + token->size);
             if (lines.first <= line_where_token_ends){
-                _update_line_cache(app, buffer, tab_width, &line_cache);
+                Momo_Indent__LineCache_Update(app, buffer, tab_width, &line_cache);
                 i64 line_where_token_starts_shift = this_indent - line_cache.indent_info.indent_pos;
                 for (;line_it < line_where_token_ends;){
                     line_it += 1;
@@ -498,7 +514,7 @@ actual_indent = N; )
             }
             
             if (token->kind != TokenBaseKind_Comment){
-                in_unfinished_statement = _is_unfinished_statment(token, nest);
+                in_unfinished_statement = Momo_Indent__IsUnfinishedStatement(token, nest);
                 if (in_unfinished_statement){
                     following_indent += indent_width;
                 }
@@ -519,21 +535,21 @@ actual_indent = N; )
 
 
 internal i64*
-_get_indentations(Application_Links *app, Arena *arena, Buffer_ID buffer, Range_i64 lines, Indent_Flag flags, i32 tab_width, i32 indent_width){
+Momo_Indent__GetIndentationArrayBasedOnExtension(Application_Links *app, Arena *arena, Buffer_ID buffer, Range_i64 lines, Indent_Flag flags, i32 tab_width, i32 indent_width){
     String8 file_name = push_buffer_file_name(app, arena, buffer);
     if (file_name.size > 0){
         String8 extension = string_file_extension(file_name);
         if (string_match(extension, S8Lit("go"))) {
-            return _get_indentations_for_golang(app, arena, buffer, lines, flags, tab_width, indent_width);
+            return Momo_Indent__GetIndentationArrayGolang(app, arena, buffer, lines, flags, tab_width, indent_width);
         }
     }
 
-    return _get_indentations_for_default(app, arena, buffer, lines, flags, tab_width, indent_width);
+    return Momo_Indent__GetIndentationArrayDefault(app, arena, buffer, lines, flags, tab_width, indent_width);
     
 }
 
 function b32
-indent_buffer(Application_Links *app, Buffer_ID buffer, Range_i64 pos, Indent_Flag flags, i32 tab_width, i32 indent_width){
+Momo_Indent_IndentBuffer(Application_Links *app, Buffer_ID buffer, Range_i64 pos, Indent_Flag flags, i32 tab_width, i32 indent_width){
     ProfileScope(app, "auto indent buffer");
     Token_Array token_array = get_token_array_from_buffer(app, buffer);
     Token_Array *tokens = &token_array;
@@ -562,15 +578,15 @@ indent_buffer(Application_Links *app, Buffer_ID buffer, Range_i64 pos, Indent_Fl
         }
         line_numbers = get_line_range_from_pos_range(app, buffer, pos);
         
-        i64 *indentations = _get_indentations(app, scratch, buffer, line_numbers, flags, tab_width, indent_width);
-        _set_line_indents(app, scratch, buffer, line_numbers, indentations, flags, tab_width);
+        i64 *indentations = Momo_Indent__GetIndentationArrayBasedOnExtension(app, scratch, buffer, line_numbers, flags, tab_width, indent_width);
+        Momo_Indent_SetLineIndents(app, scratch, buffer, line_numbers, indentations, flags, tab_width);
     }
     
     return(result);
 }
 
-function b32
-indent_buffer(Application_Links *app, Buffer_ID buffer, Range_i64 pos, Indent_Flag flags){
+function void
+Momo_Indent_IndentBuffer(Application_Links *app, Buffer_ID buffer, Range_i64 pos, Indent_Flag flags){
     i32 indent_width = (i32)def_get_config_u64(app, vars_save_string_lit("indent_width"));
     i32 tab_width = (i32)def_get_config_u64(app, vars_save_string_lit("default_tab_width"));
     tab_width = clamp_bot(1, tab_width);
@@ -579,35 +595,17 @@ indent_buffer(Application_Links *app, Buffer_ID buffer, Range_i64 pos, Indent_Fl
     if (indent_with_tabs){
         AddFlag(flags, Indent_UseTab);
     }
-    return indent_buffer(app, buffer, pos, flags, indent_width, tab_width);
-}
-
-function b32
-indent_buffer(Application_Links *app, Buffer_ID buffer, Range_i64 pos){
-    return indent_buffer(app, buffer, pos, 0);
-}
-
-
-
-function void
-indent_lines_right(Application_Links *app, Buffer_ID buffer, Range_i64 view_range, Indent_Flag flags) {
-    Scratch_Block scratch(app);
-    i32 indent_width = (i32)def_get_config_u64(app, vars_save_string_lit("indent_width"));
-    i32 tab_width = (i32)def_get_config_u64(app, vars_save_string_lit("default_tab_width"));
-    tab_width = clamp_bot(1, tab_width);
-    AddFlag(flags, Indent_FullTokens);
-    b32 indent_with_tabs = def_get_config_b32(vars_save_string_lit("indent_with_tabs"));
-    if (indent_with_tabs){
-        AddFlag(flags, Indent_UseTab);
-    }
-
-    Range_i64 line_numbers = get_line_range_from_pos_range(app, buffer, view_range);
-    i64* indentations = _get_indentations_to_shift_lines_right(app, scratch, buffer, line_numbers, flags, tab_width, indent_width);
-    _set_line_indents(app, scratch, buffer, line_numbers, indentations, flags, tab_width);
+    Momo_Indent_IndentBuffer(app, buffer, pos, flags, indent_width, tab_width);
 }
 
 function void
-write_text_and_indent(Application_Links* app, String_Const_u8 insert) {
+Momo_Indent_IndentBuffer(Application_Links *app, Buffer_ID buffer, Range_i64 pos){
+    Momo_Indent_IndentBuffer(app, buffer, pos, 0);
+}
+
+
+function void
+Momo_Indent_WriteTextAndIndent(Application_Links* app, String_Const_u8 insert) {
     if (insert.str != 0 && insert.size > 0){
         b32 do_auto_indent = false;
         for (u64 i = 0; !do_auto_indent && i < insert.size; i += 1){
@@ -641,7 +639,7 @@ write_text_and_indent(Application_Links* app, String_Const_u8 insert) {
             pos.min = Min(pos.min, end_pos);
             pos.max = Max(pos.max, end_pos);
             
-            indent_buffer(app, buffer, pos, 0);
+            Momo_Indent_IndentBuffer(app, buffer, pos, 0);
             move_past_lead_whitespace(app, view, buffer);
         }
         else{
