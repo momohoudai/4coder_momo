@@ -12,7 +12,7 @@ BUFFER_HOOK_SIG(momo_save_file){
     b32 auto_indent = def_get_config_b32(vars_save_string_lit("automatically_indent_text_on_save"));
     b32 is_virtual = def_get_config_b32(vars_save_string_lit("enable_virtual_whitespace"));
     if (auto_indent && is_virtual){
-        Momo_Indent_IndentBuffer(app, buffer_id, buffer_range(app, buffer_id));
+        indent_buffer(app, buffer_id, buffer_range(app, buffer_id));
     }
     
     Managed_Scope scope = buffer_get_managed_scope(app, buffer_id);
