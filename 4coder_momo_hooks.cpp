@@ -12,7 +12,7 @@ BUFFER_HOOK_SIG(momo_save_file){
     b32 auto_indent = def_get_config_b32(vars_save_string_lit("automatically_indent_text_on_save"));
     b32 is_virtual = def_get_config_b32(vars_save_string_lit("enable_virtual_whitespace"));
     if (auto_indent && is_virtual){
-        Momo_Indent_IndentBuffer(app, buffer_id, buffer_range(app, buffer_id));
+        momo_indent_buffer(app, buffer_id, buffer_range(app, buffer_id));
     }
     
     Managed_Scope scope = buffer_get_managed_scope(app, buffer_id);
@@ -122,10 +122,10 @@ momo_render_range_highlight(Application_Links *app, View_ID view_id, Text_Layout
     Rect_f32 range_start_rect = text_layout_character_on_screen(app, text_layout_id, range.start);
     Rect_f32 range_end_rect = text_layout_character_on_screen(app, text_layout_id, range.end-1);
     Rect_f32 total_range_rect = {0};
-    total_range_rect.x0 = MinimumF32(range_start_rect.x0, range_end_rect.x0);
-    total_range_rect.y0 = MinimumF32(range_start_rect.y0, range_end_rect.y0);
-    total_range_rect.x1 = MaximumF32(range_start_rect.x1, range_end_rect.x1);
-    total_range_rect.y1 = MaximumF32(range_start_rect.y1, range_end_rect.y1);
+    total_range_rect.x0 = Min(range_start_rect.x0, range_end_rect.x0);
+    total_range_rect.y0 = Min(range_start_rect.y0, range_end_rect.y0);
+    total_range_rect.x1 = Max(range_start_rect.x1, range_end_rect.x1);
+    total_range_rect.y1 = Max(range_start_rect.y1, range_end_rect.y1);
     
     switch (kind) {
         case MOMO_RANGE_HIGHLIGHT_KIND_UNDERLINE: {
@@ -191,10 +191,10 @@ momo_render_buffer(Application_Links *app, View_ID view_id, Face_ID face_id,
     
     // NOTE(rjf): Brace highlight
     {
-        Color_Array colors = finalize_color_array(fleury_color_brace_highlight);
+        Color_Array colors = finalize_color_array(momo_color_brace_highlight);
         if(colors.count >= 1 && Momo_Colors_IsArgbValid(colors.vals[0]))
         {
-            Momo_Brace_RenderHightlight(app, buffer, text_layout_id, cursor_pos,
+            momo_render_brace_highlight(app, buffer, text_layout_id, cursor_pos,
                                         colors.vals, colors.count);
         }
     }
@@ -346,8 +346,8 @@ momo_render_buffer(Application_Links *app, View_ID view_id, Face_ID face_id,
     Momo_Cursor_Render(app, view_id, is_active_view, buffer, text_layout_id, cursor_roundness, mark_thickness, frame_info);
 
     // NOTE(Momo): render brace ending annotation and brace lines
-    Momo_Brace_RenderCloseBraceAnnotation(app, buffer, text_layout_id, cursor_pos);
-    Momo_Brace_RenderLines(app, buffer, view_id, text_layout_id, cursor_pos);
+    momo_render_close_brace_annotation(app, buffer, text_layout_id, cursor_pos);
+    momo_render_brace_lines(app, buffer, view_id, text_layout_id, cursor_pos);
     
     // NOTE(allen): put the actual text on the actual screen
     draw_text_layout_default(app, text_layout_id);

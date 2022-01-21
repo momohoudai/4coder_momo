@@ -60,7 +60,7 @@ CUSTOM_DOC("Audo-indents the entire current buffer.")
   View_ID view = get_active_view(app, Access_ReadWriteVisible);
   Buffer_ID buffer = view_get_buffer(app, view, Access_ReadWriteVisible);
   i64 buffer_size = buffer_get_size(app, buffer);
-  Momo_Indent_IndentBuffer(app, buffer, Ii64(0, buffer_size));
+  momo_indent_buffer(app, buffer, Ii64(0, buffer_size));
 }
 
 CUSTOM_COMMAND_SIG(momo_indent_line_at_cursor)
@@ -69,7 +69,7 @@ CUSTOM_DOC("Auto-indents the line on which the cursor sits.")
   View_ID view = get_active_view(app, Access_ReadWriteVisible);
   Buffer_ID buffer = view_get_buffer(app, view, Access_ReadWriteVisible);
   i64 pos = view_get_cursor_pos(app, view);
-  Momo_Indent_IndentBuffer(app, buffer, Ii64(pos));
+  momo_indent_buffer(app, buffer, Ii64(pos));
   move_past_lead_whitespace(app, view, buffer);
 }
 
@@ -79,7 +79,7 @@ CUSTOM_DOC("Auto-indents the range between the cursor and the mark.")
   View_ID view = get_active_view(app, Access_ReadWriteVisible);
   Buffer_ID buffer = view_get_buffer(app, view, Access_ReadWriteVisible);
   Range_i64 range = get_view_range(app, view);
-  Momo_Indent_IndentBuffer(app, buffer, range);
+  momo_indent_buffer(app, buffer, range);
   move_past_lead_whitespace(app, view, buffer);
 }
 
@@ -94,7 +94,7 @@ CUSTOM_DOC("Inserts text and auto-indents the line on which the cursor sits if a
   ProfileScope(app, "write and auto indent");
   User_Input in = get_current_input(app);
   String_Const_u8 insert = to_writable(&in);
-  Momo_Indent_WriteTextAndIndent(app, insert);
+  momo_write_text_and_indent(app, insert);
 }
 
 
@@ -161,7 +161,7 @@ CUSTOM_DOC("List all definitions in the index and jump to the one selected by th
   {
     View_ID view = get_this_ctx_view(app, Access_Always);
     point_stack_push_view_cursor(app, view);
-    Momo_JumpToLocation(app, view, result.buffer, result.pos);
+    momo_jump_to_location(app, view, result.buffer, result.pos);
   }
 }
 
@@ -337,7 +337,7 @@ CUSTOM_COMMAND_SIG(momo_append_line_and_enter_insert)
 CUSTOM_DOC("Inserts text and auto-indents the line on which the cursor sits if any of the text contains 'layout punctuation' such as ;:{}()[]# and new lines.")
 {
   seek_end_of_textual_line(app);
-  //Momo_Indent_WriteTextAndIndent(app, string_u8_litexpr("\n"));
+  //momo_write_text_and_indent(app, string_u8_litexpr("\n"));
   
   View_ID view = get_active_view(app, Access_ReadWriteVisible);
   Buffer_ID buffer = view_get_buffer(app, view, Access_ReadWriteVisible);
@@ -345,7 +345,7 @@ CUSTOM_DOC("Inserts text and auto-indents the line on which the cursor sits if a
   pos.min = view_get_cursor_pos(app, view);
   write_text(app, string_u8_litexpr("\n"));
   pos.max = view_get_cursor_pos(app, view);
-  Momo_Indent_IndentBuffer(app, buffer, pos, 0);
+  momo_indent_buffer(app, buffer, pos, 0);
   move_past_lead_whitespace(app, view, buffer);
   
   momo_switch_to_insert_mode(app);
@@ -437,23 +437,23 @@ CUSTOM_DOC("Vsplit panel but don't go")
 
 // NOTE(Momo): Yeah this is pretty dumb, but hey
 CUSTOM_COMMAND_SIG(momo_number_mode_1) 
-CUSTOM_DOC("Number Mode 1") { Momo_EnterNumberMode(app, string_u8_litexpr("1")); }
+CUSTOM_DOC("Number Mode 1") { momo_enter_number_mode(app, string_u8_litexpr("1")); }
 CUSTOM_COMMAND_SIG(momo_number_mode_2) 
-CUSTOM_DOC("Number Mode 2") { Momo_EnterNumberMode(app, string_u8_litexpr("2")); }
+CUSTOM_DOC("Number Mode 2") { momo_enter_number_mode(app, string_u8_litexpr("2")); }
 CUSTOM_COMMAND_SIG(momo_number_mode_3) 
-CUSTOM_DOC("Number Mode 3") { Momo_EnterNumberMode(app, string_u8_litexpr("3")); }
+CUSTOM_DOC("Number Mode 3") { momo_enter_number_mode(app, string_u8_litexpr("3")); }
 CUSTOM_COMMAND_SIG(momo_number_mode_4) 
-CUSTOM_DOC("Number Mode 4") { Momo_EnterNumberMode(app, string_u8_litexpr("4")); }
+CUSTOM_DOC("Number Mode 4") { momo_enter_number_mode(app, string_u8_litexpr("4")); }
 CUSTOM_COMMAND_SIG(momo_number_mode_5) 
-CUSTOM_DOC("Number Mode 5") { Momo_EnterNumberMode(app, string_u8_litexpr("5")); }
+CUSTOM_DOC("Number Mode 5") { momo_enter_number_mode(app, string_u8_litexpr("5")); }
 CUSTOM_COMMAND_SIG(momo_number_mode_6) 
-CUSTOM_DOC("Number Mode 6") { Momo_EnterNumberMode(app, string_u8_litexpr("6")); }
+CUSTOM_DOC("Number Mode 6") { momo_enter_number_mode(app, string_u8_litexpr("6")); }
 CUSTOM_COMMAND_SIG(momo_number_mode_7) 
-CUSTOM_DOC("Number Mode 7") { Momo_EnterNumberMode(app, string_u8_litexpr("7")); }
+CUSTOM_DOC("Number Mode 7") { momo_enter_number_mode(app, string_u8_litexpr("7")); }
 CUSTOM_COMMAND_SIG(momo_number_mode_8) 
-CUSTOM_DOC("Number Mode 8") { Momo_EnterNumberMode(app, string_u8_litexpr("8")); }
+CUSTOM_DOC("Number Mode 8") { momo_enter_number_mode(app, string_u8_litexpr("8")); }
 CUSTOM_COMMAND_SIG(momo_number_mode_9) 
-CUSTOM_DOC("Number Mode 9") { Momo_EnterNumberMode(app, string_u8_litexpr("9")); }
+CUSTOM_DOC("Number Mode 9") { momo_enter_number_mode(app, string_u8_litexpr("9")); }
 
 
 CUSTOM_UI_COMMAND_SIG(momo_search_for_definition_under_cursor_project_wide)
@@ -512,14 +512,14 @@ CUSTOM_COMMAND_SIG(momo_snipe_forward_whitespace_and_token_boundary)
 CUSTOM_DOC("Delete a single, whole token on or to the right of the cursor and post it to the clipboard.")
 {
   Scratch_Block scratch(app);
-  current_view_snipe_delete(app, Scan_Forward, push_boundary_list(scratch, Momo_BoundaryTokenAndWhiteSpace));
+  current_view_snipe_delete(app, Scan_Forward, push_boundary_list(scratch, momo_boundary_token_and_whitespace));
 }
 
 CUSTOM_COMMAND_SIG(momo_snipe_backward_whitespace_and_token_boundary)
 CUSTOM_DOC("Delete a single, whole token on or to the left of the cursor and post it to the clipboard.")
 {
   Scratch_Block scratch(app);
-  current_view_snipe_delete(app, Scan_Backward, push_boundary_list(scratch, Momo_BoundaryTokenAndWhiteSpace));
+  current_view_snipe_delete(app, Scan_Backward, push_boundary_list(scratch, momo_boundary_token_and_whitespace));
 }
 
 
@@ -853,8 +853,8 @@ CUSTOM_DOC("Removes #if 0/#endif")
       i64 endif_pos;
       i64 if0_pos;
       
-      Momo_SeekStringForward(app, buffer, -1, search_from, 0, if0_str, &if0_pos);
-      Momo_SeekStringForward(app, buffer, -1, search_from, 0, endif_str, &endif_pos);
+      momo_seek_string_forward(app, buffer, -1, search_from, 0, if0_str, &if0_pos);
+      momo_seek_string_forward(app, buffer, -1, search_from, 0, endif_str, &endif_pos);
       
       if (if0_pos != -1) {
         if (if0_pos < endif_pos) {
@@ -896,8 +896,8 @@ CUSTOM_DOC("Removes #if 0/#endif")
       // find the next #endif or #if0
       i64 endif_pos;
       i64 if0_pos;
-      Momo_SeekStringBackward(app, buffer, -1, search_from, 0, if0_str, &if0_pos);
-      Momo_SeekStringBackward(app, buffer, -1, search_from, 0, endif_str, &endif_pos);
+      momo_seek_string_backward(app, buffer, -1, search_from, 0, if0_str, &if0_pos);
+      momo_seek_string_backward(app, buffer, -1, search_from, 0, endif_str, &endif_pos);
       
       if (endif_pos != -1) {
         if (if0_pos < endif_pos) {
@@ -1084,10 +1084,10 @@ CUSTOM_DOC("Queries the user a string, and can do reverse and forward search wit
           if (match_key_code(&in, KeyCode_N)) {
             Input_Modifier_Set* mods = &in.event.key.modifiers;
             if (has_modifier(mods, KeyCode_Shift)) {
-              Momo_SeekStringBackward(app, buffer, match.start, match.start - 1, 0, find.string, &new_pos);
+              momo_seek_string_backward(app, buffer, match.start, match.start - 1, 0, find.string, &new_pos);
             }
             else {
-              Momo_SeekStringForward(app, buffer, match.start, match.end, 0, find.string, &new_pos);
+              momo_seek_string_forward(app, buffer, match.start, match.end, 0, find.string, &new_pos);
             }
           }
           
@@ -1147,14 +1147,14 @@ CUSTOM_COMMAND_SIG(momo_backspace_token_boundary)
 CUSTOM_DOC("Deletes left to a token boundary.")
 {
   Scratch_Block scratch(app);
-  current_view_boundary_delete(app, Scan_Backward, push_boundary_list(scratch, Momo_BoundaryTokenAndWhiteSpace));
+  current_view_boundary_delete(app, Scan_Backward, push_boundary_list(scratch, momo_boundary_token_and_whitespace));
 }
 
 CUSTOM_COMMAND_SIG(momo_delete_token_boundary)
 CUSTOM_DOC("Deletes right to a token boundary.")
 {
   Scratch_Block scratch(app);
-  current_view_boundary_delete(app, Scan_Forward, push_boundary_list(scratch, Momo_BoundaryTokenAndWhiteSpace));
+  current_view_boundary_delete(app, Scan_Forward, push_boundary_list(scratch, momo_boundary_token_and_whitespace));
 }
 
 CUSTOM_COMMAND_SIG(momo_backspace_alpha_numeric_or_camel_boundary)
@@ -1187,7 +1187,7 @@ CUSTOM_DOC("Shift lines to the right by indent width")
   View_ID view = get_active_view(app, Access_ReadWriteVisible);
   Buffer_ID buffer = view_get_buffer(app, view, Access_ReadWriteVisible);
   Range_i64 range = get_view_range(app, view);
-  Momo_Indent_IndentLinesRight(app, buffer, range, 0);
+  momo_indent_lines_right(app, buffer, range, 0);
   
 }
 

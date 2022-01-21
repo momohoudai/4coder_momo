@@ -4,6 +4,7 @@ static b32 g_query_lock = false;
 static String_Const_u8 g_file_bar_message = {};
 
 
+
 #define QueryLock \
 if (g_query_lock) { \
     momo_leave_event_unhandled(app); \
@@ -14,7 +15,7 @@ Defer { g_query_lock = false; };
 
 
 function void
-Momo_SeekStringForward(Application_Links* app, Buffer_ID buffer, i64 fallback_pos, i64 pos, i64 end, String_Const_u8 needle, i64* result) {
+momo_seek_string_forward(Application_Links* app, Buffer_ID buffer, i64 fallback_pos, i64 pos, i64 end, String_Const_u8 needle, i64* result) {
     if (end == 0) {
         end = (i32)buffer_get_size(app, buffer);
     }
@@ -36,7 +37,7 @@ Momo_SeekStringForward(Application_Links* app, Buffer_ID buffer, i64 fallback_po
 }
 
 function void
-Momo_SeekStringBackward(Application_Links* app, Buffer_ID buffer, i64 fallback_pos, i64 pos, i64 min, String_Const_u8 needle, i64* result) {
+momo_seek_string_backward(Application_Links* app, Buffer_ID buffer, i64 fallback_pos, i64 pos, i64 min, String_Const_u8 needle, i64* result) {
     String_Match match = {};
     match.range.first = pos;
     for (;;) {
@@ -54,7 +55,7 @@ Momo_SeekStringBackward(Application_Links* app, Buffer_ID buffer, i64 fallback_p
 
 
 function i64
-Momo_BoundaryWord(Application_Links* app, Buffer_ID buffer, Side side, Scan_Direction direction, i64 pos) {
+momo_boundary_word(Application_Links* app, Buffer_ID buffer, Side side, Scan_Direction direction, i64 pos) {
     i64 result = 0;
     if (direction == Scan_Forward) {
         result = Min(buffer_seek_character_class_change_0_1(app, buffer, &character_predicate_alpha_numeric_underscore_utf8, direction, pos),
@@ -74,7 +75,7 @@ Momo_BoundaryWord(Application_Links* app, Buffer_ID buffer, Side side, Scan_Dire
 
 
 function void
-Momo_EnterNumberMode(Application_Links* app, String_Const_u8 init_str) {
+momo_enter_number_mode(Application_Links* app, String_Const_u8 init_str) {
     QueryLock;
 
     View_ID view = get_active_view(app, Access_ReadVisible);
@@ -171,7 +172,7 @@ Momo_EnterNumberMode(Application_Links* app, String_Const_u8 init_str) {
 }
 
 internal void
-Momo_JumpToLocation(Application_Links *app, View_ID view, Buffer_ID buffer, i64 pos)
+momo_jump_to_location(Application_Links *app, View_ID view, Buffer_ID buffer, i64 pos)
 {
     // NOTE(rjf): This function was ripped from 4coder's jump_to_location. It was copied
     // and modified so that jumping to a location didn't cause a selection in notepad-like
@@ -192,7 +193,7 @@ Momo_JumpToLocation(Application_Links *app, View_ID view, Buffer_ID buffer, i64 
 
 
 function i64
-Momo_BoundaryTokenAndWhiteSpace(Application_Links *app, Buffer_ID buffer, 
+momo_boundary_token_and_whitespace(Application_Links *app, Buffer_ID buffer, 
                                Side side, Scan_Direction direction, i64 pos)
 {
     i64 result = boundary_non_whitespace(app, buffer, side, direction, pos);
