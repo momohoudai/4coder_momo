@@ -54,12 +54,12 @@ momo_do_full_lex_async_sub(Async_Context *actx, Buffer_ID buffer_id)
     Token_List list = {};
     b32 canceled = false;
     
-    Momo_Language *language = Momo_Language_GetFromBuffer(app, buffer_id);
+    Momo_Language *language = momo_get_language_from_buffer(app, buffer_id);
     
     // NOTE(rjf): Fall back to C++ if we don't have a proper language.
     if(language == 0)
     {
-        language = Momo_Language_GetFromString(S8Lit("cpp"));
+        language = momo_get_language_from_string(S8Lit("cpp"));
     }
     
     if(language != 0)
@@ -157,7 +157,7 @@ momo_render_buffer(Application_Links *app, View_ID view_id, Face_ID face_id,
     Token_Array token_array = get_token_array_from_buffer(app, buffer);
     if(token_array.tokens != 0)
     {
-        Momo_Colors_SyntaxHighlight(app, text_layout_id, &token_array);
+        momo_highlight_syntax(app, text_layout_id, &token_array);
         
         // NOTE(allen): Scan for TODOs and NOTEs
         b32 use_comment_keywords = def_get_config_b32(vars_save_string_lit("use_comment_keywords"));
@@ -192,7 +192,7 @@ momo_render_buffer(Application_Links *app, View_ID view_id, Face_ID face_id,
     // NOTE(rjf): Brace highlight
     {
         Color_Array colors = finalize_color_array(momo_color_brace_highlight);
-        if(colors.count >= 1 && Momo_Colors_IsArgbValid(colors.vals[0]))
+        if(colors.count >= 1 && momo_is_argb_valid(colors.vals[0]))
         {
             momo_render_brace_highlight(app, buffer, text_layout_id, cursor_pos,
                                         colors.vals, colors.count);
@@ -343,7 +343,7 @@ momo_render_buffer(Application_Links *app, View_ID view_id, Face_ID face_id,
     f32 mark_thickness = (f32)def_get_config_u64(app, vars_save_string_lit("mark_thickness"));
     
     // NOTE(rjf): Cursor
-    Momo_Cursor_Render(app, view_id, is_active_view, buffer, text_layout_id, cursor_roundness, mark_thickness, frame_info);
+    momo_render_cursor(app, view_id, is_active_view, buffer, text_layout_id, cursor_roundness, mark_thickness, frame_info);
 
     // NOTE(Momo): render brace ending annotation and brace lines
     momo_render_close_brace_annotation(app, buffer, text_layout_id, cursor_pos);
@@ -426,7 +426,7 @@ momo_render_buffer(Application_Links *app, View_ID view_id, Face_ID face_id,
     {
         Rect_f32 view_rect = view_get_screen_rect(app, view_id);
         ARGB_Color color = fcolor_resolve(fcolor_id(fleury_color_inactive_pane_overlay));
-        if(Momo_Colors_IsArgbValid(color))
+        if(momo_is_argb_valid(color))
         {
             draw_rectangle(app, view_rect, 0.f, color);
         }
@@ -471,7 +471,7 @@ momo_draw_file_bar(Application_Links *app, View_ID view_id, Buffer_ID buffer, Fa
             bar.y1,
         };
         ARGB_Color progress_bar_color = fcolor_resolve(fcolor_id(fleury_color_file_progress_bar));
-        if(Momo_Colors_IsArgbValid(progress_bar_color))
+        if(momo_is_argb_valid(progress_bar_color))
         {
             draw_rectangle(app, progress_bar_rect, 0, progress_bar_color);
         }
@@ -643,7 +643,7 @@ momo_render(Application_Links *app, Frame_Info frame_info, View_ID view_id)
         else if(is_active_view == 0)
         {
             ARGB_Color inactive_bg_color = fcolor_resolve(fcolor_id(fleury_color_inactive_pane_background));
-            if(Momo_Colors_IsArgbValid(inactive_bg_color))
+            if(momo_is_argb_valid(inactive_bg_color))
             {
                 color = inactive_bg_color;
             }
@@ -658,7 +658,7 @@ momo_render(Application_Links *app, Frame_Info frame_info, View_ID view_id)
         if(def_get_config_b32(vars_save_string_lit("f4_margin_use_mode_color")) &&
            is_active_view)
         {
-            color = Momo_Colors_GetCursorColor(app, global_keybinding_mode, global_keyboard_macro_is_recording);
+            color = momo_get_cursor_color(app, global_keybinding_mode, global_keyboard_macro_is_recording);
         }
         draw_margin(app, view_rect, region, color);
     }
@@ -793,7 +793,7 @@ function BUFFER_HOOK_SIG(momo_begin_buffer)
     // NOTE(rjf): Treat as code if we've identified the language of a file.
     if(treat_as_code == false)
     {
-        Momo_Language *language = Momo_Language_GetFromBuffer(app, buffer_id);
+        Momo_Language *language = momo_get_language_from_buffer(app, buffer_id);
         if(language)
         {
             treat_as_code = true;
@@ -1002,13 +1002,13 @@ function BUFFER_EDIT_RANGE_SIG(momo_buffer_edit_range)
             String_Const_u8 partial_text = push_buffer_range(app, scratch, buffer_id, relex_range);
             
             //~ NOTE(rjf): Lex
-            Momo_Language *language = Momo_Language_GetFromBuffer(app, buffer_id);
+            Momo_Language *language = momo_get_language_from_buffer(app, buffer_id);
             // NOTE(rjf): Fall back to C++ if we don't have a proper language.
             if(language == 0)
             {
-                language = Momo_Language_GetFromString(S8Lit("cpp"));
+                language = momo_get_language_from_string(S8Lit("cpp"));
             }
-            Token_List relex_list = Momo_Language_LexFullInput_NoBreaks(app, language, scratch, partial_text);
+            Token_List relex_list = momo_lex_text(app, language, scratch, partial_text);
             //~
             
             if (relex_range.one_past_last < buffer_get_size(app, buffer_id)){

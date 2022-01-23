@@ -24,5 +24,10 @@ CUSTOM_ID(colors, fleury_color_lego_grab);
 CUSTOM_ID(colors, fleury_color_lego_splat);
 CUSTOM_ID(colors, fleury_color_error_annotation);
 
-static ARGB_Color Momo_Colors_ARGBFromID(Color_Table table, Managed_ID id, int subindex);
-static ARGB_Color Momo_Colors_ARGBFromID(Color_Table table, Managed_ID id);
+enum Momo_KeybindingMode;
+
+static ARGB_Color momo_argb_from_id(Color_Table table, Managed_ID id, int subindex);
+static ARGB_Color momo_argb_from_id(Color_Table table, Managed_ID id);
+static b32 momo_is_argb_valid(ARGB_Color color);
+static ARGB_Color momo_get_cursor_color(Application_Links *app, Momo_KeybindingMode mode, b32 is_recording_mode);
+static void momo_highlight_syntax(Application_Links *app, Text_Layout_ID text_layout_id, Token_Array *array);

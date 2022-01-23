@@ -371,7 +371,7 @@ internal void
 Momo_Index_ParseFile(Application_Links *app, Momo_Index_File *file, String_Const_u8 string, Token_Array tokens)
 {
     Momo_Index_Lock();
-    struct Momo_Language *lang = Momo_Language_GetFromBuffer(app, file->buffer);
+    struct Momo_Language *lang = momo_get_language_from_buffer(app, file->buffer);
     _Momo_Index_Parse(app, file, string, tokens, lang);
     Momo_Index_Unlock();
 }

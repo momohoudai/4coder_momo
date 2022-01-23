@@ -58,3 +58,13 @@ struct Momo_Language_State
 };
 
 global Momo_Language_State momo_langs = {};
+
+static void momo_register_all_languages(void);
+static Momo_Language* momo_get_language_from_string(String_Const_u8 name);
+static Momo_Language* momo_get_language_from_buffer(Application_Links *app, Buffer_ID buffer);
+static void momo_push_data_to_language_pos_context_call(Arena *arena,
+                                                    Momo_Language_PosContextData **first_ptr,
+                                                    Momo_Language_PosContextData **last_ptr,
+                                                    String_Const_u8 string, int param_idx);
+                                                    
+static Token_List momo_lex_text(Application_Links *app, Momo_Language *language, Arena *arena, String_Const_u8 text);

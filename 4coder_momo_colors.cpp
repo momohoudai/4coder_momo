@@ -1,13 +1,13 @@
 
 
-function b32
-Momo_Colors_IsArgbValid(ARGB_Color color)
+static b32
+momo_is_argb_valid(ARGB_Color color)
 {
     return color != 0xFF990099;
 }
 
 static ARGB_Color
-Momo_Colors_ARGBFromID(Color_Table table, Managed_ID id, int subindex)
+momo_argb_from_id(Color_Table table, Managed_ID id, int subindex)
 {
     ARGB_Color result = 0;
     FColor color = fcolor_id(id);
@@ -23,15 +23,15 @@ Momo_Colors_ARGBFromID(Color_Table table, Managed_ID id, int subindex)
 }
 
 static ARGB_Color
-Momo_Colors_ARGBFromID(Color_Table table, Managed_ID id)
+momo_argb_from_id(Color_Table table, Managed_ID id)
 {
-    return Momo_Colors_ARGBFromID(table, id, 0);
+    return momo_argb_from_id(table, id, 0);
 }
 
 internal ARGB_Color
-Momo_Colors_GetTokenColor(Application_Links *app, Token* token, Buffer_ID buffer, Token* next_token) {
+_momo_get_token_color(Application_Links *app, Token* token, Buffer_ID buffer, Token* next_token) {
     Color_Table table = active_color_table;
-    ARGB_Color default_color = Momo_Colors_ARGBFromID(table, defcolor_text_default);
+    ARGB_Color default_color = momo_argb_from_id(table, defcolor_text_default);
     ARGB_Color color = default_color;
     f32 t = 1;
 
@@ -52,7 +52,7 @@ Momo_Colors_GetTokenColor(Application_Links *app, Token* token, Buffer_ID buffer
                     {
                         case MOMO_INDEX_NOTE_KIND_TYPE:
                         {
-                            color = Momo_Colors_ARGBFromID(table,
+                            color = momo_argb_from_id(table,
                                                   note->flags & MOMO_INDEX_NOTE_FLAG_SUM_TYPE
                                                   ? fleury_color_index_sum_type
                                                   : fleury_color_index_product_type);
@@ -60,24 +60,24 @@ Momo_Colors_GetTokenColor(Application_Links *app, Token* token, Buffer_ID buffer
                         
                         case MOMO_INDEX_NOTE_KIND_MACRO:
                         {
-                            color = Momo_Colors_ARGBFromID(table, fleury_color_index_macro);
+                            color = momo_argb_from_id(table, fleury_color_index_macro);
                         }break;
                         
                         case MOMO_INDEX_NOTE_KIND_FUNCTION:
                         {
                             // We only attempt to highlight a function when it 'looks' like a function
                             // (i.e. opening braces after the token)
-                            color = Momo_Colors_ARGBFromID(table, fleury_color_index_function);
+                            color = momo_argb_from_id(table, fleury_color_index_function);
                         }break;
                         
                         case MOMO_INDEX_NOTE_KIND_CONSTANT:
                         {
-                            color = Momo_Colors_ARGBFromID(table, fleury_color_index_constant);
+                            color = momo_argb_from_id(table, fleury_color_index_constant);
                         }break;
                         
                         case MOMO_INDEX_NOTE_KIND_DECL:
                         {
-                            color = Momo_Colors_ARGBFromID(table, fleury_color_index_decl);
+                            color = momo_argb_from_id(table, fleury_color_index_decl);
                         }break;
                         
                         default: {
@@ -85,18 +85,18 @@ Momo_Colors_GetTokenColor(Application_Links *app, Token* token, Buffer_ID buffer
                         }
                     }
                     
-                    if(!Momo_Colors_IsArgbValid(color)) { color = default_color; }
+                    if(!momo_is_argb_valid(color)) { color = default_color; }
                 }
                 
             }break;
             
-            case TokenBaseKind_Preprocessor:     { color = Momo_Colors_ARGBFromID(table, defcolor_preproc); } break;
-            case TokenBaseKind_Keyword:          { color = Momo_Colors_ARGBFromID(table, defcolor_keyword); } break;
-            case TokenBaseKind_Comment:          { color = Momo_Colors_ARGBFromID(table, defcolor_comment); } break;
-            case TokenBaseKind_LiteralString:    { color = Momo_Colors_ARGBFromID(table, defcolor_str_constant); } break;
-            case TokenBaseKind_LiteralInteger:   { color = Momo_Colors_ARGBFromID(table, defcolor_int_constant); } break;
-            case TokenBaseKind_LiteralFloat:     { color = Momo_Colors_ARGBFromID(table, defcolor_float_constant); } break;
-            case TokenBaseKind_Operator:         { color = Momo_Colors_ARGBFromID(table, fleury_color_operators); if(!Momo_Colors_IsArgbValid(color)) { color = default_color; } } break;
+            case TokenBaseKind_Preprocessor:     { color = momo_argb_from_id(table, defcolor_preproc); } break;
+            case TokenBaseKind_Keyword:          { color = momo_argb_from_id(table, defcolor_keyword); } break;
+            case TokenBaseKind_Comment:          { color = momo_argb_from_id(table, defcolor_comment); } break;
+            case TokenBaseKind_LiteralString:    { color = momo_argb_from_id(table, defcolor_str_constant); } break;
+            case TokenBaseKind_LiteralInteger:   { color = momo_argb_from_id(table, defcolor_int_constant); } break;
+            case TokenBaseKind_LiteralFloat:     { color = momo_argb_from_id(table, defcolor_float_constant); } break;
+            case TokenBaseKind_Operator:         { color = momo_argb_from_id(table, fleury_color_operators); if(!momo_is_argb_valid(color)) { color = default_color; } } break;
             
             case TokenBaseKind_ScopeOpen:
             case TokenBaseKind_ScopeClose:
@@ -104,8 +104,8 @@ Momo_Colors_GetTokenColor(Application_Links *app, Token* token, Buffer_ID buffer
             case TokenBaseKind_ParentheticalClose:
             case TokenBaseKind_StatementClose:
             {
-                color = Momo_Colors_ARGBFromID(table, fleury_color_syntax_crap);
-                if(!Momo_Colors_IsArgbValid(color)) { color = default_color; }
+                color = momo_argb_from_id(table, fleury_color_syntax_crap);
+                if(!momo_is_argb_valid(color)) { color = default_color; }
                 break;
             }
             
@@ -116,7 +116,7 @@ Momo_Colors_GetTokenColor(Application_Links *app, Token* token, Buffer_ID buffer
                     case TokenCppKind_LiteralTrue:
                     case TokenCppKind_LiteralFalse:
                     {
-                        color = Momo_Colors_ARGBFromID(table, defcolor_bool_constant);
+                        color = momo_argb_from_id(table, defcolor_bool_constant);
                         break;
                     }
                     case TokenCppKind_LiteralCharacter:
@@ -125,12 +125,12 @@ Momo_Colors_GetTokenColor(Application_Links *app, Token* token, Buffer_ID buffer
                     case TokenCppKind_LiteralCharacterUTF16:
                     case TokenCppKind_LiteralCharacterUTF32:
                     {
-                        color = Momo_Colors_ARGBFromID(table, defcolor_char_constant);
+                        color = momo_argb_from_id(table, defcolor_char_constant);
                         break;
                     }
                     case TokenCppKind_PPIncludeFile:
                     {
-                        color = Momo_Colors_ARGBFromID(table, defcolor_include);
+                        color = momo_argb_from_id(table, defcolor_include);
                         break;
                     }
                 }
@@ -144,14 +144,14 @@ Momo_Colors_GetTokenColor(Application_Links *app, Token* token, Buffer_ID buffer
 
 
 internal ARGB_Color
-Momo_Colors_GetCursorColor(Application_Links *app, Momo_KeybindingMode mode, b32 is_recording_mode) {
+momo_get_cursor_color(Application_Links *app, Momo_KeybindingMode mode, b32 is_recording_mode) {
     // TODO: more control over possible colors?
     Color_Table table = active_color_table;
-    ARGB_Color cursor_color = Momo_Colors_ARGBFromID(table, defcolor_cursor, mode);
+    ARGB_Color cursor_color = momo_argb_from_id(table, defcolor_cursor, mode);
     ARGB_Color color_to_blend = cursor_color;
     
     if (is_recording_mode) {
-        color_to_blend = Momo_Colors_ARGBFromID(table, fleury_color_cursor_macro);
+        color_to_blend = momo_argb_from_id(table, fleury_color_cursor_macro);
     }
     
     return color_blend(cursor_color, 0.5f, color_to_blend);
@@ -160,14 +160,14 @@ Momo_Colors_GetCursorColor(Application_Links *app, Momo_KeybindingMode mode, b32
 
 
 static void
-Momo_Colors_SyntaxHighlight(Application_Links *app, Text_Layout_ID text_layout_id, Token_Array *array)
+momo_highlight_syntax(Application_Links *app, Text_Layout_ID text_layout_id, Token_Array *array)
 {
     Color_Table table = active_color_table;
     Buffer_ID buffer = text_layout_get_buffer(app, text_layout_id);
     Range_i64 visible_range = text_layout_get_visible_range(app, text_layout_id);
     i64 first_index = token_index_from_pos(array, visible_range.first);
     Token_Iterator_Array it = token_iterator_index(0, array, first_index);
-    ARGB_Color comment_tag_color = Momo_Colors_ARGBFromID(table, fleury_color_index_comment_tag, 0);
+    ARGB_Color comment_tag_color = momo_argb_from_id(table, fleury_color_index_comment_tag, 0);
     
     for(;;)
     {
@@ -182,11 +182,11 @@ Momo_Colors_SyntaxHighlight(Application_Links *app, Text_Layout_ID text_layout_i
 
 
         Token* next_token = token_it_read(&next_it);
-        ARGB_Color argb = Momo_Colors_GetTokenColor(app, token, buffer, next_token);
+        ARGB_Color argb = _momo_get_token_color(app, token, buffer, next_token);
         paint_text_color(app, text_layout_id, Ii64_size(token->pos, token->size), argb);
         
         // NOTE(rjf): Substrings from comments
-        if(Momo_Colors_IsArgbValid(comment_tag_color))
+        if(momo_is_argb_valid(comment_tag_color))
         {
             if(token->kind == TokenBaseKind_Comment)
             {
@@ -216,7 +216,7 @@ Momo_Colors_SyntaxHighlight(Application_Links *app, Text_Layout_ID text_layout_i
         }
     }
     
-    Momo_Language *lang = Momo_Language_GetFromBuffer(app, buffer);
+    Momo_Language *lang = momo_get_language_from_buffer(app, buffer);
     if(lang != 0 && lang->Highlight != 0)
     {
         lang->Highlight(app, text_layout_id, array, table);

@@ -1,20 +1,5 @@
-
-internal void
-Momo_CS_ParseMacro(Momo_Index_ParseCtx *ctx)
-{
-    Token *name = 0;
-    if(Momo_Index_ParsePattern(ctx, "%k", TokenBaseKind_Identifier, &name))
-    {
-        Momo_Index_MakeNote(ctx->app, ctx->file, 0, Momo_Index_StringFromToken(ctx, name),
-                          MOMO_INDEX_NOTE_KIND_MACRO, 0, Ii64(name));
-        Momo_Index_SkipSoftTokens(ctx, 1);
-    }
-}
-
-
-
 internal b32
-Momo_Go_ParseSkippableContent(Momo_Index_ParseCtx *ctx)
+_momo_parse_golang_skippable_content(Momo_Index_ParseCtx *ctx)
 {
     b32 body_found = 0;
     int nest = 0;
@@ -26,10 +11,6 @@ Momo_Go_ParseSkippableContent(Momo_Index_ParseCtx *ctx)
         if(Momo_Index_ParsePattern(ctx, "%k", TokenBaseKind_Comment, &name))
         {
             Momo_Index_ParseComment(ctx, name);
-        }
-        else if(Momo_Index_ParsePattern(ctx, "%b", TokenCppKind_PPDefine, &name))
-        {
-            Momo_CS_ParseMacro(ctx);
         }
         else if(Momo_Index_ParsePattern(ctx, "%t", "{"))
         {
@@ -59,7 +40,7 @@ Momo_Go_ParseSkippableContent(Momo_Index_ParseCtx *ctx)
 
 
 function b32
-Momo_Go_ParseFunctionBody(Momo_Index_ParseCtx *ctx)
+_momo_parse_golang_function_body(Momo_Index_ParseCtx *ctx)
 {
     b32 valid = 0;
     b32 prototype = 0;
@@ -89,7 +70,7 @@ Momo_Go_ParseFunctionBody(Momo_Index_ParseCtx *ctx)
     {
         if(prototype == 0)
         {
-            Momo_Go_ParseSkippableContent(ctx);
+            _momo_parse_golang_skippable_content(ctx);
         }
     }
     
@@ -98,7 +79,7 @@ Momo_Go_ParseFunctionBody(Momo_Index_ParseCtx *ctx)
 
 // Go structs can contain functions, so we need to parse that within itself as well...
 function void
-Momo_Go_ParseStructBody(Momo_Index_ParseCtx *ctx)
+_momo_parse_golang_struct_body(Momo_Index_ParseCtx *ctx)
 {
     Token *base_type = 0;
     Token *name = 0;
@@ -154,7 +135,7 @@ Momo_Go_ParseStructBody(Momo_Index_ParseCtx *ctx)
                 }
 
                 if (!constructor) {
-                    if(Momo_Go_ParseFunctionBody(ctx)) {
+                    if(_momo_parse_golang_function_body(ctx)) {
                         auto name = Momo_Index_StringFromToken(ctx, func_name);
                         Momo_Index_MakeNote(ctx->app, ctx->file, name, name,
                                         MOMO_INDEX_NOTE_KIND_FUNCTION, 0, Ii64(func_name));
@@ -182,7 +163,7 @@ Momo_Go_ParseStructBody(Momo_Index_ParseCtx *ctx)
 }
 
 function void
-Momo_Go_ParseEnumBody(Momo_Index_ParseCtx *ctx)
+_momo_parse_golang_enum_body(Momo_Index_ParseCtx *ctx)
 {
     if(Momo_Index_ParsePattern(ctx, "%t", "{"))
     {
@@ -229,7 +210,7 @@ Momo_Go_ParseEnumBody(Momo_Index_ParseCtx *ctx)
     }
 }
 
-internal MOMO_LANGUAGE_INDEXFILE(Momo_Go_Index_File)
+internal MOMO_LANGUAGE_INDEXFILE(momo_index_golang_file)
 {
     int scope_nest = 0;
     for(b32 handled = 0; !ctx->done;)
@@ -271,7 +252,7 @@ internal MOMO_LANGUAGE_INDEXFILE(Momo_Go_Index_File)
                 Momo_Index_ParsePattern(ctx, "%t", "class"))
         {
             handled = 1;      
-            Momo_Go_ParseStructBody(ctx);
+            _momo_parse_golang_struct_body(ctx);
                     
         }
         
@@ -282,7 +263,7 @@ internal MOMO_LANGUAGE_INDEXFILE(Momo_Go_Index_File)
         else if(Momo_Index_ParsePattern(ctx, "%t%k", "enum", TokenBaseKind_Identifier, &name))
         {
             handled = 1;
-            //Momo_Go_ParseEnumBody(ctx);
+            //_momo_parse_golang_enum_body(ctx);
             Momo_Index_MakeNote(ctx->app, ctx->file, 0, Momo_Index_StringFromToken(ctx, name),
                                   MOMO_INDEX_NOTE_KIND_TYPE, 0, Ii64(name));
         }
@@ -294,15 +275,7 @@ internal MOMO_LANGUAGE_INDEXFILE(Momo_Go_Index_File)
             handled = 1;
             Momo_Index_ParseComment(ctx, name);
         }
-        
-        //~ NOTE(rjf): Macros
-        else if(Momo_Index_ParsePattern(ctx, "%b", TokenCppKind_PPDefine, &name))
-        {
-            handled = 1;
-            Momo_CS_ParseMacro(ctx);
-        }
-        
-        
+
         if(handled == 0)
         {
             Momo_Index_ParseCtx_Inc(ctx, 0);
@@ -310,7 +283,7 @@ internal MOMO_LANGUAGE_INDEXFILE(Momo_Go_Index_File)
     }
 }
 
-internal MOMO_LANGUAGE_POSCONTEXT(Momo_Go_PosContext)
+internal MOMO_LANGUAGE_POSCONTEXT(momo_golang_pos_context)
 {
     int count = 0;
     Momo_Language_PosContextData *first = 0;
@@ -335,7 +308,7 @@ internal MOMO_LANGUAGE_POSCONTEXT(Momo_Go_PosContext)
                     Token *name = token_it_read(&it);
                     if(name && name->kind == TokenBaseKind_Identifier)
                     {
-                        Momo_Language_PosContext_PushDataCall(arena, &first, &last, push_buffer_range(app, arena, buffer, Ii64(name)), arg_idx);
+                        momo_push_data_to_language_pos_context_call(arena, &first, &last, push_buffer_range(app, arena, buffer, Ii64(name)), arg_idx);
                         count += 1;
                         arg_idx = 0;
                     }
@@ -397,6 +370,6 @@ internal MOMO_LANGUAGE_POSCONTEXT(Momo_Go_PosContext)
     return first;
 }
 
-internal MOMO_LANGUAGE_HIGHLIGHT(Momo_Go_Highlight)
+internal MOMO_LANGUAGE_HIGHLIGHT(momo_highlight_golang)
 {
 }
