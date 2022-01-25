@@ -1,7 +1,7 @@
 /* date = January 29th 2021 9:37 pm */
 
-internal Momo_Language *
-Momo_Language_GetFromString(String_Const_u8 name)
+static Momo_Language *
+momo_get_language_from_string(String_Const_u8 name)
 {
     Momo_Language *result = 0;
     if(momo_langs.initialized)
@@ -20,10 +20,10 @@ Momo_Language_GetFromString(String_Const_u8 name)
     return result;
 }
 
-#define Momo_Language_Register(name, IndexFile, LexInit, LexFullInput, PosContext, Highlight, lex_state_type) _Momo_Language_Resgister(name, IndexFile, (Momo_Language_LexInit *)LexInit, (Momo_Language_LexFullInput *)LexFullInput, (Momo_Language_PosContext *)PosContext, (Momo_Language_Highlight *)Highlight, sizeof(lex_state_type))
+#define _momo_register_language(name, IndexFile, LexInit, LexFullInput, PosContext, Highlight, lex_state_type) _momo_register_language_sub(name, IndexFile, (Momo_Language_LexInit *)LexInit, (Momo_Language_LexFullInput *)LexFullInput, (Momo_Language_PosContext *)PosContext, (Momo_Language_Highlight *)Highlight, sizeof(lex_state_type))
 
 internal void
-_Momo_Language_Resgister(String_Const_u8 name,
+_momo_register_language_sub(String_Const_u8 name,
                      Momo_Language_IndexFile          *IndexFile,
                      Momo_Language_LexInit            *LexInit,
                      Momo_Language_LexFullInput       *LexFullInput,
@@ -66,18 +66,18 @@ _Momo_Language_Resgister(String_Const_u8 name,
 }
 
 internal Momo_Language *
-Momo_Language_GetFromBuffer(Application_Links *app, Buffer_ID buffer)
+momo_get_language_from_buffer(Application_Links *app, Buffer_ID buffer)
 {
     Momo_Language *language = 0;
     Scratch_Block scratch(app);
     String_Const_u8 file_name = push_buffer_file_name(app, scratch, buffer);
     String_Const_u8 extension = string_file_extension(file_name);
-    language = Momo_Language_GetFromString(extension);
+    language = momo_get_language_from_string(extension);
     return language;
 }
 
 internal void
-Momo_Language_PosContext_PushData(Arena *arena,
+_momo_push_data_to_language_pos_context(Arena *arena,
                                 Momo_Language_PosContextData **first_ptr,
                                 Momo_Language_PosContextData **last_ptr,
                                 Momo_Index_Note *note,
@@ -103,26 +103,26 @@ Momo_Language_PosContext_PushData(Arena *arena,
     *last_ptr = last;
 }
 
-internal void
-Momo_Language_PosContext_PushDataCall(Arena *arena,
+static void
+momo_push_data_to_language_pos_context_call(Arena *arena,
                                      Momo_Language_PosContextData **first_ptr,
                                      Momo_Language_PosContextData **last_ptr,
                                      String_Const_u8 string, int param_idx)
 {
-    Momo_Language_PosContext_PushData(arena, first_ptr, last_ptr, Momo_Index_LookupNote(string, 0), 0, param_idx);
+    _momo_push_data_to_language_pos_context(arena, first_ptr, last_ptr, Momo_Index_LookupNote(string, 0), 0, param_idx);
 }
 
 internal void
-Momo_Language_PosContext_PushDataDot(Arena *arena,
+_momo_push_data_to_language_pos_context_dot(Arena *arena,
                                     Momo_Language_PosContextData **first_ptr,
                                     Momo_Language_PosContextData **last_ptr,
                                     String_Const_u8 string, Token *query)
 {
-    Momo_Language_PosContext_PushData(arena, first_ptr, last_ptr, Momo_Index_LookupNote(string, 0), query, 0);
+    _momo_push_data_to_language_pos_context(arena, first_ptr, last_ptr, Momo_Index_LookupNote(string, 0), query, 0);
 }
 
 internal Token_List
-Momo_Language_LexFullInput_NoBreaks(Application_Links *app, Momo_Language *language, Arena *arena, String_Const_u8 text)
+momo_lex_text(Application_Links *app, Momo_Language *language, Arena *arena, String_Const_u8 text)
 {
     Token_List list = {};
     if(language != 0)
@@ -146,9 +146,9 @@ Momo_Language_LexFullInput_NoBreaks(Application_Links *app, Momo_Language *langu
 #include "4coder_momo_lang_cs.cpp"
 //#include "4coder_momo_lang_go.cpp"
 
-// NOTE(rjf): @Momo_Language_RegisterAll Register languages.
+// NOTE(rjf): @momo_register_all_languages Register languages.
 function void
-Momo_Language_RegisterAll(void)
+momo_register_all_languages(void)
 {
     // NOTE(Momo): C/C++
     {
@@ -159,24 +159,24 @@ Momo_Language_RegisterAll(void)
         };
         for(int i = 0; i < ArrayCount(extensions); i += 1)
         {
-            Momo_Language_Register(extensions[i],
-                                momo_cpp_index_file,
+            _momo_register_language(extensions[i],
+                                momo_index_cpp_file,
                                 lex_full_input_cpp_init,
                                 lex_full_input_cpp_breaks,
                                 momo_cpp_poscontext,
-                                momo_cpp_highlight,
+                                momo_highlight_cpp,
                                 Lex_State_Cpp);
         }
     }
 
     // NOTE(Momo): C#
     {
-        Momo_Language_Register(S8Lit("cs"),
-                            Momo_CS_Index_File,
+        _momo_register_language(S8Lit("cs"),
+                            momo_index_cs_file,
                             lex_full_input_cs_init,
                             lex_full_input_cs_breaks,
-                            Momo_CS_PosContext,
-                            Momo_CS_Highlight,
+                            momo_cs_pos_context,
+                            momo_highlight_cs,
                             Lex_State_Cs);
     
     }
@@ -184,12 +184,12 @@ Momo_Language_RegisterAll(void)
 #if 0
     // NOTE(Momo): go
     {
-        Momo_Language_Register(S8Lit("go"),
-                            Momo_Go_Index_File,
+        _momo_register_language(S8Lit("go"),
+                            momo_index_golang_file,
                             lex_full_input_go_init,
                             lex_full_input_go_breaks,
-                            Momo_Go_PosContext,
-                            Momo_Go_Highlight,
+                            momo_golang_pos_context,
+                            momo_highlight_golang,
                             Lex_State_Go);
     
     }
@@ -197,7 +197,7 @@ Momo_Language_RegisterAll(void)
 #if 0
     // NOTE(rjf): Jai
     {
-        Momo_Language_Register(S8Lit("jai"),
+        _momo_register_language(S8Lit("jai"),
                             Momo_Jai_IndexFile,
                             lex_full_input_jai_init,
                             lex_full_input_jai_breaks,

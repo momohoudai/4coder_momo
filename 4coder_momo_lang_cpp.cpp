@@ -1,6 +1,6 @@
 
 internal void
-momo_cpp_parse_macro(Momo_Index_ParseCtx *ctx)
+_momo_parse_cpp_macro(Momo_Index_ParseCtx *ctx)
 {
   Token *name = 0;
   if(Momo_Index_ParsePattern(ctx, "%k", TokenBaseKind_Identifier, &name))
@@ -14,7 +14,7 @@ momo_cpp_parse_macro(Momo_Index_ParseCtx *ctx)
 }
 
 internal b32
-momo_cpp_parse_skippable_content(Momo_Index_ParseCtx *ctx)
+_momo_parse_cpp_skippable_content(Momo_Index_ParseCtx *ctx)
 {
   b32 body_found = 0;
   int nest = 0;
@@ -29,7 +29,7 @@ momo_cpp_parse_skippable_content(Momo_Index_ParseCtx *ctx)
     }
     else if(Momo_Index_ParsePattern(ctx, "%b", TokenCppKind_PPDefine, &name))
     {
-      momo_cpp_parse_macro(ctx);
+      _momo_parse_cpp_macro(ctx);
     }
     else if(Momo_Index_ParsePattern(ctx, "%t", "{"))
     {
@@ -57,55 +57,85 @@ momo_cpp_parse_skippable_content(Momo_Index_ParseCtx *ctx)
 }
 
 function void
-momo_cpp_parse_struct(Momo_Index_ParseCtx *ctx)
+_momo_parse_cpp_struct(Momo_Index_ParseCtx *ctx)
 {
   Token *name = 0;
-  b32 valid = 0;
   b32 need_end_name = 0;
   
-  if(Momo_Index_ParsePattern(ctx, "%k", TokenBaseKind_Identifier, &name))
-  {
-    valid = 1;
-  }
-  else
+  if(!Momo_Index_ParsePattern(ctx, "%k", TokenBaseKind_Identifier, &name))
   {
     need_end_name = 1;
   }
-  
-  if(Momo_Index_ParsePattern(ctx, "%b", TokenCppKind_PPDefine, &name))
-  {
-    momo_cpp_parse_macro(ctx);
+
+  // Parse until we reach open brace and close brace
+  b32 found_open_brace = 0;
+  b32 found_close_brace = 0;
+  b32 found_early_semicolon = 0;
+  for(;!ctx->done;) {
+    if(Momo_Index_ParsePattern(ctx, "%t", "{")) {
+      found_open_brace = 1;
+      break;
+    }
+    if(Momo_Index_ParsePattern(ctx, "%t", ";")) {
+      found_early_semicolon = 1;
+      break;
+    }
+    Momo_Index_ParseCtx_Inc(ctx, MOMO_INDEX_TOKEN_SKIP_FLAG_WHITESPACE);
   }
-  
-  if(momo_cpp_parse_skippable_content(ctx))
-  {
-  }
-  else
-  {
-    // NOTE(Momo): ignore prototypes
+
+  if (found_early_semicolon && !need_end_name) {
+    // prototype found
     return;
   }
-  
-  if(need_end_name)
-  {
-    if(Momo_Index_ParsePattern(ctx, "%k", TokenBaseKind_Identifier, &name))
-    {
-      valid = 1;
+
+
+  // Look for corresponding close brace
+  u32 brace_set_count = 1;
+  for(;!ctx->done;) {
+    if(Momo_Index_ParsePattern(ctx, "%t", "{")) {
+      ++brace_set_count;
+    }
+
+    else if(Momo_Index_ParsePattern(ctx, "%t", "}")) {
+      --brace_set_count;
+      if (brace_set_count == 0)  {
+        found_close_brace = 1;
+        break;
+      }
+    }
+    else {
+      Momo_Index_ParseCtx_Inc(ctx, MOMO_INDEX_TOKEN_SKIP_FLAG_WHITESPACE);
     }
   }
-  
-  if(valid)
-  {
-    // struct have same key and display
-    String_Const_u8 name_str = Momo_Index_StringFromToken(ctx, name);
-    Momo_Index_MakeNote(ctx->app, ctx->file, name_str, name_str, 
-                        MOMO_INDEX_NOTE_KIND_TYPE, 0, Ii64(name));
+
+
+  // Confirm that this is a definition and do the remaining.
+  if (found_open_brace && found_close_brace) {
+    b32 valid = 0;
+    if(need_end_name) {
+      if(Momo_Index_ParsePattern(ctx, "%k", TokenBaseKind_Identifier, &name))
+      {
+        valid = 1;
+      }
+    }
+    else {
+      valid = 1;
+    }
+
+    if(valid)
+    {
+      // struct have same key and display
+      String_Const_u8 name_str = Momo_Index_StringFromToken(ctx, name);
+      Momo_Index_MakeNote(ctx->app, ctx->file, name_str, name_str, 
+                          MOMO_INDEX_NOTE_KIND_TYPE, 0, Ii64(name));
+    }
   }
+
 }
 
 
 function b32
-momo_cpp_parse_function_body(Momo_Index_ParseCtx *ctx, b32 *prototype_ptr)
+_momo_parse_cpp_function_body(Momo_Index_ParseCtx *ctx, b32 *prototype_ptr)
 {
   b32 valid = 0;
   b32 prototype = 0;
@@ -135,7 +165,7 @@ momo_cpp_parse_function_body(Momo_Index_ParseCtx *ctx, b32 *prototype_ptr)
   {
     if(prototype == 0)
     {
-      momo_cpp_parse_skippable_content(ctx);
+      _momo_parse_cpp_skippable_content(ctx);
     }
   }
   
@@ -145,7 +175,28 @@ momo_cpp_parse_function_body(Momo_Index_ParseCtx *ctx, b32 *prototype_ptr)
 }
 
 function void
-momo_cpp_parse_enum_body(Momo_Index_ParseCtx *ctx)
+_momo_make_cpp_enum_note(Momo_Index_ParseCtx * ctx, Token* constant, Token* parent_name = 0) {
+  if(parent_name) {
+    u8 buffer[512];
+    String_u8 display_str = Su8(buffer, 0, ArrayCount(buffer));            
+    String_Const_u8 constant_str = Momo_Index_StringFromToken(ctx, constant);
+    String_Const_u8 parent_str = Momo_Index_StringFromToken(ctx, parent_name);
+
+    string_append(&display_str, parent_str);
+    string_append(&display_str, string_u8_litexpr("::"));
+    string_append(&display_str, constant_str);
+
+    Momo_Index_MakeNote(ctx->app, ctx->file, constant_str, display_str.string, MOMO_INDEX_NOTE_KIND_CONSTANT, 0, Ii64(constant));
+  }
+  else {
+    String_Const_u8 constant_str = Momo_Index_StringFromToken(ctx, constant);
+    Momo_Index_MakeNote(ctx->app, ctx->file, constant_str, constant_str, MOMO_INDEX_NOTE_KIND_CONSTANT, 0, Ii64(constant));
+  }
+
+}
+
+function void
+_momo_parse_cpp_enum_body(Momo_Index_ParseCtx *ctx, Token* parent_name = 0)
 {
   if(Momo_Index_ParsePattern(ctx, "%t", "{"))
   {
@@ -158,18 +209,16 @@ momo_cpp_parse_enum_body(Momo_Index_ParseCtx *ctx)
       }
       else if(Momo_Index_ParsePattern(ctx, "%b", TokenCppKind_PPDefine, &constant))
       {
-        momo_cpp_parse_macro(ctx);
+        _momo_parse_cpp_macro(ctx);
       }
       else if(Momo_Index_ParsePattern(ctx, "%k%t", TokenBaseKind_Identifier, &constant, ","))
       {
-        String_Const_u8 constant_str = Momo_Index_StringFromToken(ctx, constant);
-        Momo_Index_MakeNote(ctx->app, ctx->file, constant_str, constant_str, MOMO_INDEX_NOTE_KIND_CONSTANT, 0, Ii64(constant));
+        _momo_make_cpp_enum_note(ctx, constant, parent_name);              
       }
       else if(Momo_Index_ParsePattern(ctx, "%k%t", TokenBaseKind_Identifier, &constant, "="))
       {
-        String_Const_u8 constant_str = Momo_Index_StringFromToken(ctx, constant);
-        Momo_Index_MakeNote(ctx->app, ctx->file, constant_str, constant_str, MOMO_INDEX_NOTE_KIND_CONSTANT, 0, Ii64(constant));
-        
+        _momo_make_cpp_enum_note(ctx, constant, parent_name);             
+
         for(;!ctx->done;)
         {
           Token *token = token_it_read(&ctx->it);
@@ -188,8 +237,7 @@ momo_cpp_parse_enum_body(Momo_Index_ParseCtx *ctx)
       }
       else if(Momo_Index_ParsePattern(ctx, "%k", TokenBaseKind_Identifier, &constant))
       {
-        String_Const_u8 constant_str = Momo_Index_StringFromToken(ctx, constant);
-        Momo_Index_MakeNote(ctx->app, ctx->file, constant_str, constant_str, MOMO_INDEX_NOTE_KIND_CONSTANT, 0, Ii64(constant));
+        _momo_make_cpp_enum_note(ctx, constant, parent_name);              
       }
       else if(Momo_Index_ParsePattern(ctx, "%t", "}"))
       {
@@ -203,7 +251,7 @@ momo_cpp_parse_enum_body(Momo_Index_ParseCtx *ctx)
   }
 }
 
-internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
+internal MOMO_LANGUAGE_INDEXFILE(momo_index_cpp_file)
 {
   int scope_nest = 0;
   for(b32 handled = 0; !ctx->done;)
@@ -248,7 +296,7 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
     else if(Momo_Index_ParsePattern(ctx, "%b", TokenCppKind_PPDefine, &name))
     {
       handled = 1;
-      momo_cpp_parse_macro(ctx);
+      _momo_parse_cpp_macro(ctx);
     }
     
     
@@ -257,13 +305,13 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
             Momo_Index_ParsePattern(ctx, "%t", "struct"))
     {
       handled = 1;
-      momo_cpp_parse_struct(ctx);
+      _momo_parse_cpp_struct(ctx);
     }
     else if(scope_nest == 0 && 
             Momo_Index_ParsePattern(ctx, "%t%t", "typedef", "struct"))
     {
       handled = 1;
-      momo_cpp_parse_struct(ctx);
+      _momo_parse_cpp_struct(ctx);
       
       // What is this for?
 #if 0
@@ -280,7 +328,7 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
             Momo_Index_ParsePattern(ctx, "%t", "class"))
     {
       handled = 1;
-      momo_cpp_parse_struct(ctx);
+      _momo_parse_cpp_struct(ctx);
     }
     
     //~ NOTE(rjf): Unions
@@ -288,13 +336,13 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
             Momo_Index_ParsePattern(ctx, "%t", "union"))
     {
       handled = 1;
-      momo_cpp_parse_struct(ctx);
+      _momo_parse_cpp_struct(ctx);
     }
     else if (scope_nest == 0 && 
              Momo_Index_ParsePattern(ctx, "%t%t", "typedef", "union"))
     {
       handled = 1;
-      momo_cpp_parse_struct(ctx);
+      _momo_parse_cpp_struct(ctx);
       
       // What is this for?
 #if 0
@@ -320,7 +368,7 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
       }
       if(prototype == 0)
       {
-        momo_cpp_parse_enum_body(ctx);
+        _momo_parse_cpp_enum_body(ctx);
       }
       if(possible_name_at_end)
       {
@@ -334,7 +382,27 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
                             MOMO_INDEX_NOTE_KIND_TYPE, 0, Ii64(name));
       }
     }
-    
+   
+    else if (scope_nest == 0 &&
+             Momo_Index_ParsePattern(ctx, "%t%t%k", "enum", "struct", TokenBaseKind_Identifier, &name))
+    {
+      handled = 1;
+      b32 prototype = 0;
+      if(Momo_Index_ParsePattern(ctx, "%t", ";"))
+      {
+        prototype = 1;
+      }
+      if(prototype == 0)
+      {
+        _momo_parse_cpp_enum_body(ctx, name);
+      }
+      if(name != 0 && !prototype)
+      {
+        String_Const_u8 name_str = Momo_Index_StringFromToken(ctx, name);  
+        Momo_Index_MakeNote(ctx->app, ctx->file, name_str, name_str,
+                            MOMO_INDEX_NOTE_KIND_TYPE, 0, Ii64(name));
+      }
+    }
     //~ NOTE(rjf): Enums
     else if(scope_nest == 0 &&
             Momo_Index_ParsePattern(ctx, "%t%k", "enum", TokenBaseKind_Identifier, &name) ||
@@ -348,7 +416,7 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
       }
       if(prototype == 0)
       {
-        momo_cpp_parse_enum_body(ctx);
+        _momo_parse_cpp_enum_body(ctx);
       }
       if(name != 0 && !prototype)
       {
@@ -549,7 +617,6 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
     }
     
     //~ NOTE(Momo): C++ Member Functions (outside of the struct/class)
-    // TODO(Momo): Ignore constructors?
     else if(scope_nest == 0 &&
             (Momo_Index_ParsePattern(ctx, "%k%o%k%t%k%t",
                                      TokenBaseKind_Identifier, &base_type,
@@ -567,7 +634,8 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
       handled = 1;         
       b32 is_valid = 0;
       Range_i64 prototype_range = {};
-      
+
+  
       while(!ctx->done) {
         Token* token = token_it_read(&ctx->it);
         if (token == 0) {
@@ -670,7 +738,7 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_cpp_index_file)
         handled = 1;
         Momo_Index_MakeNote(ctx->app, ctx->file, 0, Momo_Index_StringFromToken(ctx, name),
                             MOMO_INDEX_NOTE_KIND_FUNCTION, prototype ? MOMO_INDEX_NOTE_FLAG_PRODUCT_TYPE : 0, Ii64(name));
-        momo_cpp_parse_skippable_content(ctx);
+        _momo_parse_cpp_skippable_content(ctx);
       }
     }
 #endif        
@@ -716,7 +784,7 @@ internal MOMO_LANGUAGE_POSCONTEXT(momo_cpp_poscontext)
           Token *name = token_it_read(&it);
           if(name && name->kind == TokenBaseKind_Identifier)
           {
-            Momo_Language_PosContext_PushDataCall(arena, &first, &last, push_buffer_range(app, arena, buffer, Ii64(name)), arg_idx);
+            momo_push_data_to_language_pos_context_call(arena, &first, &last, push_buffer_range(app, arena, buffer, Ii64(name)), arg_idx);
             count += 1;
             arg_idx = 0;
           }
@@ -778,6 +846,6 @@ internal MOMO_LANGUAGE_POSCONTEXT(momo_cpp_poscontext)
   return first;
 }
 
-internal MOMO_LANGUAGE_HIGHLIGHT(momo_cpp_highlight)
+internal MOMO_LANGUAGE_HIGHLIGHT(momo_highlight_cpp)
 {
 }

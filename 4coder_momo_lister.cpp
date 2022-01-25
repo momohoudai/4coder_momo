@@ -1187,7 +1187,7 @@ Momo_Lister_CreateWithProjectNotes(Application_Links* app, String_Const_u8 init_
             view = get_next_view_looped_primary_panels(app, view, Access_Always);
         }
         point_stack_push_view_cursor(app, view);
-        Momo_JumpToLocation(app, view, result.buffer, result.pos);
+        momo_jump_to_location(app, view, result.buffer, result.pos);
     }
 }
 

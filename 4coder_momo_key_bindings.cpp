@@ -4,7 +4,7 @@
 
 
 function Implicit_Map_Result
-Momo_KeyBinding_ImplicitMap(Application_Links *app, String_ID lang, String_ID mode, Input_Event *event)
+momo_get_keybinding_implicit_map(Application_Links *app, String_ID lang, String_ID mode, Input_Event *event)
 {
 
 	Implicit_Map_Result result = {};
@@ -42,13 +42,13 @@ Momo_KeyBinding_ImplicitMap(Application_Links *app, String_ID lang, String_ID mo
 
 //~ NOTE(rjf): Bindings
 function void
-Momo_KeyBindings_Init(Mapping *mapping)
+momo_init_keybindings(Mapping *mapping)
 {
     String_ID global_map_id = vars_save_string_lit("keys_global");
     String_ID file_map_id = vars_save_string_lit("keys_file");
     String_ID code_map_id = vars_save_string_lit("keys_code");
         
-	implicit_map_function = Momo_KeyBinding_ImplicitMap;
+	implicit_map_function = momo_get_keybinding_implicit_map;
 	
 	MappingScope();
     SelectMapping(mapping);
