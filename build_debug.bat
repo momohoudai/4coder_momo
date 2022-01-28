@@ -1,4 +1,5 @@
 @echo off
+copy .\setup_cl_generic.bat ..\bin\setup_cl_generic.bat
 call ..\bin\buildsuper_x64-win.bat .\4coder_momo.cpp debug
 copy .\custom_4coder.dll ..\..\custom_4coder.dll
 copy .\custom_4coder.pdb ..\..\custom_4coder.pdb

@@ -1,5 +1,6 @@
 @echo off
-call setup_cl_x64.bat
+copy .\setup_cl_generic.bat ..\bin\setup_cl_generic.bat
+call ..\bin\setup_cl_x64.bat
 call ..\bin\buildsuper_x64-win.bat .\4coder_momo.cpp release
 copy .\custom_4coder.dll ..\..\custom_4coder.dll
 copy .\custom_4coder.pdb ..\..\custom_4coder.pdb

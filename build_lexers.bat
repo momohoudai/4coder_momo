@@ -1,4 +1,6 @@
 @echo off
+
+copy .\setup_cl_generic.bat ..\bin\setup_cl_generic.bat
 call ..\bin\build_one_time .\4coder_momo_lexer_gen_cpp.cpp ..\..\
 ..\..\one_time.exe
 copy ..\generated\lexer_cpp.h .\generated\4coder_momo_lexer_cpp.h
