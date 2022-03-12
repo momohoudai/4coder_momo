@@ -954,17 +954,15 @@ CUSTOM_DOC("Goto mode")
       }
       
       if (match_key_code(&in, KeyCode_D)) {
-#if 0
+
         Input_Modifier_Set* mods = &in.event.key.modifiers;
         if (has_modifier(mods, KeyCode_Shift)) {
-          momo_search_for_definition_under_cursor_project_wide(app);
+          momo_search_for_definition_under_cursor_project_wide_other_panel(app);
         }
         else {
-          momo_search_for_definition_under_cursor_project_wide_other_panel(app);
-          
+          momo_search_for_definition_under_cursor_project_wide(app);
         }
-#endif 
-        momo_search_for_definition_under_cursor_project_wide(app);
+
         break;
       }
       else if (match_key_code(&in, KeyCode_G)) {

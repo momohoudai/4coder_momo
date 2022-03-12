@@ -688,13 +688,18 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_index_cpp_file)
                                      TokenBaseKind_Identifier, &name,
                                      "=") ||
              Momo_Index_ParsePattern(ctx, "%k%o%k%t",
-                                     TokenBaseKind_Identifier, &base_type,
+                                     TokenBaseKind_Keyword, &base_type,
                                      TokenBaseKind_Identifier, &name,
-                                     "[") ||
+                                     "=") ||       
              Momo_Index_ParsePattern(ctx, "%k%o%k%t",
                                      TokenBaseKind_Keyword, &base_type,
                                      TokenBaseKind_Identifier, &name,
-                                     "=")))
+                                     "[") ||
+             Momo_Index_ParsePattern(ctx, "%k%o%k%t",
+                                     TokenBaseKind_Identifier, &base_type,
+                                     TokenBaseKind_Identifier, &name,
+                                     "[")))
+                                  
     {
       handled = 1;
       String_Const_u8 name_str = Momo_Index_StringFromToken(ctx, name);
