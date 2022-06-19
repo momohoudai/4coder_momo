@@ -605,7 +605,10 @@ CUSTOM_DOC("Cycle panel left") {
        view = get_view_next(app, view, Access_Always))
   {
     Rect_f32 current_rect = view_get_screen_rect(app, view);
-    f32 diff = (active_rect.x0 + 1.f) - (current_rect.x1 - 1.f);
+    if (current_rect.x0 >= active_rect.x0) continue;
+    f32 diff_x = fabsf(current_rect.x0 - active_rect.x0); 
+    f32 diff_y = fabsf(current_rect.y0 - active_rect.y0) * 2.f;
+    f32 diff = diff_x + diff_y;
     if (diff > 0.f && diff < best_diff) {
       best_diff = diff;
       found_view = view;
@@ -630,7 +633,10 @@ CUSTOM_DOC("Cycle panel right") {
        view = get_view_next(app, view, Access_Always))
   {
     Rect_f32 current_rect = view_get_screen_rect(app, view);
-    f32 diff = (current_rect.x0 + 1.f) - (active_rect.x1 - 1.f);
+    if (current_rect.x0 <= active_rect.x0) continue;
+    f32 diff_x = fabsf(current_rect.x0 - active_rect.x0); 
+    f32 diff_y = fabsf(current_rect.y0 - active_rect.y0) * 2.f;
+    f32 diff = diff_x + diff_y;
     if (diff > 0.f && diff < best_diff) {
       best_diff = diff;
       found_view = view;
@@ -655,7 +661,10 @@ CUSTOM_DOC("Cycle panel up") {
        view = get_view_next(app, view, Access_Always))
   {
     Rect_f32 current_rect = view_get_screen_rect(app, view);
-    f32 diff = (active_rect.y0 + 1.f) - (current_rect.y1 - 1.f);
+    if (current_rect.y0 >= active_rect.y0) continue;
+    f32 diff_x = fabsf(current_rect.x0 - active_rect.x0) * 2.f;
+    f32 diff_y = fabsf(current_rect.y0 - active_rect.y0);
+    f32 diff = diff_x + diff_y;
     if (diff > 0.f && diff < best_diff) {
       best_diff = diff;
       found_view = view;
@@ -680,7 +689,10 @@ CUSTOM_DOC("Cycle panel down") {
        view = get_view_next(app, view, Access_Always))
   {
     Rect_f32 current_rect = view_get_screen_rect(app, view);
-    f32 diff = (current_rect.y0 + 1.f) - (active_rect.y1 - 1.f);
+    if (current_rect.y0 <= active_rect.y0) continue;
+    f32 diff_x = fabsf(current_rect.x0 - active_rect.x0) * 2.f;
+    f32 diff_y = fabsf(current_rect.y0 - active_rect.y0);
+    f32 diff = diff_x + diff_y;
     if (diff > 0.f && diff < best_diff) {
       best_diff = diff;
       found_view = view;

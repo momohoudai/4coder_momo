@@ -44,6 +44,19 @@ _momo_parse_cpp_skippable_content(Momo_Index_ParseCtx *ctx)
         break;
       }
     }
+    else if(Momo_Index_ParsePattern(ctx, "%t", "<"))
+    {
+      nest += 1;
+      body_found = 1;
+    }
+    else if(Momo_Index_ParsePattern(ctx, "%t", ">"))
+    {
+      nest -= 1;
+      if(nest == 0)
+      {
+        break;
+      }
+    }
     else if(body_found == 0)
     {
       break;
@@ -254,6 +267,7 @@ _momo_parse_cpp_enum_body(Momo_Index_ParseCtx *ctx, Token* parent_name = 0)
 internal MOMO_LANGUAGE_INDEXFILE(momo_index_cpp_file)
 {
   int scope_nest = 0;
+  int template_nest = 0;
   for(b32 handled = 0; !ctx->done;)
   {
     handled = 0;
@@ -289,6 +303,21 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_index_cpp_file)
       if(scope_nest < 0)
       {
         scope_nest = 0;
+      }
+    }
+
+    else if(Momo_Index_ParsePattern(ctx, "%t", "<"))
+    {
+      handled = 1;
+      template_nest += 1;
+    }
+    else if(Momo_Index_ParsePattern(ctx, "%t", ">"))
+    {
+      handled = 1;
+      template_nest -= 1;
+      if(template_nest < 0)
+      {
+        template_nest = 0;
       }
     }
     
@@ -674,7 +703,7 @@ internal MOMO_LANGUAGE_INDEXFILE(momo_index_cpp_file)
     }
     
     //~ NOTE(rjf): Declarations
-    else if(scope_nest == 0 &&
+    else if(scope_nest == 0 && template_nest == 0 &&
             (Momo_Index_ParsePattern(ctx, "%k%o%k%o%t",
                                      TokenBaseKind_Identifier, &base_type,
                                      TokenBaseKind_Identifier, &name,

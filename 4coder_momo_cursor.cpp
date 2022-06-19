@@ -79,11 +79,11 @@ _momo_do_cursor_interpolation(Application_Links *app, Frame_Info frame_info,
 {
     *last_rect = *rect;
     
-    float x_change = target.x0 - rect->x0;
-    float y_change = target.y0 - rect->y0;
+    f32 x_change = target.x0 - rect->x0;
+    f32 y_change = target.y0 - rect->y0;
     
-    float cursor_size_x = (target.x1 - target.x0);
-    float cursor_size_y = (target.y1 - target.y0) * (1 + fabsf(y_change) / 60.f);
+    f32 cursor_size_x = (target.x1 - target.x0);
+    f32 cursor_size_y = (target.y1 - target.y0) * (1 + fabsf(y_change) / 60.f);
     
     b32 should_animate_cursor = !global_battery_saver && !def_get_config_b32(vars_save_string_lit("f4_disable_cursor_trails"));
     if(should_animate_cursor)
